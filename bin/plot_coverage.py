@@ -212,6 +212,7 @@ def main():
         "software": ["python 3.12", f"pandas {pd.__version__}",
                      f"numpy {np.__version__}", f"matplotlib {matplotlib.__version__}"],
         "metrics": {
+            "n_plotted_points": int(len(plotted_rows)),
             "n_organism_replicate_pairs": int(len(summ)),
             "n_above_1x": int(len(deep)),
             "organisms_above_1x": organisms,

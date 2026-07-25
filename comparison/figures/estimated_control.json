@@ -1,5 +1,13 @@
 {
   "id": "estimated_control",
+  "display_type": "calculation",
+  "source_files": [
+    "comparison/estimated_control.py (constants from the cited Table 1 and Methods; no input file is read)"
+  ],
+  "software": [
+    "python 3.12",
+    "scipy (Garwood exact Poisson interval)"
+  ],
   "title": "Estimated no-adaptive-sampling control from Mojarro et al. 2019",
   "caption": "No control library was sequenced for this study with adaptive sampling disabled. Mojarro et al. 2019 provides the closest published substitute: the same 1 ug lambda genomic carrier, a 2 pg DNA sample, and a standard 48 h MinION run with no real-time selective sequencing. Applying this study's enrichment definition to their Table 1 gives 0.30x on a base basis - that is, without adaptive sampling the sample's share of output bases is about three-fold LOWER than its share of input mass, because carrier molecules sequence to full length (whole-run mean 6,675 bp) while target molecules do not (mean 1,054 bp). Depletion-mode adaptive sampling inverts that relationship, truncating carrier reads on rejection. The comparison is an estimate across experiments, not a control.",
   "source": "Mojarro A, Hachey J, Bailey R, Brown M, Doebler R, Ruvkun G, Zuber MT, Carr CE. Astrobiology 2019;19(9):1139-1152. doi:10.1089/ast.2018.1929. Table 1 and Methods.",

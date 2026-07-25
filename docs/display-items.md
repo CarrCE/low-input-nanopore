@@ -90,3 +90,23 @@ cp results/summary/{abundance,readlengths,coverage,mode_delta}.pdf \
 cp comparison/figures/low_input_comparison.pdf \
    ../low-input-nanopore-manuscript/figures/
 ```
+
+## Enforcement
+
+`bin/verify_display_items.py` checks the contract mechanically and exits
+non-zero on any violation, so it can gate a release:
+
+```bash
+docker run --rm -u $(id -u):$(id -g) -v "$PWD":/w -w /w \
+  low-input-nanopore/analysis:0.1.0 python3 bin/verify_display_items.py
+```
+
+It asserts that each item has a vector PDF, a JSON sidecar carrying
+`id`/`title`/`caption`/`source_files`/`software`, and a CSV whose row count
+equals `metrics.n_plotted_points` declared by the generating script. That last
+assertion is the one that catches the failure mode this project hit twice:
+a CSV of summary statistics sitting next to a figure looks correct and is not.
+
+Items that are calculations rather than figures declare
+`"display_type": "calculation"` and are exempt from the PDF and plotted-point
+checks; they must still ship a CSV and a complete JSON.

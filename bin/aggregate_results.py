@@ -240,7 +240,8 @@ def main():
             "member. Points are the mean across replicates; error bars are the "
             "standard deviation. The dashed line is 1:1.",
             [Path(f).name for f in args.metrics],
-            {"n_organisms": int(len(grp_all))})
+            {"n_organisms": int(len(grp_all)),
+             "n_plotted_points": int(len(grp_all))})
         print(f"[aggregate] wrote abundance.pdf/.png/.csv/.json")
 
     # ---- Figure: read length by role (the ejection signature) -------------
@@ -359,8 +360,9 @@ def main():
             "log-spaced bins spanning 1 bp to 2 Mb (accurate to well under 1%), "
             "because the per-read tables are too large to hold in memory at once.",
             [Path(f).name for f in args.readlengths],
-            {r["role"]: {"n": int(r["n"]), "median_bp": float(r["median"])}
-             for _, r in stats.iterrows()})
+            {**{r["role"]: {"n": int(r["n"]), "median_bp": float(r["median"])}
+                for _, r in stats.iterrows()},
+             "n_plotted_points": int(len(plotted))})
         print(f"[aggregate] wrote readlengths.pdf/.png/.csv/.json")
         print(stats.to_string(index=False))
 

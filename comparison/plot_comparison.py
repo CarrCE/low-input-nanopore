@@ -505,6 +505,7 @@ def main(argv=None):
             "command": " ".join([Path(__file__).name] + (list(argv) if argv else sys.argv[1:])),
         },
         "metrics": {
+            "n_plotted_points": int(len(prior) + len(mine)),
             "convention": {
                 "reads_per_fg": "reads / (dna_pg * 1000)",
                 "bases_per_fg": "bases / (dna_pg * 1000)",

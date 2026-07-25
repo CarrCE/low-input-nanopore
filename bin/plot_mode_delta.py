@@ -79,11 +79,17 @@ def main():
                                      np.nan)
     piv["reads_lost"] = piv["reads_competitive"] - piv["reads_sequential"]
     piv = piv.sort_values(["experiment", "role", "reads_retained"])
-    piv.to_csv(outdir / f"{args.basename}.csv", index=False)
 
     plot = piv[(piv["role"] == "sample") & piv["reads_retained"].notna()
                & (piv["reads_competitive"] > 0)].copy()
     plot = plot.sort_values("reads_retained")
+
+    # <id>.csv is canonical: exactly the bars the figure draws, in draw order.
+    # The full table, including the carrier and contaminant rows that are
+    # computed but not plotted, goes to <id>_summary.csv.
+    plot.assign(bar_order=range(len(plot))).to_csv(
+        outdir / f"{args.basename}.csv", index=False)
+    piv.to_csv(outdir / f"{args.basename}_summary.csv", index=False)
 
     fig, ax = plt.subplots(figsize=(7.2, max(3.2, 0.30 * len(plot) + 1.4)))
     ypos = np.arange(len(plot))
@@ -131,6 +137,7 @@ def main():
         "software": ["python 3.12", f"pandas {pd.__version__}",
                      f"numpy {np.__version__}", f"matplotlib {matplotlib.__version__}"],
         "metrics": {
+            "n_plotted_points": int(len(plot)),
             "n_organisms": int(len(plot)),
             "n_materially_affected": int((plot["reads_retained"] < 0.98).sum()),
             "worst_case": ({
