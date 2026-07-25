@@ -44,6 +44,11 @@ if (!params.samplesheet) { helpMessage(); exit 1, "error: --samplesheet is requi
 if (!(params.mode in ['competitive', 'sequential', 'both'])) {
     exit 1, "error: --mode must be one of competitive, sequential, both"
 }
+if (params.breseq_consensus && params.mode == 'competitive') {
+    exit 1, "error: --breseq_consensus has no effect with --mode competitive. " +
+            "Competitive assignment never subtracts, so there is no subtraction " +
+            "step for a consensus to improve. Use --mode sequential or --mode both."
+}
 
 // ---------------------------------------------------------------------------
 // Processes
@@ -188,7 +193,7 @@ process ASSIGN_READS {
     publishDir "${params.outdir}/${meta.sample_id}/${mode}", mode: 'copy'
 
     input:
-    tuple val(meta), path(bam), path(contig_map), val(mode)
+    tuple val(meta), path(bam), path(contig_map), val(mode), path(consensus_hits)
     path script
 
     output:
@@ -197,12 +202,221 @@ process ASSIGN_READS {
     path "${meta.sample_id}.assignments.tsv.gz",                              emit: assignments
 
     script:
+    // Nextflow has no optional path inputs, so the no-consensus case stages a
+    // placeholder. Its name is the switch: assign_reads.py sees the flag only
+    // when a real hits file was produced upstream.
+    def consensus_arg = consensus_hits.name != 'NO_CONSENSUS_HITS'
+                      ? "--consensus-hits ${consensus_hits}" : ''
     """
     python3 ${script} ${bam} \\
         --contig-map ${contig_map} \\
         --prefix     ${meta.sample_id} \\
         --min-mapq   ${params.min_mapq} \\
-        --mode       ${mode}
+        --mode       ${mode} ${consensus_arg}
+    """
+}
+
+process EXTRACT_CONTAMINANT_READS {
+    tag   { meta.sample_id }
+    label 'tools'
+    label 'process_medium'
+
+    input:
+    tuple val(meta), path(bam), path(contig_map), path(fasta)
+
+    output:
+    tuple val(meta), path("contaminant.fastq"), path("contaminant.fasta"), emit: seed
+
+    script:
+    // breseq needs two things: the contaminant reference on its own, and a read
+    // set to build the consensus from.
+    //
+    // Feeding it the whole run would be absurd -- ~10M reads through bowtie2 --
+    // and pointless, since only reads that resemble the contaminant inform its
+    // consensus. Seeding from reads whose PRIMARY alignment lands on the
+    // contaminant is the cheap equivalent. The deviation from the original
+    // analysis, which ran breseq on everything, is that a read whose primary
+    // alignment goes elsewhere but which carries a supplementary alignment to
+    // the contaminant does not contribute. Those reads are chimeric or
+    // repeat-spanning; they would add little consensus evidence and a lot of
+    // noise.
+    """
+    awk -F'\\t' 'NR>1 && \$3=="contaminant" {print \$1}' ${contig_map} > contaminant_contigs.txt
+
+    if [ ! -s contaminant_contigs.txt ]; then
+        echo "error: no contaminant-role contigs in ${contig_map}; --breseq_consensus has nothing to build a consensus of" >&2
+        exit 1
+    fi
+
+    samtools faidx ${fasta}
+    xargs samtools faidx ${fasta} < contaminant_contigs.txt > contaminant.fasta
+
+    # -F 0x900 keeps primary alignments only, so each read appears at most once.
+    # `samtools fastq` writes reads with neither READ1 nor READ2 set -- i.e. all
+    # of these, the data being single-end -- to stdout, so no -0/-s redirection
+    # is given; supplying -0 here would send every read to that file instead.
+    # -n keeps the qname verbatim so it still matches the assignment BAM.
+    samtools view -h -F 0x900 ${bam} \\
+      | awk '
+            NR == FNR      { keep[\$1] = 1; next }
+            /^@SQ/         { split(\$2, a, ":"); if (a[2] in keep) print; next }
+            /^@/           { print; next }
+            (\$3 in keep)  { print }
+        ' contaminant_contigs.txt - \\
+      | samtools fastq -n - > contaminant.fastq
+
+    n=\$(( \$(wc -l < contaminant.fastq) / 4 ))
+    if [ "\$n" -eq 0 ]; then
+        echo "error: no reads aligned to the contaminant, so no consensus can be built" >&2
+        exit 1
+    fi
+
+    # Depth gate. breseq calls missing coverage before it calls a consensus, so
+    # below roughly 10x it declares the whole reference deleted and gdtools
+    # APPLY then writes an empty FASTA -- a failure that surfaces as "empty
+    # consensus" several steps downstream and says nothing about the cause.
+    # Checking here turns that into a number. Read bases over reference bases
+    # is an upper bound on true depth (it ignores soft-clipping), which is the
+    # safe direction for a gate: it only ever lets a marginal case through to
+    # breseq's own, stricter judgement.
+    ref_bases=\$(grep -v '^>' contaminant.fasta | tr -d '\\n' | wc -c | tr -d ' ')
+    read_bases=\$(awk 'NR % 4 == 2 { n += length(\$0) } END { printf "%.0f", n }' contaminant.fastq)
+    depth=\$(awk -v r="\$read_bases" -v g="\$ref_bases" 'BEGIN { printf "%.2f", r / g }')
+    echo "seeding breseq with \$n contaminant reads, \$read_bases bases over \$ref_bases reference bases (~\${depth}x)"
+
+    if awk -v d="\$depth" -v m=${params.breseq_min_depth} 'BEGIN { exit !(d < m) }'; then
+        echo "error: contaminant depth ~\${depth}x is below --breseq_min_depth ${params.breseq_min_depth}x." >&2
+        echo "       breseq would call the entire reference deleted and the consensus would come back empty." >&2
+        echo "       The full replicates in this study reach 20-56x; the bundled test profile reaches ~0.2x," >&2
+        echo "       which is why -profile test cannot exercise --breseq_consensus." >&2
+        echo "       Lower the gate only if you have a reason to believe breseq can work at this depth." >&2
+        exit 1
+    fi
+    """
+}
+
+process BRESEQ_CONSENSUS {
+    tag   { meta.sample_id }
+    label 'breseq'
+    label 'process_medium'
+    publishDir "${params.outdir}/${meta.sample_id}/breseq", mode: 'copy',
+               pattern: '{consensus.fasta,output.gd,breseq.log,consensus_summary.txt}'
+
+    input:
+    tuple val(meta), path(reads), path(reference)
+
+    output:
+    tuple val(meta), path("consensus.fasta"), emit: consensus
+    path "output.gd",                         emit: gd
+    path "consensus_summary.txt",             emit: summary
+    path "breseq.log",                        emit: log
+
+    script:
+    // -x is breseq's nanopore mode (0.38+): it splits long reads into shorter
+    // subsequences so its short-read mapping and mutation calling apply. The
+    // documented cost is that indels in homopolymers of 4+ bases are not
+    // called, which for ONT data is the right trade -- those are exactly the
+    // positions where the basecaller is least trustworthy, and calling them
+    // would write basecalling error into the consensus.
+    //
+    // --no-junction-prediction: we want a corrected consensus sequence, not a
+    // structural-variant catalogue. Junction prediction is the expensive part
+    // and gdtools APPLY does not use its output.
+    """
+    breseq -x \\
+        --no-junction-prediction \\
+        -j ${task.cpus} \\
+        -n ${meta.sample_id} \\
+        -r ${reference} \\
+        -o breseq_out \\
+        ${reads} > breseq.log 2>&1 || {
+            echo "error: breseq failed; tail of log follows" >&2
+            tail -50 breseq.log >&2
+            exit 1
+        }
+
+    if [ ! -s breseq_out/output/output.gd ]; then
+        echo "error: breseq produced no output.gd" >&2
+        tail -50 breseq.log >&2
+        exit 1
+    fi
+    cp breseq_out/output/output.gd output.gd
+
+    # breseq predicts missing coverage before it predicts a consensus. Given too
+    # little data it emits a DEL spanning the whole reference, and gdtools APPLY
+    # then faithfully deletes the genome. Catching that here names the cause;
+    # left to APPLY it surfaces only as a zero-byte FASTA.
+    ref_bases=\$(grep -v '^>' ${reference} | tr -d '\\n' | wc -c | tr -d ' ')
+    if awk -v g="\$ref_bases" '\$1 == "DEL" && \$6 >= g { found = 1 } END { exit !found }' output.gd; then
+        echo "error: breseq called the entire contaminant reference deleted (a DEL spanning all \$ref_bases bp)." >&2
+        echo "       That is its missing-coverage prediction, not a consensus: there was too little" >&2
+        echo "       evidence for it to call one. breseq saw:" >&2
+        grep -E '^#=(INPUT|CONVERTED|MAPPED)-' output.gd >&2
+        exit 1
+    fi
+
+    gdtools APPLY -r ${reference} -f FASTA -o consensus.fasta output.gd
+
+    if [ ! -s consensus.fasta ]; then
+        echo "error: gdtools APPLY produced an empty consensus despite no whole-reference deletion. Inspect output.gd." >&2
+        exit 1
+    fi
+
+    # A consensus identical to the reference means the whole step changed
+    # nothing, which is worth stating plainly in the results rather than
+    # leaving the reader to diff two FASTAs.
+    {
+        echo "sample\t${meta.sample_id}"
+        echo "reference_bases\t\$ref_bases"
+        echo "consensus_bases\t\$(grep -v '^>' consensus.fasta | tr -d '\\n' | wc -c | tr -d ' ')"
+        echo "mutations_applied\t\$(awk '\$1 ~ /^(SNP|SUB|DEL|INS|MOB|AMP|CON|INV)\$/' output.gd | wc -l | tr -d ' ')"
+        grep -E '^#=(INPUT|CONVERTED|MAPPED)-' output.gd | sed 's/^#=//;s/ /\t/'
+    } > consensus_summary.txt
+    """
+}
+
+process MAP_CONSENSUS {
+    tag   { meta.sample_id }
+    label 'tools'
+    label 'process_high'
+    publishDir "${params.outdir}/${meta.sample_id}/breseq", mode: 'copy',
+               pattern: 'consensus_hits.tsv'
+
+    input:
+    tuple val(meta), path(fastq), path(consensus)
+
+    output:
+    tuple val(meta), path("consensus_hits.txt"), emit: hits
+    path "consensus_hits.tsv",                   emit: stats
+
+    script:
+    // Every read in the run is tested against the consensus, not just the ones
+    // that already aligned to the stock contaminant reference. That is the
+    // point of the exercise: the consensus is supposed to catch reads the stock
+    // reference misses, and restricting the test to reads it already caught
+    // would guarantee it never does.
+    //
+    // -F 0x904 drops unmapped, secondary and supplementary records, so each
+    // surviving read contributes its primary alignment once.
+    """
+    minimap2 -ax ${params.minimap2_preset} -t ${task.cpus} \\
+        ${consensus} ${fastq} 2> minimap2.log \\
+      | samtools view -F 0x904 -q ${params.min_mapq} - \\
+      | cut -f1 \\
+      | sort -u > consensus_hits.txt
+
+    grep -q 'ERROR' minimap2.log && exit 1 || true
+
+    if [ ! -s consensus_hits.txt ]; then
+        echo "error: no reads matched the breseq consensus. An empty subtraction is indistinguishable from a broken step, so this is an error rather than a silent no-op." >&2
+        exit 1
+    fi
+
+    {
+        echo "sample\t${meta.sample_id}"
+        echo "consensus_hits\t\$(wc -l < consensus_hits.txt | tr -d ' ')"
+        echo "min_mapq\t${params.min_mapq}"
+    } > consensus_hits.tsv
     """
 }
 
@@ -422,6 +636,11 @@ workflow {
     ch_script_cov     = file("${projectDir}/bin/coverage_summary.py",    checkIfExists: true)
     ch_script_qfilt   = file("${projectDir}/bin/filter_by_qscore.awk",   checkIfExists: true)
 
+    // Placeholder for the optional consensus-hits input. Nextflow process
+    // inputs are positional and non-optional, so the absence of a real file has
+    // to be represented by a real file whose name says so.
+    ch_no_consensus   = file("${projectDir}/assets/NO_CONSENSUS_HITS", checkIfExists: true)
+
     ch_samples = parseSamplesheet(params.samplesheet)
 
     // One reference build per distinct reference set, shared by its samples.
@@ -462,7 +681,7 @@ workflow {
 
     MAP_COMPETITIVE(ch_to_map)
 
-    ch_to_assign = ch_keyed
+    ch_base_assign = ch_keyed
         .combine(BUILD_REFERENCE.out.contig_map, by: 0)
         .map { name, meta, fq, ref, cmap -> tuple(meta.sample_id, meta, cmap) }
         .join(MAP_COMPETITIVE.out.bam.map { meta, bam -> tuple(meta.sample_id, bam) })
@@ -471,6 +690,44 @@ workflow {
         // one extra cheap pass over the BAM rather than a second mapping run.
         .combine(Channel.fromList(
             params.mode == 'both' ? ['competitive', 'sequential'] : [params.mode]))
+
+    // ---- optional breseq contaminant consensus -----------------------------
+    // Subtract against the E. coli actually present in the carrier prep rather
+    // than against the stock MG1655 reference, which is what the original
+    // lowinput_s1 analysis did. Only sequential mode subtracts anything, so
+    // competitive rows carry the placeholder even when this is on.
+    if (params.breseq_consensus) {
+        EXTRACT_CONTAMINANT_READS(
+            ch_keyed
+                .combine(BUILD_REFERENCE.out.contig_map, by: 0)
+                .map { name, meta, fq, ref, cmap -> tuple(name, meta, cmap) }
+                .combine(BUILD_REFERENCE.out.fasta, by: 0)
+                .map { name, meta, cmap, fasta -> tuple(meta.sample_id, meta, cmap, fasta) }
+                .join(MAP_COMPETITIVE.out.bam.map { meta, bam -> tuple(meta.sample_id, bam) })
+                .map { sid, meta, cmap, fasta, bam -> tuple(meta, bam, cmap, fasta) }
+        )
+
+        BRESEQ_CONSENSUS(EXTRACT_CONTAMINANT_READS.out.seed)
+
+        MAP_CONSENSUS(
+            ch_reads
+                .map { meta, fq -> tuple(meta.sample_id, meta, fq) }
+                .join(BRESEQ_CONSENSUS.out.consensus
+                          .map { meta, cons -> tuple(meta.sample_id, cons) })
+                .map { sid, meta, fq, cons -> tuple(meta, fq, cons) }
+        )
+
+        ch_to_assign = ch_base_assign
+            .map { meta, bam, cmap, mode -> tuple(meta.sample_id, meta, bam, cmap, mode) }
+            .combine(MAP_CONSENSUS.out.hits
+                         .map { meta, hits -> tuple(meta.sample_id, hits) }, by: 0)
+            .map { sid, meta, bam, cmap, mode, hits ->
+                   tuple(meta, bam, cmap, mode,
+                         mode == 'sequential' ? hits : ch_no_consensus) }
+    } else {
+        ch_to_assign = ch_base_assign
+            .map { meta, bam, cmap, mode -> tuple(meta, bam, cmap, mode, ch_no_consensus) }
+    }
 
     ASSIGN_READS(ch_to_assign, ch_script_assign)
 

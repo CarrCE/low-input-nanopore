@@ -153,8 +153,18 @@ indistinguishable, not about a single alignment being weak.
 | `--mode` | Meaning | Status |
 |---|---|---|
 | `competitive` (default) | One minimap2 pass against the combined index; best organism wins by AS margin, ties reported as ambiguous | **Implemented** |
-| `sequential` | The classic subtraction chain: remove carrier, then remove contaminant, then map survivors to the community. Optionally (`--breseq_consensus`) subtract a reference-guided consensus of the contaminant actually present in the carrier prep | Declared and validated, **not yet wired in `main.nf`** — see `docs/TODO.md` |
-| `both` | Run both and emit a per-organism delta table quantifying what subtraction costs | **Not yet wired** |
+| `sequential` | The classic subtraction chain: remove carrier, then remove contaminant, then map survivors to the community | **Implemented** |
+| `both` | Run both and emit a per-organism delta table quantifying what subtraction costs (`results/summary/mode_delta.*`) | **Implemented** |
+
+`--breseq_consensus` (sequential and both only) subtracts against a
+reference-guided consensus of the contaminant actually present in the carrier
+prep, built with breseq, instead of against the stock reference. That is what
+the original `lowinput_s1` analysis did, so the flag exists to reproduce it
+faithfully. It needs real depth: below `--breseq_min_depth` (default 10×) breseq
+predicts missing coverage across the whole reference and returns a deleted
+genome rather than a consensus, so the bundled test profile — ~0.3× contaminant
+depth — cannot exercise it. The accounting is covered by `make check`; **no full
+replicate has been run through it yet**, see `docs/TODO.md` item 2.
 
 ### The read-accounting guarantee
 

@@ -24,31 +24,48 @@ the samplesheet parser to prefer the accession when `--fetch_from_sra` is set.
 The container for it does not exist yet either — `docker/tools` has no SRA
 toolkit.
 
-## 2. Sequential mode is implemented; breseq and the delta table are not
+## 2. `--breseq_consensus` is wired but has never been run at full depth
 
-`--mode competitive | sequential | both` are all wired. Sequential applies the
-subtraction chain (carrier → contaminant → community) as a decision rule over the
-*same* alignments competitive mode uses, so `--mode both` costs one extra pass
-over the existing BAM rather than a second mapping run. The deliberate deviation
-from a literal sequential pipeline — which would re-map survivors against a
-smaller index — is documented in `ecoli-partitioning.md`.
+`--mode competitive | sequential | both` are all wired, and the per-organism
+delta between the two modes is a display item
+(`results/summary/mode_delta.{pdf,csv,json}`, `bin/plot_mode_delta.py`).
+Sequential applies the subtraction chain (carrier → contaminant → community) as a
+decision rule over the *same* alignments competitive mode uses, so `--mode both`
+costs one extra pass over the existing BAM rather than a second mapping run. The
+deliberate deviation from a literal sequential pipeline — which would re-map
+survivors against a smaller index — is documented in `ecoli-partitioning.md`.
 
-Still not implemented:
+`--breseq_consensus` is now implemented: `EXTRACT_CONTAMINANT_READS` →
+`BRESEQ_CONSENSUS` → `MAP_CONSENSUS` build a reference-guided consensus of the
+*E. coli* actually present in the carrier prep and feed the matching read IDs to
+`assign_reads.py --consensus-hits`, which subtracts against that consensus
+instead of the stock MG1655 reference. That is what the original `lowinput_s1`
+analysis did, so the option exists to reproduce it faithfully rather than to
+approximate it.
 
-- the `--breseq_consensus` path, i.e. building a reference-guided consensus of
-  the *E. coli* actually present in the carrier prep and subtracting reads that
-  match it. The `withLabel: breseq` container
-  (`quay.io/biocontainers/breseq:0.40.1--h3be2455_0`) is pinned in
-  `conf/base.config` and its platform/root quirks are documented, but no process
-  carries that label. Without it, sequential mode subtracts against the MG1655
-  reference rather than against the strain actually present, which is not exactly
-  what the original analysis did;
-- a dedicated per-organism delta table contrasting the two modes. Both modes'
-  numbers land in `results/summary/per_organism.tsv` keyed by `mode`, so the
-  delta is derivable, but nothing computes and presents it as a display item —
-  and that is the artifact that would quantify what subtraction costs.
+**What is verified.** The accounting is tested: `make check`
+(`tests/consensus_accounting.py`) asserts seven properties over the smoke-test
+BAM, including that no read is lost, that consensus-subtracted reads are booked
+to a contaminant organism, that a read matching the consensus but aligning
+nowhere is still subtracted, and that contaminant reads which *miss* the
+consensus fall through rather than vanish. All seven pass.
 
-The delta has not been measured on these data yet.
+**What is not.** No replicate has been run end to end with
+`--breseq_consensus`. The bundled test profile cannot do it: 40,000 reads give
+~0.3× contaminant depth, and below roughly 10× breseq predicts missing coverage
+across the whole reference and returns a deleted genome instead of a consensus.
+That is now caught up front by `--breseq_min_depth` (default 10) with a
+diagnostic naming the measured depth, and again after breseq by a check for a
+whole-reference `DEL`. The real replicates carry 20–56× contaminant depth
+(s1: 33.8×, 21.4×, 20.5×; s2: 52.7×, 40.2×, 56.3×, 49.1×), so the path should
+run — but "should" is not "did", and the consensus has not been inspected.
+
+Until a full run happens, the claim that subtraction over-removes rests on the
+measured competitive-vs-sequential delta against the *stock* reference, not
+against the consensus the original analysis actually used. The delta is already
+stark (*E. coli* retains 1.18% of its reads under subtraction), and building the
+consensus can only make the subtraction more aggressive, so the conclusion is
+conservative as it stands.
 
 ## 3. Aggregation exists; coverage-artifact analysis does not
 

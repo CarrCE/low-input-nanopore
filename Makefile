@@ -32,7 +32,7 @@ DEMO_READS  ?= 40000
 
 .DEFAULT_GOAL := help
 
-.PHONY: help images test s1 s2 demo-data clean
+.PHONY: help images test check s1 s2 demo-data clean
 
 help: ## Show this help
 	@printf 'low-input-nanopore -- make targets\n\n'
@@ -92,6 +92,17 @@ demo-data: ## Regenerate the smoke-test subsample into data/test/
 	    -v "$(ROOT)":/work -w /work \
 	    -e SRC="$(DEMO_SOURCE)" -e OUT="$(DEMO_OUT)" -e NREADS="$(DEMO_READS)" \
 	    "$(ANALYSIS_IMAGE)" python3 -
+
+TEST_BAM        ?= results/test_s2/alignments/test_s2.qname.bam
+TEST_CONTIG_MAP ?= results/references/lowinput_s2/contig_map.tsv
+
+check: ## Assert consensus subtraction preserves read accounting (needs `make test` first)
+	@test -f "$(ROOT)/$(TEST_BAM)" \
+	  || { echo "error: $(TEST_BAM) not found. Run 'make test' first." >&2; exit 1; }
+	@docker run --rm -u "$$(id -u):$$(id -g)" \
+	    -v "$(ROOT)":/repo -w /repo "$(ANALYSIS_IMAGE)" \
+	    python3 tests/consensus_accounting.py \
+	        --bam "$(TEST_BAM)" --contig-map "$(TEST_CONTIG_MAP)"
 
 clean: ## Remove Nextflow scratch (work/, .nextflow*); leaves results/ alone
 	@rm -rf "$(ROOT)/work" "$(ROOT)/.nextflow"

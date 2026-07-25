@@ -30,6 +30,13 @@ Two assignment rules are available over the same alignments:
                community's own E. coli, and running it against the identical
                alignments makes that loss measurable rather than assumed.
 
+Sequential mode optionally takes --consensus-hits: read IDs matching a
+breseq-derived consensus of the contaminant actually present in the carrier
+prep, rather than the stock MG1655 reference. That is what the original
+lowinput_s1 analysis subtracted against, so the option exists to reproduce it
+faithfully. The consensus test REPLACES the reference-alignment test for its
+role; it is a corrected version of the same genome, not a second genome.
+
 Input is a qname-grouped (unsorted, straight-from-minimap2) BAM/SAM so all
 alignments for a read arrive together and nothing has to be held in memory.
 
@@ -70,7 +77,38 @@ def parse_args():
     p.add_argument("--min-subtract-as", type=int, default=0,
                    help="sequential mode only: minimum AS for a read to count as "
                         "belonging to a subtracted role")
+    p.add_argument("--consensus-hits", default=None,
+                   help="sequential mode only: file of read IDs (one per line, "
+                        "optionally gzipped) that matched a breseq-derived "
+                        "consensus of the contaminant actually present in the "
+                        "carrier prep. When given, this REPLACES the "
+                        "reference-alignment test for --consensus-role")
+    p.add_argument("--consensus-role", default="contaminant",
+                   help="role whose subtraction test --consensus-hits replaces")
     return p.parse_args()
+
+
+def load_consensus_hits(path):
+    """Read IDs that matched the breseq consensus, one per line.
+
+    Only the contaminant's own reads are expected here, so the set stays far
+    smaller than the run's read count. IDs are stored verbatim; the producer is
+    responsible for stripping any /1 /2 or comment suffix so they match BAM
+    qnames exactly.
+    """
+    opener = gzip.open if path.endswith(".gz") else open
+    hits = set()
+    with opener(path, "rt") as fh:
+        for line in fh:
+            rid = line.strip()
+            if rid:
+                hits.add(rid)
+    if not hits:
+        sys.exit(f"error: --consensus-hits {path} contained no read IDs. An "
+                 f"empty consensus subtraction is indistinguishable from a "
+                 f"broken upstream step, so this is treated as an error rather "
+                 f"than as 'nothing matched'.")
+    return hits
 
 
 def load_contig_map(path):
@@ -113,6 +151,35 @@ def main():
     args = parse_args()
     contig2org, org2role = load_contig_map(args.contig_map)
 
+    subtract_order = [r.strip() for r in args.subtract_order.split(",")]
+
+    # ---- breseq consensus subtraction (sequential mode only) ---------------
+    consensus_hits = None
+    consensus_fallback_org = None
+    if args.consensus_hits:
+        if args.mode != "sequential":
+            sys.exit("error: --consensus-hits applies to --mode sequential only. "
+                     "Competitive assignment never subtracts, so there is no "
+                     "subtraction step for a consensus to improve.")
+        if args.consensus_role not in subtract_order:
+            sys.exit(f"error: --consensus-role '{args.consensus_role}' is not in "
+                     f"--subtract-order '{args.subtract_order}', so the consensus "
+                     f"would replace a test that never runs.")
+        role_orgs = sorted(o for o, r in org2role.items()
+                           if r == args.consensus_role)
+        if not role_orgs:
+            sys.exit(f"error: no organism in {args.contig_map} has role "
+                     f"'{args.consensus_role}', so consensus hits could not be "
+                     f"attributed to anything.")
+        # Reads that match the consensus but align to nothing of that role in the
+        # combined index still have to be counted somewhere. They are attributed
+        # to this organism, chosen deterministically so two runs agree.
+        consensus_fallback_org = role_orgs[0]
+        consensus_hits = load_consensus_hits(args.consensus_hits)
+        print(f"consensus subtraction: {len(consensus_hits)} read IDs, "
+              f"replacing the reference test for role '{args.consensus_role}' "
+              f"(fallback organism: {consensus_fallback_org})", file=sys.stderr)
+
     counts = defaultdict(lambda: {"reads": 0, "read_bases": 0, "aligned_bases": 0})
 
     assign_fh = gzip.open(f"{args.prefix}.assignments.tsv.gz", "wt")
@@ -120,9 +187,39 @@ def main():
     assign_fh.write("read_id\torganism\tcall\trole\tas_best\tas_runnerup\tmargin\tread_length\taligned_bases\n")
     len_fh.write("read_id\tcall\torganism\trole\tread_length\n")
 
+    def subtract_to_consensus(qname, ranked, rlen):
+        """Book one read against the consensus-derived contaminant."""
+        hits = [(o, v) for o, v in ranked if org2role.get(o) == args.consensus_role]
+        if hits:
+            org, v = max(hits, key=lambda kv: kv[1]["as"])
+            as_out, aligned = v["as"], v["aligned"]
+        else:
+            # Matched the consensus but aligned to nothing of this role in the
+            # combined index -- possibly nothing at all. This is exactly the
+            # class of read the consensus exists to catch, one the stock
+            # reference misses, so it is subtracted with zero aligned bases
+            # rather than dropped.
+            org, as_out, aligned = consensus_fallback_org, 0, 0
+        counts[org]["reads"] += 1
+        counts[org]["read_bases"] += rlen
+        counts[org]["aligned_bases"] += aligned
+        assign_fh.write(f"{qname}\t{org}\tsubtracted_consensus\t"
+                        f"{args.consensus_role}\t{as_out}\t0\t0\t{rlen}\t{aligned}\n")
+        len_fh.write(f"{qname}\tsubtracted_consensus\t{org}\t"
+                     f"{args.consensus_role}\t{rlen}\n")
+
     def flush(qname, per_org, rlen):
         """Resolve one read's alignments into a single call."""
         if not per_org:
+            # The consensus test is checked even for reads that align nowhere in
+            # the combined index. The original pipeline subtracted against the
+            # consensus on raw reads, before any community mapping, so a read
+            # that matches the consensus but not the stock references was
+            # removed there too. Skipping it here would leave those reads in the
+            # unassigned bin and understate what subtraction costs.
+            if consensus_hits is not None and qname in consensus_hits:
+                subtract_to_consensus(qname, [], rlen)
+                return
             counts["unassigned"]["reads"] += 1
             counts["unassigned"]["read_bases"] += rlen
             assign_fh.write(f"{qname}\tunassigned\tunmapped\tnone\t0\t0\t0\t{rlen}\t0\n")
@@ -144,7 +241,21 @@ def main():
             # read from the community's own E. coli that also aligns to the
             # carrier-derived E. coli K-12 is claimed by the subtraction step and
             # lost, even when it matches the community strain better.
-            for role_to_subtract in [r.strip() for r in args.subtract_order.split(",")]:
+            for role_to_subtract in subtract_order:
+                if consensus_hits is not None and role_to_subtract == args.consensus_role:
+                    # The original lowinput_s1 analysis did not subtract against
+                    # the stock MG1655 reference. It used breseq to build a
+                    # reference-guided consensus of the E. coli actually present
+                    # in the carrier prep, then deleted every read matching that
+                    # consensus. Reproducing that faithfully means the consensus
+                    # test REPLACES the reference-alignment test for this role
+                    # rather than being added to it -- the consensus is a
+                    # corrected version of the same genome, not a second genome.
+                    if qname in consensus_hits:
+                        subtract_to_consensus(qname, ranked, rlen)
+                        return
+                    continue
+
                 hits = [(o, v) for o, v in ranked
                         if org2role.get(o) == role_to_subtract
                         and v["as"] >= args.min_subtract_as]
@@ -159,8 +270,7 @@ def main():
                     return
 
             remaining = [(o, v) for o, v in ranked
-                         if org2role.get(o) not in
-                         [r.strip() for r in args.subtract_order.split(",")]]
+                         if org2role.get(o) not in subtract_order]
             if not remaining:
                 counts["unassigned"]["reads"] += 1
                 counts["unassigned"]["read_bases"] += rlen

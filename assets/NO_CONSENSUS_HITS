@@ -1,0 +1,7 @@
+# Placeholder staged as the `consensus_hits` input to ASSIGN_READS when
+# --breseq_consensus is off.
+#
+# Nextflow process inputs are positional and cannot be optional, so "no file"
+# has to be represented by a file. ASSIGN_READS switches on the basename: only
+# when it is something other than NO_CONSENSUS_HITS is --consensus-hits passed
+# to bin/assign_reads.py. Do not rename this file without updating that check.
