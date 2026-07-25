@@ -69,16 +69,21 @@ NR % 4 == 0 {
 }
 
 END {
+    # %.0f, never %d. mawk (the default awk in Debian, and so in this image)
+    # formats %d through a 32-bit int and saturates at 2147483647, which silently
+    # truncated every base count on a real run -- 2.1 Gbases where the true value
+    # was tens of Gbases. Counters are held as doubles, so %.0f prints them
+    # exactly up to 2^53.
     if (STATS != "") {
-        printf "min_qscore\t%s\n", MINQ                > STATS
-        printf "reads_in\t%d\n",  total                > STATS
-        printf "reads_kept\t%d\n", kept                > STATS
-        printf "bases_in\t%d\n",  total_bases          > STATS
-        printf "bases_kept\t%d\n", kept_bases          > STATS
+        printf "min_qscore\t%s\n", MINQ                  > STATS
+        printf "reads_in\t%.0f\n",  total                > STATS
+        printf "reads_kept\t%.0f\n", kept                > STATS
+        printf "bases_in\t%.0f\n",  total_bases          > STATS
+        printf "bases_kept\t%.0f\n", kept_bases          > STATS
         printf "read_pass_fraction\t%.6f\n",  (total ? kept / total : 0)             > STATS
         printf "base_pass_fraction\t%.6f\n",  (total_bases ? kept_bases / total_bases : 0) > STATS
     }
-    printf "[filter] MINQ=%s kept %d/%d reads (%.4f), %d/%d bases (%.4f)\n",
+    printf "[filter] MINQ=%s kept %.0f/%.0f reads (%.4f), %.0f/%.0f bases (%.4f)\n",
            MINQ, kept, total, (total ? kept / total : 0),
            kept_bases, total_bases, (total_bases ? kept_bases / total_bases : 0) > "/dev/stderr"
 }
