@@ -283,18 +283,27 @@ def main():
         roles = [r for r in ["carrier", "contaminant", "sample", "ambiguous",
                              "none", "unassigned"] if exact.get(r, {}).get("n")]
 
-        fig, ax = plt.subplots(figsize=(6.4, 4.4))
+        fig, ax = plt.subplots(figsize=(6.8, 4.4))
         for role in roles:
             counts = hist[role]
             n = exact[role]["n"]
             med = hist_quantile(counts, 0.5)
-            # Match what ax.hist(density=True) would draw: counts / (N * width).
-            ax.stairs(counts / (n * widths), BINS, color=ROLE_COLORS.get(role, "0.5"),
+            # Plot the fraction of reads per bin, NOT counts/(n*width).
+            # The bins are equal-width in log10, so counts/n already is a
+            # density with respect to log(length) -- which is the right density
+            # for a log x axis. Dividing by the linear bin width instead makes
+            # narrow low-length bins explode: a spike of ~10 bp unmapped reads
+            # then dominates the axis and flattens every distribution of
+            # interest into the baseline.
+            ax.stairs(counts / n, BINS, color=ROLE_COLORS.get(role, "0.5"),
                       linewidth=1.3,
                       label=f"{role} (n={n:,}, median {med:,.0f} bp)")
         ax.set_xscale("log")
+        # Reads below ~20 bp are adapter-length artefacts, not molecules; keep
+        # them out of the view so the axis is set by the real distributions.
+        ax.set_xlim(20, max(1e4, max(exact[r]["max"] for r in roles) * 1.1))
         ax.set_xlabel("Read length (bp)")
-        ax.set_ylabel("Density")
+        ax.set_ylabel("Fraction of reads per bin")
         ax.set_title("Read length by assignment class")
         ax.legend(frameon=True, framealpha=0.95, edgecolor="0.7", fontsize=7.5)
         ax.grid(True, which="major", color="0.93", lw=0.5, zorder=0)
