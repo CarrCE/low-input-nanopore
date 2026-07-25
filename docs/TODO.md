@@ -24,43 +24,52 @@ the samplesheet parser to prefer the accession when `--fetch_from_sra` is set.
 The container for it does not exist yet either — `docker/tools` has no SRA
 toolkit.
 
-## 2. Only the competitive mode is wired
+## 2. Sequential mode is implemented; breseq and the delta table are not
 
-`nextflow.config` and `--help` advertise `--mode competitive | sequential | both`,
-and `main.nf` validates all three, but the workflow body only builds the
-competitive path. `--mode sequential` and `--mode both` currently pass validation
-and then silently run the competitive path anyway, which is worse than failing.
+`--mode competitive | sequential | both` are all wired. Sequential applies the
+subtraction chain (carrier → contaminant → community) as a decision rule over the
+*same* alignments competitive mode uses, so `--mode both` costs one extra pass
+over the existing BAM rather than a second mapping run. The deliberate deviation
+from a literal sequential pipeline — which would re-map survivors against a
+smaller index — is documented in `ecoli-partitioning.md`.
 
-Not implemented:
+Still not implemented:
 
-- the sequential subtraction chain (carrier → contaminant → community);
 - the `--breseq_consensus` path, i.e. building a reference-guided consensus of
   the *E. coli* actually present in the carrier prep and subtracting reads that
   match it. The `withLabel: breseq` container
   (`quay.io/biocontainers/breseq:0.40.1--h3be2455_0`) is pinned in
   `conf/base.config` and its platform/root quirks are documented, but no process
-  carries that label;
-- the per-organism delta table that `--mode both` is supposed to emit — which is
-  the artifact that would actually quantify how much the sequential method costs
-  (see `ecoli-partitioning.md`).
+  carries that label. Without it, sequential mode subtracts against the MG1655
+  reference rather than against the strain actually present, which is not exactly
+  what the original analysis did;
+- a dedicated per-organism delta table contrasting the two modes. Both modes'
+  numbers land in `results/summary/per_organism.tsv` keyed by `mode`, so the
+  delta is derivable, but nothing computes and presents it as a display item —
+  and that is the artifact that would quantify what subtraction costs.
 
-Interim mitigation: reject `sequential` and `both` at parse time instead of
-accepting them.
+The delta has not been measured on these data yet.
 
-## 3. No aggregation across replicates, and no figures
+## 3. Aggregation exists; coverage-artifact analysis does not
 
-`COMPUTE_METRICS` emits one `metrics.tsv` and one `summary.json` per sample. There
-is no step that:
+`AGGREGATE` (`bin/aggregate_results.py`) pools replicates into
+`results/summary/{per_organism,per_sample,experiment_summary}.tsv`, honours
+`include_in_headline` when computing experiment-level statistics, and emits two
+display items with CSV + JSON sidecars: `abundance.*` (theoretical vs measured)
+and `readlengths.*` (the adaptive-sampling ejection signature, from
+`readlengths.tsv.gz`).
 
-- pools replicates by the `experiment` column into mean/SD/CI per organism;
-- honours `include_in_headline` when computing the headline statistics (the
-  column is parsed into `meta` and then never used downstream);
-- produces any manuscript figure — the analysis container ships matplotlib and
-  nothing calls it;
-- uses the per-read `readlengths.tsv.gz` for the adaptive-sampling
-  ejection-signature analysis it was written for.
+Still missing:
 
-`modules/local/` and `comparison/` are empty placeholders for this work.
+- **The coverage-artifact analysis.** `COVERAGE_PROFILE` writes
+  `<sample>.depth.tsv.gz` per sample and nothing consumes it. The uneven-coverage
+  behaviour observed for some community members — one of the motivating
+  observations for this work — is therefore not yet characterised or plotted, and
+  `params.coverage_window` is declared but unused.
+- Confidence intervals: `experiment_summary.tsv` reports count/mean/SD/min/max
+  only. With n=3 replicates an SD is thin; decide whether to report CIs or to
+  present replicates individually.
+- No figure yet contrasts the competitive and sequential modes (see item 2).
 
 ## 4. Mojarro 2019 reads/bases values are unsourced literals
 

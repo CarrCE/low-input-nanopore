@@ -132,6 +132,16 @@ sequencing failure and would quietly inflate the apparent noise floor.
   sensitivity of the *E. coli* split to them has not been characterised.
 - Competitive assignment recovers a *partition*, not a deconvolution. It bounds
   each strain's contribution; it does not apportion the shared core between them.
-- A quantitative comparison of what sequential subtraction costs on these data —
-  the `--mode both` delta table — is not implemented yet. See item 2 in
-  `TODO.md`.
+- Both rules are implemented (`--mode competitive|sequential|both`) and are
+  evaluated over the *same* alignments: `--mode both` makes a second cheap pass
+  over the existing BAM rather than re-mapping. That is a deliberate deviation
+  from a literal sequential pipeline, which would re-map the survivors against a
+  smaller index. The benefit is that any difference between the two modes is
+  attributable to the decision rule alone rather than to a different alignment
+  substrate; the cost is that reads which would fail to map to the reduced index
+  but do map to the combined one are treated slightly differently than a literal
+  re-mapping would treat them.
+- The quantitative delta between the two modes on these data has not been
+  measured yet — the runs are pending. Until that number exists, the claim that
+  subtraction over-removes the community's *E. coli* is a mechanistic argument,
+  not a measurement.
