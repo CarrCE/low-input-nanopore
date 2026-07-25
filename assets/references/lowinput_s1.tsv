@@ -1,0 +1,30 @@
+# Reference set A -- lowinput_s1
+# ZymoBIOMICS Microbial Community DNA Standard II (Log Distribution), D6311,
+# sequenced with a lambda genomic carrier under depletion-mode adaptive sampling.
+#
+# role:
+#   sample      -- a member of the mock community (the DNA we are trying to enrich)
+#   carrier     -- the genomic carrier added to reach library-prep input mass
+#   contaminant -- organism carried over from carrier production, not part of the community
+#
+# theoretical_dna_fraction is the manufacturer's genomic-DNA fraction, and sums
+# to 1.0 across role=sample rows. Carrier/contaminant rows are 0 by definition.
+#
+# NOTE: this set contains E. coli in BOTH roles. Zymo's community strain
+# (B-1109, 4,925,141 bp) and the lambda-prep background (K-12 MG1655,
+# 4,641,652 bp) are distinct strains, so reads can be partitioned between them
+# rather than discarded wholesale. See docs/ecoli-partitioning.md.
+#
+organism	accession	role	theoretical_dna_fraction	strain	notes
+Listeria monocytogenes	GCF_028743575.1	sample	0.891	B-33116 = ATCC 19117	complete
+Pseudomonas aeruginosa	GCF_028743595.1	sample	0.089	B-3509 = ATCC 15442	complete
+Bacillus spizizenii	GCF_028743795.1	sample	0.0089	B-354 = ATCC 6633	listed by Zymo as B. subtilis
+Saccharomyces cerevisiae	GCA_030867715.1	sample	0.0089	Y-567 = ATCC 9763	contig-level, exact strain
+Escherichia coli	GCF_028743555.1	sample	0.00089	B-1109	complete; community member
+Salmonella enterica	GCF_028743635.1	sample	0.00089	B-4212	complete
+Limosilactobacillus fermentum	GCF_030770375.1	sample	0.000089	B-1840 = ATCC 14931	listed by Zymo as Lactobacillus fermentum
+Enterococcus faecalis	GCF_028743535.1	sample	0.000009	B-537 = ATCC 7080	complete
+Cryptococcus neoformans	GCA_028975465.1	sample	0.000009	Y-2534 = ATCC 32045	contig-level, exact strain
+Staphylococcus aureus	GCF_028743615.1	sample	0.000001	B-41012	complete
+Enterobacteria phage lambda	GCF_000840245.1	carrier	0	NC_001416.1	48,502 bp
+Escherichia coli K-12	GCF_000005845.2	contaminant	0	K-12 substr. MG1655	lambda-production background

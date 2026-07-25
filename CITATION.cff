@@ -1,0 +1,38 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+type: software
+title: "low-input-nanopore: enrichment analysis for depletion-mode adaptive sampling nanopore sequencing"
+abstract: >-
+  A Nextflow pipeline that quantifies how much depletion-mode adaptive sampling
+  enriches low-input sample DNA sequenced against a lambda genomic carrier on
+  Oxford Nanopore. Reads are assigned competitively against a combined
+  reference holding the community, the carrier, and the E. coli contaminant
+  carried over from lambda production, so that every read is accounted for
+  exactly once and enrichment is computed against an exact denominator.
+version: 0.1.0
+license: MIT
+repository-code: "https://github.com/CarrCE/low-input-nanopore"
+url: "https://github.com/CarrCE/low-input-nanopore"
+keywords:
+  - nanopore
+  - adaptive sampling
+  - low-input sequencing
+  - metagenomics
+  - enrichment
+  - Nextflow
+authors:
+  - family-names: McKaig
+    given-names: Jordan
+    affiliation: "School of Earth and Atmospheric Sciences; Daniel Guggenheim School of Aerospace Engineering, Georgia Institute of Technology"
+  - family-names: Sailor
+    given-names: Jenna
+    affiliation: "Wallace H. Coulter Department of Biomedical Engineering, Georgia Institute of Technology"
+  - family-names: Carr
+    given-names: Christopher E.
+    orcid: "https://orcid.org/0000-0002-6980-9276"
+    affiliation: "Daniel Guggenheim School of Aerospace Engineering; School of Earth and Atmospheric Sciences, Georgia Institute of Technology"
+contact:
+  - family-names: Carr
+    given-names: Christopher E.
+    orcid: "https://orcid.org/0000-0002-6980-9276"
+    affiliation: "Daniel Guggenheim School of Aerospace Engineering; School of Earth and Atmospheric Sciences, Georgia Institute of Technology"

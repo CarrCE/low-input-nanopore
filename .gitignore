@@ -1,0 +1,30 @@
+# ---------------------------------------------------------------------------
+# Large / regenerated inputs and outputs. Nothing here belongs in git; every
+# path below is either fetched by the pipeline or produced by it.
+# ---------------------------------------------------------------------------
+# Reads are large and not yet deposited; only the documentation that describes
+# them is tracked. Samplesheets and reference-set definitions live in assets/,
+# which is tracked normally.
+data/*
+!data/readme.md
+!data/reference_genomes.md
+
+refs/
+results/
+work/
+.nextflow/
+.nextflow.log*
+
+# Scratch and private material (manuscript prose lives in its own repo)
+ignore/
+manuscript/
+
+# OS / editor
+.DS_Store
+._*
+*.swp
+
+# Python
+__pycache__/
+*.pyc
+.venv/

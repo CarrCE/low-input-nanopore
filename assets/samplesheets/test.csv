@@ -1,0 +1,7 @@
+# Smoke-test samplesheet: first 40,000 reads of lowinput_s2_r1.
+# Exercises the whole pipeline in a couple of minutes against the small
+# 5-genome lowinput_s2 reference set. Regenerate the subsample with `make demo-data`.
+# library_dna_ng is scaled to the subsampled fraction only so the per-fg
+# arithmetic is exercised; the value is NOT a real measurement.
+sample_id,experiment,replicate,fastq,sra_accession,reference_set,library_dna_ng,carrier_dna_ng,dna_into_extraction_ng,cells_into_extraction,include_in_headline,notes
+test_s2,test,1,data/test/test_s2.fastq,,assets/references/lowinput_s2.tsv,0.26,1000,,,0,smoke test subsample - not a real measurement

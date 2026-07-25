@@ -1,0 +1,22 @@
+# Reference set B -- lowinput_s2
+# ZymoBIOMICS Spike-in Control II (Low Microbial Load), D6321, whole cells,
+# sequenced with a lambda genomic carrier under depletion-mode adaptive sampling.
+#
+# None of the three spike-in organisms share homology with lambda or with
+# E. coli, which is what makes this dataset the clean case: the E. coli
+# ambiguity that complicates lowinput_s1 cannot arise here. E. coli K-12 is
+# still included as a contaminant reference so that carrier-derived E. coli
+# reads are accounted for explicitly rather than silently landing in the
+# unassigned bin.
+#
+# theoretical_dna_fraction is by DNA mass from the D6321 datasheet:
+#   Truepera     0.3500 / 0.3869 ng = 0.904627
+#   Imtechella   0.0340 / 0.3869 ng = 0.087877
+#   Allobacillus 0.0029 / 0.3869 ng = 0.007496
+#
+organism	accession	role	theoretical_dna_fraction	strain	notes
+Truepera radiovictrix	GCF_031201145.1	sample	0.904627	CIP 108686 = DSM 17093	complete; resistant to lysozyme lysis
+Imtechella halotolerans	GCF_028743515.2	sample	0.087877	JCM 17677, type K1	complete; Gram-negative
+Allobacillus halotolerans	GCF_028743495.1	sample	0.007496	BCRC 17939, type B3A	complete; Gram-positive
+Enterobacteria phage lambda	GCF_000840245.1	carrier	0	NC_001416.1	48,502 bp
+Escherichia coli K-12	GCF_000005845.2	contaminant	0	K-12 substr. MG1655	lambda-production background
