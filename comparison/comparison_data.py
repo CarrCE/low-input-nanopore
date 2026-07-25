@@ -47,7 +47,7 @@ STUDIES = ["Mojarro et al. 2019", "B. Raghavendra et al. 2023", "Zorzano et al. 
 
 #: Which classifier variant is plotted for each prior study by default.
 DEFAULT_CLASSIFIERS = {
-    "Mojarro et al. 2019": "published_unverified",
+    "Mojarro et al. 2019": "published_table1",
     "Zorzano et al. 2025": "kraken2_q1",          # internally consistent on both axes
     "B. Raghavendra et al. 2023": "kraken2_q10",  # only variant with base counts
 }

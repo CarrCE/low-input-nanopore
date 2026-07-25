@@ -144,7 +144,7 @@ def extract_mojarro(wb):
         "replicate_idx": 0,
         "replicate_label": "n/a",
         "row_type": "sample",
-        "classifier": "published_unverified",
+        "classifier": "published_table1",
         "reads": reads,
         "bases": bases,
         "dna_pg": dna_pg,

@@ -5,7 +5,7 @@
   "source_files": [
     {
       "path": "w/prior_studies.tsv",
-      "sha256": "7a323d2b08af5bb8f43ffb9ac7ce68ae7988fe4d3030d5ca1b0bf5a79a054f43",
+      "sha256": "77b991f870c2a24583619ac580df9213053471d07c3f698eae93812642c1db78",
       "role": "prior-study data"
     },
     {
@@ -15,17 +15,17 @@
     },
     {
       "path": "comparison/plot_comparison.py",
-      "sha256": "ac83da84d80a13b2b4bdc7bdaec3d9c0eb717cd05306c0881f2f6115eb27e3c2",
+      "sha256": "0639fae3de64bf6529c16f41c6628c7e4e7f219e2c2a8a3b7a025db009c61ed7",
       "role": "figure script"
     },
     {
       "path": "comparison/comparison_data.py",
-      "sha256": "4296140877c3573dccfc0d33c31a4c358c1c5394efd9a54b8262c871ce1c67ad",
+      "sha256": "9be8943070f19c549911e9084bba4ebad8fb739872a757b39cf2167fc17bfc98",
       "role": "loader"
     }
   ],
   "software": {
-    "generated_utc": "2026-07-25T06:04:15+00:00",
+    "generated_utc": "2026-07-25T12:45:50+00:00",
     "python": "3.12.13",
     "platform": "Linux-6.12.76-linuxkit-aarch64-with-glibc2.36",
     "numpy": "2.1.3",
@@ -42,7 +42,7 @@
     "classifier_selection": {
       "Zorzano et al. 2025": "kraken2_q1",
       "B. Raghavendra et al. 2023": "kraken2_q10",
-      "Mojarro et al. 2019": "published_unverified"
+      "Mojarro et al. 2019": "published_table1"
     },
     "n_points_plotted": 28,
     "n_prior_points": 24,
@@ -115,14 +115,6 @@
         "fold_bases": 2891.581986656939
       }
     ],
-    "unverified_points_plotted": [
-      {
-        "study": "Mojarro et al. 2019",
-        "condition": "2 pg Bacillus spizizenii DNA",
-        "classifier": "published_unverified",
-        "reads_per_fg": 0.0025,
-        "bases_per_fg": 2.635
-      }
-    ]
+    "unverified_points_plotted": []
   }
 }

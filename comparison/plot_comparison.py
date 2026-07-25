@@ -508,7 +508,7 @@ def main(argv=None):
             "classifier_selection": {
                 "Zorzano et al. 2025": args.zorzano_classifier,
                 "B. Raghavendra et al. 2023": args.raghavendra_classifier,
-                "Mojarro et al. 2019": "published_unverified",
+                "Mojarro et al. 2019": "published_table1",
             },
             "n_points_plotted": int(len(prior) + len(mine)),
             "n_prior_points": int(len(prior)),
