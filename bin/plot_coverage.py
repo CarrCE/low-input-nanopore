@@ -75,7 +75,7 @@ def main():
                      ignore_index=True)
 
     summ = summ.sort_values(["organism", "sample_id"])
-    summ.to_csv(outdir / f"{args.basename}.csv", index=False)
+    summ.to_csv(outdir / f"{args.basename}_summary.csv", index=False)
 
     deep = summ[summ["mean_depth"] >= MIN_DEPTH_INTERPRETABLE]
     organisms = sorted(deep["organism"].unique())
@@ -92,6 +92,10 @@ def main():
     gs = fig.add_gridspec(nrow_prof + 1, ncol, height_ratios=[1] * nrow_prof + [1.9],
                           hspace=0.65, wspace=0.28)
 
+    # Accumulate exactly what gets drawn, so the accompanying CSV lets a reader
+    # redraw the figure without rerunning the pipeline.
+    plotted_rows = []
+
     colors = {o: PALETTE[i % len(PALETTE)] for i, o in enumerate(organisms)}
     for i, org in enumerate(organisms):
         axp = fig.add_subplot(gs[i // ncol, i % ncol])
@@ -106,6 +110,13 @@ def main():
         binw = sub["bin_start"].diff().median() or 1000
         x = np.arange(len(y)) * binw / 1e6
         smooth = pd.Series(y).rolling(SMOOTH_BINS, center=True, min_periods=1).median()
+        for xi, yi, si_ in zip(x, y, smooth):
+            plotted_rows.append({
+                "panel": "A", "organism": org, "sample_id": sid,
+                "mean_depth": mean_depth, "position_mb": xi,
+                "depth_over_mean_raw": yi, "depth_over_mean_smoothed": si_,
+                "gini": "",
+            })
         axp.fill_between(x, 0, y, color=colors[org], alpha=0.22, lw=0, zorder=2)
         axp.plot(x, smooth, color=colors[org], lw=1.1, zorder=3)
         axp.axhline(1.0, color="0.4", lw=0.8, ls=(0, (4, 3)), zorder=4)
@@ -147,6 +158,13 @@ def main():
         axB.scatter(sub["mean_depth"], sub["gini"], s=34, alpha=0.9,
                     color=colorsB[org], edgecolors="black", linewidths=0.4,
                     label=italicize(org), zorder=3)
+        for _, r in sub.iterrows():
+            plotted_rows.append({
+                "panel": "B", "organism": org, "sample_id": r["sample_id"],
+                "mean_depth": r["mean_depth"], "position_mb": "",
+                "depth_over_mean_raw": "", "depth_over_mean_smoothed": "",
+                "gini": r["gini"],
+            })
     axB.set_xscale("log")
     axB.set_xlabel("Mean depth (×)")
     axB.set_ylabel("Gini coefficient of per-base depth")
@@ -162,6 +180,8 @@ def main():
     fig.savefig(outdir / f"{args.basename}.pdf", bbox_inches="tight")
     fig.savefig(outdir / f"{args.basename}.png", bbox_inches="tight", dpi=600)
     plt.close(fig)
+
+    pd.DataFrame(plotted_rows).to_csv(outdir / f"{args.basename}.csv", index=False)
 
     interpretable = deep[["sample_id", "organism", "mean_depth", "breadth_1x",
                           "cv", "gini"]].to_dict("records")

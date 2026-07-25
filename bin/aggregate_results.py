@@ -327,7 +327,26 @@ def main():
             "p75": hist_quantile(hist[role], 0.75),
             "max": exact[role]["max"],
         } for role in roles])
-        stats.to_csv(outdir / "readlengths.csv", index=False)
+
+        # The CSV that accompanies a figure must hold the points the figure
+        # actually draws, so a reader can redraw it without rerunning anything.
+        # Summary statistics alone are not that; they go in the JSON sidecar.
+        plotted = []
+        for role in roles:
+            counts = hist[role]
+            n = exact[role]["n"]
+            for i, c in enumerate(counts):
+                if c == 0:
+                    continue
+                plotted.append({
+                    "role": role,
+                    "bin_lower_bp": BINS[i],
+                    "bin_upper_bp": BINS[i + 1],
+                    "count": int(c),
+                    "fraction_of_reads": c / n,
+                })
+        pd.DataFrame(plotted).to_csv(outdir / "readlengths.csv", index=False)
+        stats.to_csv(outdir / "readlengths_summary.csv", index=False)
         write_sidecar(
             outdir / "readlengths.json", "readlengths",
             "Read-length distribution by assignment class",
