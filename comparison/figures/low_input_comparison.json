@@ -1,37 +1,42 @@
 {
   "id": "fig_low_input_comparison",
   "title": "Low-input nanopore performance \u2014 this study vs prior work",
-  "caption": "Low-input nanopore sequencing performance expressed per femtogram of DNA entering library preparation. Each prior-study point is one sample (24 samples from B. Raghavendra et al. 2023, Mojarro et al. 2019, Zorzano et al. 2025); reads/fg = reads/(pg DNA x 1000) and bases/fg = bases/(pg DNA x 1000). This study is shown as Round 1 (n=3) and Round 2 (n=1). Dashed contours are iso-improvement circles around the Round 1 mean (0.4247 reads/fg, 624 bases/fg) at 10x, 100x and 1000x geometric-mean fold improvement in log10-log10 space. Callouts give the largest per-study improvement: B. Raghavendra et al. 2023 (10 pg of E. coli\u2009+\u20092 pg of S. cerevisiae): 2,124\u00d7 reads, 5,653\u00d7 bases; Mojarro et al. 2019 (2 pg Bacillus spizizenii DNA): 170\u00d7 reads, 237\u00d7 bases; Zorzano et al. 2025 (Microbialite (2800 a)): 4,090\u00d7 reads, 2,892\u00d7 bases. Zorzano et al. 2025 counts use the 'kraken2_q1' variant and Basapathi Raghavendra et al. 2023 the 'kraken2_q10' variant; see prior_studies.tsv for the per-row provenance of every point.",
+  "caption": "Low-input nanopore sequencing performance expressed per femtogram of DNA entering library preparation. Each prior-study point is one sample (24 samples from B. Raghavendra et al. 2023, Mojarro et al. 2019, Zorzano et al. 2025); reads/fg = reads/(pg DNA x 1000) and bases/fg = bases/(pg DNA x 1000). This study is shown as Round 1 (n=3) and Round 2 (n=3). Dashed contours are iso-improvement circles around the Round 1 mean (0.1510 reads/fg, 419 bases/fg) at 10x, 100x and 1000x geometric-mean fold improvement in log10-log10 space. Callouts give the largest per-study improvement: B. Raghavendra et al. 2023 (10 pg of YSC-2 yeast extract): 755\u00d7 reads, 1,763\u00d7 bases; Mojarro et al. 2019 (2 pg Bacillus spizizenii DNA): 60\u00d7 reads, 159\u00d7 bases; Zorzano et al. 2025 (Microbialite (2800 a)): 1,454\u00d7 reads, 1,943\u00d7 bases. Zorzano et al. 2025 counts use the 'kraken2_q1' variant and Basapathi Raghavendra et al. 2023 the 'minimap2_competitive' variant; see prior_studies.tsv for the per-row provenance of every point.",
   "source_files": [
     {
-      "path": "w/prior_studies.tsv",
-      "sha256": "77b991f870c2a24583619ac580df9213053471d07c3f698eae93812642c1db78",
+      "path": "comparison/prior_studies.tsv",
+      "sha256": "3e1346a44abde2cb115cd3ed17fad3b81497366704a1b8017436dfb00c67f02f",
       "role": "prior-study data"
     },
     {
-      "path": "w/this_study.tsv",
+      "path": "comparison/this_study.tsv",
       "sha256": "0e3f49c27630a94c0c9dc2679aefb171cc1daba6de709894451f4c5784180fe8",
       "role": "this-study data"
     },
     {
       "path": "comparison/plot_comparison.py",
-      "sha256": "0639fae3de64bf6529c16f41c6628c7e4e7f219e2c2a8a3b7a025db009c61ed7",
+      "sha256": "6914271e683925026d8cfa18d772948206a09e2f1eff12c3ccc2445260084e15",
       "role": "figure script"
     },
     {
       "path": "comparison/comparison_data.py",
-      "sha256": "9be8943070f19c549911e9084bba4ebad8fb739872a757b39cf2167fc17bfc98",
+      "sha256": "4189295b8a45282bccc0f518c7308ee832d1d5e76d61e670800e96c4b4eaa399",
       "role": "loader"
+    },
+    {
+      "path": "results",
+      "sha256": null,
+      "role": "live pipeline results directory"
     }
   ],
   "software": {
-    "generated_utc": "2026-07-25T12:45:50+00:00",
+    "generated_utc": "2026-07-25T15:25:43+00:00",
     "python": "3.12.13",
     "platform": "Linux-6.12.76-linuxkit-aarch64-with-glibc2.36",
     "numpy": "2.1.3",
     "pandas": "2.2.3",
     "matplotlib": "3.9.2",
-    "command": "plot_comparison.py --outdir figures"
+    "command": "plot_comparison.py --results-dir results --raghavendra-classifier minimap2_competitive --outdir comparison/figures"
   },
   "metrics": {
     "convention": {
@@ -41,10 +46,10 @@
     },
     "classifier_selection": {
       "Zorzano et al. 2025": "kraken2_q1",
-      "B. Raghavendra et al. 2023": "kraken2_q10",
+      "B. Raghavendra et al. 2023": "minimap2_competitive",
       "Mojarro et al. 2019": "published_table1"
     },
-    "n_points_plotted": 28,
+    "n_points_plotted": 30,
     "n_prior_points": 24,
     "n_prior_points_by_study": {
       "B. Raghavendra et al. 2023": 14,
@@ -55,41 +60,45 @@
       "Round 1": {
         "n": 3,
         "reads_values": [
-          0.6202566660462521,
-          0.38495,
-          0.2689372841935085
+          0.2053210355,
+          0.140008,
+          0.107714972
         ],
         "bases_values": [
-          799.3874742090087,
-          622.171385,
-          450.68527882622
+          529.582885,
+          419.237175,
+          309.1218978
         ],
-        "reads_mean": 0.4247146500799202,
-        "bases_mean": 624.0813793450762,
-        "reads_min": 0.2689372841935085,
-        "reads_max": 0.6202566660462521,
-        "bases_min": 450.68527882622,
-        "bases_max": 799.3874742090087,
+        "reads_mean": 0.15101466916666667,
+        "bases_mean": 419.3139859333333,
+        "reads_min": 0.107714972,
+        "reads_max": 0.2053210355,
+        "bases_min": 309.1218978,
+        "bases_max": 529.582885,
         "sources": [
-          "legacy_spreadsheet"
+          "pipeline_run"
         ]
       },
       "Round 2": {
-        "n": 1,
+        "n": 3,
         "reads_values": [
-          0.03251344086021505
+          0.1167846154,
+          0.225315625,
+          0.17679
         ],
         "bases_values": [
-          84.67359767025089
+          245.7909615,
+          506.0105906,
+          402.9174075
         ],
-        "reads_mean": 0.03251344086021505,
-        "bases_mean": 84.67359767025089,
-        "reads_min": 0.03251344086021505,
-        "reads_max": 0.03251344086021505,
-        "bases_min": 84.67359767025089,
-        "bases_max": 84.67359767025089,
+        "reads_mean": 0.17296341346666666,
+        "bases_mean": 384.9063198666667,
+        "reads_min": 0.1167846154,
+        "reads_max": 0.225315625,
+        "bases_min": 245.7909615,
+        "bases_max": 506.0105906,
         "sources": [
-          "legacy_spreadsheet"
+          "pipeline_run"
         ]
       }
     },
@@ -98,21 +107,21 @@
     "largest_improvement_per_study": [
       {
         "study": "B. Raghavendra et al. 2023",
-        "condition": "10 pg of E. coli\u2009+\u20092 pg of S. cerevisiae",
-        "fold_reads": 2123.573250399601,
-        "fold_bases": 5652.911044792358
+        "condition": "10 pg of YSC-2 yeast extract",
+        "fold_reads": 755.0733458333333,
+        "fold_bases": 1762.5640434356171
       },
       {
         "study": "Mojarro et al. 2019",
         "condition": "2 pg Bacillus spizizenii DNA",
-        "fold_reads": 169.8858600319681,
-        "fold_bases": 236.84302821445021
+        "fold_reads": 60.405867666666666,
+        "fold_bases": 159.1324424794434
       },
       {
         "study": "Zorzano et al. 2025",
         "condition": "Microbialite (2800 a)",
-        "fold_reads": 4089.579514260277,
-        "fold_bases": 2891.581986656939
+        "fold_reads": 1454.1210133923553,
+        "fold_bases": 1942.8247799198077
       }
     ],
     "unverified_points_plotted": []

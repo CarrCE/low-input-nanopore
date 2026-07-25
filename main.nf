@@ -131,9 +131,23 @@ process FILTER_READS {
     path "${meta.sample_id}.qfilter.tsv",                      emit: stats
 
     script:
+    // awk cannot read gzip, and it fails silently on compressed input rather
+    // than erroring, so decompress explicitly when needed. Published datasets
+    // (e.g. the Raghavendra reads) arrive gzipped; this study's do not.
     """
-    awk -v MINQ=${params.min_qscore} -v STATS=${meta.sample_id}.qfilter.tsv \\
-        -f ${script} ${fastq} > ${meta.sample_id}.filtered.fastq
+    FQ="${fastq}"
+    if [ "\$FQ" != "\${FQ%.gz}" ]; then
+        gzip -dc "\$FQ" \\
+          | awk -v MINQ=${params.min_qscore} -v STATS=${meta.sample_id}.qfilter.tsv \\
+                -f ${script} - > ${meta.sample_id}.filtered.fastq
+    else
+        awk -v MINQ=${params.min_qscore} -v STATS=${meta.sample_id}.qfilter.tsv \\
+            -f ${script} "\$FQ" > ${meta.sample_id}.filtered.fastq
+    fi
+
+    if [ ! -s ${meta.sample_id}.filtered.fastq ]; then
+        echo "error: quality filter produced no reads from \$FQ" >&2; exit 1
+    fi
     """
 }
 

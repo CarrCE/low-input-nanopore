@@ -223,8 +223,13 @@ def build_figure(prior: pd.DataFrame, rounds: dict, title: str):
             zorder=5)
 
     # ---- this-study labels -------------------------------------------------
-    label_offsets = {"Round 1": (-0.25, -0.40, "left", "top"),
-                     "Round 2": (-0.55, +0.45, "right", "bottom")}
+    # Both rounds now sit in the same corner: correcting the Round 1 analysis
+    # (which had been counting carrier-derived E. coli as community) moved it
+    # down into Round 2's range, so the two clusters interleave. Push both
+    # labels left and down, away from the points and away from the title -- the
+    # old "Round 2 up and right" offset ran the box straight through the title.
+    label_offsets = {"Round 1": (-0.55, -0.55, "right", "top"),
+                     "Round 2": (-0.90, +0.18, "right", "center")}
     for name, info in rounds.items():
         dx, dy, ha, va = label_offsets.get(name, (+0.25, +0.40, "left", "bottom"))
         n = len(info["reads_values"])

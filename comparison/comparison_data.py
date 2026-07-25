@@ -201,10 +201,17 @@ def load_prior(path: Path = PRIOR_TSV,
 
 
 # ---------------------------------------------------------------------------
-def _live_rows(results_dir: Path) -> pd.DataFrame:
-    """Scan results/<sample_id>/<mode>/<sample_id>.metrics.tsv for headline rows."""
+def _live_rows(results_dir: Path, mode: str = "competitive") -> pd.DataFrame:
+    """
+    Scan results/<sample_id>/<mode>/<sample_id>.metrics.tsv for headline rows.
+
+    Only one assignment mode is taken. A `--mode both` run writes a metrics
+    table per mode for every sample, and counting both would enter each
+    replicate on the figure twice -- inflating n and shrinking the apparent
+    spread. Competitive is this study's primary rule.
+    """
     rows = []
-    for path in sorted(Path(results_dir).glob("*/*/*.metrics.tsv")):
+    for path in sorted(Path(results_dir).glob(f"*/{mode}/*.metrics.tsv")):
         m = pd.read_csv(path, sep="\t", dtype=str, keep_default_na=False, na_values=[""])
         if "organism" not in m.columns:
             continue
