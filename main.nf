@@ -116,6 +116,27 @@ process BUILD_REFERENCE {
     """
 }
 
+process FILTER_READS {
+    tag   { meta.sample_id }
+    label 'tools'
+    label 'process_low'
+    publishDir "${params.outdir}/${meta.sample_id}/qc", mode: 'copy', pattern: '*.qfilter.tsv'
+
+    input:
+    tuple val(meta), path(fastq)
+    path script
+
+    output:
+    tuple val(meta), path("${meta.sample_id}.filtered.fastq"), emit: reads
+    path "${meta.sample_id}.qfilter.tsv",                      emit: stats
+
+    script:
+    """
+    awk -v MINQ=${params.min_qscore} -v STATS=${meta.sample_id}.qfilter.tsv \\
+        -f ${script} ${fastq} > ${meta.sample_id}.filtered.fastq
+    """
+}
+
 process MAP_COMPETITIVE {
     tag   { meta.sample_id }
     label 'tools'
@@ -380,6 +401,7 @@ workflow {
     ch_script_metrics = file("${projectDir}/bin/compute_metrics.py",     checkIfExists: true)
     ch_script_agg     = file("${projectDir}/bin/aggregate_results.py",   checkIfExists: true)
     ch_script_cov     = file("${projectDir}/bin/coverage_summary.py",    checkIfExists: true)
+    ch_script_qfilt   = file("${projectDir}/bin/filter_by_qscore.awk",   checkIfExists: true)
 
     ch_samples = parseSamplesheet(params.samplesheet)
 
@@ -400,9 +422,24 @@ workflow {
     // Re-key samples by reference-set name so each joins its built reference.
     ch_keyed = ch_samples.map { meta, fq, ref -> tuple(ref.simpleName, meta, fq, ref) }
 
+    // Optional mean-read-quality filter. Off by default (min_qscore = 0) so the
+    // primary analysis uses every basecalled read. Set --min_qscore 10 to match
+    // the wf-metagenomics --min_read_qual 10 used when reanalysing the prior
+    // studies, which is what makes a cross-study comparison quality-matched.
+    if (params.min_qscore > 0) {
+        FILTER_READS(ch_keyed.map { name, meta, fq, ref -> tuple(meta, fq) },
+                     ch_script_qfilt)
+        ch_reads = FILTER_READS.out.reads
+    } else {
+        ch_reads = ch_keyed.map { name, meta, fq, ref -> tuple(meta, fq) }
+    }
+
     ch_to_map = ch_keyed
+        .map { name, meta, fq, ref -> tuple(meta.sample_id, name, meta) }
+        .join(ch_reads.map { meta, fq -> tuple(meta.sample_id, fq) })
+        .map { sid, name, meta, fq -> tuple(name, meta, fq) }
         .combine(BUILD_REFERENCE.out.fasta, by: 0)
-        .map { name, meta, fq, ref, fasta -> tuple(meta, fq, fasta) }
+        .map { name, meta, fq, fasta -> tuple(meta, fq, fasta) }
 
     MAP_COMPETITIVE(ch_to_map)
 
