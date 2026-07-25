@@ -215,8 +215,19 @@ process COVERAGE_PROFILE {
     tuple val(meta), path("${meta.sample_id}.depth.tsv.gz"), emit: depth
 
     script:
-    // Only community (role=sample) contigs are profiled -- carrier depth is
-    // uninformative and would dominate the file size.
+    // Only community (role=sample) contigs are profiled: carrier depth is
+    // uninformative and the carrier is >95% of the reads.
+    //
+    // The filter is applied to the SAM *stream* rather than by passing regions
+    // to `samtools view`. Region arguments require a coordinate-sorted, indexed
+    // BAM, but this BAM comes qname-grouped straight from minimap2, so the
+    // region form fails and any fallback ends up sorting all ~10M reads --
+    // which made this the single slowest step in the pipeline (43-58 min per
+    // replicate, versus 7-55 min for the mapping that produced the file).
+    // Filtering first means `samtools sort` only ever sees community reads.
+    //
+    // Non-sample @SQ lines are dropped from the header too, so `depth -a`
+    // enumerates only community genomes instead of every reference present.
     """
     awk -F'\\t' 'NR>1 && \$3=="sample" {print \$1}' ${contig_map} > sample_contigs.txt
 
@@ -224,14 +235,18 @@ process COVERAGE_PROFILE {
         echo "error: no sample-role contigs in ${contig_map}" >&2; exit 1
     fi
 
-    samtools view -@ ${task.cpus} -b -F 0x900 ${bam} \\
-        \$(tr '\\n' ' ' < sample_contigs.txt) > primary.bam 2>/dev/null \\
-      || samtools view -@ ${task.cpus} -b -F 0x900 ${bam} > primary.bam
+    samtools view -h -F 0x900 ${bam} \\
+      | awk '
+            NR == FNR                { keep[\$1] = 1; next }
+            /^@SQ/                   { split(\$2, a, ":"); if (a[2] in keep) print; next }
+            /^@/                     { print; next }
+            (\$3 in keep)            { print }
+        ' sample_contigs.txt - \\
+      | samtools sort -@ ${task.cpus} -m 1G -o sorted.bam -
 
-    samtools sort -@ ${task.cpus} -m 1G -o sorted.bam primary.bam
     samtools index sorted.bam
     samtools depth -a -@ ${task.cpus} sorted.bam | gzip -c > ${meta.sample_id}.depth.tsv.gz
-    rm -f primary.bam sorted.bam sorted.bam.bai
+    rm -f sorted.bam sorted.bam.bai
     """
 }
 
