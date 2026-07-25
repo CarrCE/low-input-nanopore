@@ -235,6 +235,31 @@ process COVERAGE_PROFILE {
     """
 }
 
+process COVERAGE_SUMMARY {
+    tag   { meta.sample_id }
+    label 'analysis'
+    label 'process_medium'
+    publishDir "${params.outdir}/${meta.sample_id}/coverage", mode: 'copy'
+
+    input:
+    tuple val(meta), path(depth), path(contig_map)
+    path script
+
+    output:
+    path "${meta.sample_id}.coverage_summary.tsv", emit: summary
+    path "${meta.sample_id}.coverage_profile.tsv", emit: profile
+
+    script:
+    """
+    python3 ${script} ${depth} \\
+        --contig-map  ${contig_map} \\
+        --sample-id   ${meta.sample_id} \\
+        --window      ${params.coverage_window} \\
+        --out-summary ${meta.sample_id}.coverage_summary.tsv \\
+        --out-profile ${meta.sample_id}.coverage_profile.tsv
+    """
+}
+
 process AGGREGATE {
     label 'analysis'
     label 'process_low'
@@ -339,6 +364,7 @@ workflow {
     ch_script_assign  = file("${projectDir}/bin/assign_reads.py",        checkIfExists: true)
     ch_script_metrics = file("${projectDir}/bin/compute_metrics.py",     checkIfExists: true)
     ch_script_agg     = file("${projectDir}/bin/aggregate_results.py",   checkIfExists: true)
+    ch_script_cov     = file("${projectDir}/bin/coverage_summary.py",    checkIfExists: true)
 
     ch_samples = parseSamplesheet(params.samplesheet)
 
@@ -393,6 +419,16 @@ workflow {
         .map { sid, meta, cmap, bam -> tuple(meta, bam, cmap) }
 
     COVERAGE_PROFILE(ch_to_coverage)
+
+    COVERAGE_SUMMARY(
+        COVERAGE_PROFILE.out.depth
+            .map { meta, depth -> tuple(meta.sample_id, meta, depth) }
+            .combine(ch_keyed.map { name, meta, fq, ref -> tuple(meta.sample_id, name) }, by: 0)
+            .map { sid, meta, depth, name -> tuple(name, meta, depth) }
+            .combine(BUILD_REFERENCE.out.contig_map, by: 0)
+            .map { name, meta, depth, cmap -> tuple(meta, depth, cmap) },
+        ch_script_cov
+    )
 
     // Study-level tables and display items, once every sample has finished.
     AGGREGATE(
