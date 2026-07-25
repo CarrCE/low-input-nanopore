@@ -302,3 +302,193 @@ right axes, a dotted constant-bases-per-read reference line, and italicised
 species names via mathtext. Unlike the original, Round 1 and Round 2 marker
 positions and label text are computed from the data rather than hardcoded, so
 the figure follows the TSVs (or live results) automatically.
+
+## Mapping-based re-analysis of Basapathi Raghavendra et al. 2023
+
+### Why this exists
+
+Defect (c) above compares two Raghavendra variants — the paper's own WIMP /
+Centrifuge calls (`published`) and our Kraken2 minQ10 reanalysis (`kraken2_q10`)
+— against *this* study's numbers, which come from competitive **minimap2
+alignment against a reference set containing the exact organisms present**.
+That is not a like-for-like comparison, and the asymmetry runs in our favour:
+
+* Kraken2 against PlusPF-8 must decide, for every read, which of ~thousands of
+  genomes (or none) a read belongs to, using exact k-mer matches. On noisy
+  ONT reads at low depth this is conservative — reads that came from *E. coli*
+  routinely fail to accumulate enough discriminating k-mers and land in the
+  unclassified bin.
+* Direct alignment to a two-genome index asks a much easier question: does this
+  read align to *E. coli* or to *S. cerevisiae*? minimap2 tolerates the ~5-10%
+  ONT error rate that k-mer classification does not, and there is no
+  possibility of the read being assigned to some third organism.
+
+So comparing our minimap2 numbers against their Kraken2 numbers inflates our
+apparent advantage by an unknown factor that has nothing to do with library
+chemistry or adaptive sampling — the thing we actually claim. Running their
+deposited reads through this pipeline, with the same assignment rule, the same
+`bases` convention and the same `reads / (dna_pg * 1000)` denominator, removes
+that confound. Whatever advantage survives is real.
+
+Note that a mapping re-analysis is only possible for Raghavendra et al. because
+the organisms are known a priori (two defined species at stated masses). The
+same treatment cannot be applied to Zorzano et al. 2025, whose samples are
+environmental metagenomes with no known reference set — the Zorzano comparison
+remains classifier-to-classifier and that limitation stands.
+
+### Carrier: there is none
+
+**Raghavendra et al. used no genomic carrier.** Methods, "Library preparation":
+
+> The gDNA for the nanopore library was prepared using nuclease-free water and
+> the low concentration of the DNA to be tested was directly pipetted from the
+> previously diluted samples, into DNA LoBind sterile eppendorf tubes. The whole
+> amount of DNA (either from *E. coli*, *S. cerevisiae*, the mock community DNA,
+> or obtained from each MMS-2 extraction), was diluted in 25 µl for library
+> preparation.
+
+SQK-LSK114 at halved reagent volumes on an R10.4.1 Flongle, applied directly to
+the diluted sample. No lambda and no other filler DNA appears anywhere in the
+paper. The reference sets therefore contain **no `role=carrier` row**, and every
+samplesheet row has `carrier_dna_ng=0`.
+
+Consequence for the metrics: `input_sample_fraction = library / (library +
+carrier) = 1.0`, so `enrichment` is identically equal to
+`output_sample_fraction` and carries no information for this study. **Only
+`reads_per_fg` and `bases_per_fg` are comparable** between Raghavendra et al.
+and this study; the enrichment axis is ours alone, because only we add a
+carrier to deplete against.
+
+### Strains and accessions
+
+| Organism | Accession | Basis |
+|---|---|---|
+| *Escherichia coli* | `GCA_900706755.1` | **Exact strain.** Methods, "Test samples": "*Escherichia coli* (NCTC 9001 Lenticule disc, Sigma Aldrich, UK) with an average genomic size of ~ 5 Mb". NCTC 9001 was sequenced by the Sanger Institute's NCTC 3000 project (BioProject PRJEB6403, BioSample SAMEA2517362, assembly 27731_A01): 5,040,580 bp in 5 contigs, contig N50 1,476,437 bp. The 5.04 Mb total corroborates the paper's stated "~5 Mb". |
+| *Saccharomyces cerevisiae* | `GCF_000146045.2` | **Assumption, documented as such.** Methods: "yeast from *Saccharomyces cerevisiae*, Type II (YSC-2, 51,475, Sigma Aldrich) with an average genomic size of ~ 12 Mb". Sigma YSC-2 is a dried commercial yeast preparation sold by enzymatic activity, not a strain-defined culture-collection deposit — neither the supplier nor the paper gives a strain, and no assembly is attributable to it. We use the standard reference genome (strain S288C, assembly R64, complete, 12,071,326 bp), which matches the stated "~12 Mb". |
+
+Two points worth knowing before editing these files:
+
+* The *E. coli* accession is a **GenBank (`GCA_`) accession on purpose**. The
+  paired RefSeq assembly `GCF_900706755.1` is **suppressed**, so
+  `datasets download genome accession GCF_900706755.1` fails. `main.nf` and
+  `bin/build_reference_set.py` both accept `GC[AF]_`, and
+  `assets/references/lowinput_s1.tsv` already sets the precedent of using a
+  contig-level `GCA_` assembly when it is the exact strain.
+* The yeast strain assumption is low-risk here: the only competitor in the index
+  is a bacterium, so strain-level divergence within *S. cerevisiae* cannot
+  reassign reads between the two organisms. It can only change how many reads
+  align at all.
+
+*Homo sapiens* is deliberately **not** included as a contaminant reference, even
+though the paper reports human reads in every sample and in the negative
+controls (Table 2: 0-2 reads; Table 3: 1, 7, 19 and 53 reads). Two reasons.
+(1) Cost: references are fetched and indexed once per reference set, and this
+study needs four, so GRCh38 would be downloaded and indexed four times.
+(2) Direction of the error: adding a competitor to a *competitive* assignment
+can only move reads away from *E. coli* / *S. cerevisiae*, never toward them, so
+omitting human makes these counts an **upper bound** on the prior study — the
+conservative direction with respect to any advantage we claim. Unmapped human
+reads fall into the `unassigned` bin, which `bin/compute_metrics.py` reconciles
+explicitly, so they stay visible. Each reference-set preamble carries the exact
+row to add if the stricter accounting is wanted; the Mix2 samples are where it
+would matter most.
+
+### Files
+
+| File | Contents |
+|---|---|
+| `comparison/fetch_raghavendra.sh` | Downloads `MinION low detectability.zip` from <https://zenodo.org/records/8208597>, verifies size and MD5, extracts the 10 `fastq_pass` files and stages them as `data/raghavendra_2023/<alias>.fastq.gz`. |
+| `assets/samplesheets/raghavendra_2023.csv` | 10 rows, `include_in_headline=0` throughout. |
+| `assets/references/raghavendra_2023_ecoli.tsv` | *E. coli* only, fraction 1.0 (Ec_R1-R3). |
+| `assets/references/raghavendra_2023_scerevisiae.tsv` | *S. cerevisiae* only, fraction 1.0 (YSC_R1-R3). |
+| `assets/references/raghavendra_2023_mix1.tsv` | 10 pg *E. coli* (0.833333) + 2 pg *S. cerevisiae* (0.166667). |
+| `assets/references/raghavendra_2023_mix2.tsv` | 10 pg *S. cerevisiae* (0.833333) + 2 pg *E. coli* (0.166667). |
+
+Four reference sets are needed rather than two because
+`theoretical_dna_fraction` is what turns a read count into a per-fg number, and
+it differs by sample design. Mix1 and Mix2 are mirror images — same two
+organisms, fractions swapped — and are kept as separate files precisely so the
+fractions cannot be attached to the wrong organism.
+
+`library_dna_ng` is the **total** sample DNA into library prep: 0.010 ng for the
+single-organism libraries and 0.012 ng (10 pg + 2 pg) for the mixes. Combined
+with the fractions above this reproduces the per-organism masses already in
+`prior_studies.tsv` — 10,000 fg and 2,000 fg — to within 4 parts per million,
+so the new rows and the existing `kraken2_q10` / `published` rows share a
+denominator and are directly comparable. These masses are the paper's own
+stated dilution targets, not measurements: "The Qubit 4.0. fluorometer
+sensitivity is limited to 10 pg/µl", so nothing at this level was quantified.
+
+### How to run
+
+```bash
+bash comparison/fetch_raghavendra.sh
+./run.sh -profile docker --samplesheet assets/samplesheets/raghavendra_2023.csv
+```
+
+The fetch script is idempotent — a second run with all 10 FASTQs already
+present and gzip-valid is a no-op and does not touch the network. It caches the
+archive under `data/raghavendra_2023/.archive/` while working and deletes it
+afterwards; set `KEEP_ARCHIVE=1` to keep it, or `ZIP=/path/to/archive.zip` to
+extract from a copy you already have instead of downloading 771 MiB.
+
+The run itself is small: the 10 deposited `fastq_pass` files hold between 2 and
+520 reads each.
+
+### Feeding the results back into `prior_studies.tsv`
+
+The resulting rows enter `prior_studies.tsv` with
+**`classifier=minimap2_competitive`**, `source=pipeline_run`, alongside — not
+instead of — the existing `kraken2_q10` and `published` rows for the same
+samples. **All three variants are retained.** They answer three different
+questions and none supersedes the others:
+
+| `classifier` | What it is | Has `bases`? |
+|---|---|---|
+| `published` | The paper's own WIMP / Centrifuge pass-read counts, Tables 2 and 3. | No — the paper publishes reads only, so these rows cannot be plotted on the y axis. |
+| `kraken2_q10` | Our Kraken2 / PlusPF-8 minQ10 reanalysis of the deposited reads. Currently the plot default. | Yes. |
+| `minimap2_competitive` | This pipeline, same assignment rule and same `bases` convention as our own data. The only variant that is methodologically like-for-like with `this_study.tsv`. | Yes. |
+
+Keeping all three makes the size of the classifier effect measurable: the gap
+between `kraken2_q10` and `minimap2_competitive` on identical reads *is* the
+mapping-versus-classification advantage, quantified rather than assumed, and it
+is the correct amount to discount our headline comparison by.
+
+### Two provenance findings from staging the data
+
+Recorded here because both bear on rows already in `prior_studies.tsv`:
+
+1. **The "263" typo is confirmed.** `prior_studies.tsv` suspected that Table 3's
+   263 *S. cerevisiae* pass reads for `APN068` was a transcription of that
+   file's total read count. The deposited `APN068_pass_...fastq.gz` contains
+   **exactly 263 reads**. The suspicion is now a verified fact.
+2. **The "Sample total reads in the deposited file" notes are mislabelled.**
+   Those `provenance_note` values (224, 73, 313, 337, 37, 190, 411, 1180, 2110,
+   4700) are the paper's MinKNOW **pass + fail** totals from Tables 2 and 3, not
+   the read counts of the deposited `fastq_pass` files, which are 8, 4, 27, 23,
+   8, 2, 7, 455, 520 and 263 respectively. The counts themselves are correct and
+   correctly attributed to the paper; only the phrase "in the deposited file" is
+   wrong. Both numbers are now carried in the `notes` column of
+   `assets/samplesheets/raghavendra_2023.csv`.
+
+### Author Correction: does not affect these numbers
+
+There is an Author Correction to this paper — Sci Rep **15**:14107 (2025),
+<https://doi.org/10.1038/s41598-025-98000-4>, published 23 April 2025. It reads
+in full:
+
+> The original version of this Article contained errors in Figure 4 a and b,
+> where the data points were interchanged. The negative control data points were
+> therefore incorrectly represented as these were stated as non-zero, which
+> contradicted the quantifications of the other conditions.
+
+**Assessment: no effect on Table 2 or Table 3, and therefore none on any
+Raghavendra row in `prior_studies.tsv`.** Figure 4a/4b are the DNA-yield curves
+from the MMS-2 Mars-simulant regolith incubation experiment — a different
+experiment, a different sample type, and a fluorometric mass measurement rather
+than a read count. Tables 2 and 3, which are the sole source of the `published`
+rows and the design of the 10 samples re-analysed here, are untouched. The
+correction changes no read count, no input mass and no organism assignment. The
+PDF held under `ignore/` is already the corrected version (its final page reads
+"© The Author(s) 2023, corrected publication 2025"), and the fetched Zenodo
+reads are unchanged by it.

@@ -1,0 +1,61 @@
+# Reference set -- raghavendra_2023_ecoli
+# Single-organism 10 pg E. coli libraries from
+#   Basapathi Raghavendra J, Zorzano M-P, Kumaresan D, Martin-Torres J.
+#   "DNA sequencing at the picogram level to investigate life on Mars and Earth."
+#   Sci Rep 13:15277 (2023). doi:10.1038/s41598-023-42170-6
+#   Author Correction: Sci Rep 15:14107 (2025). doi:10.1038/s41598-025-98000-4
+# Reads: https://zenodo.org/records/8208597 ("MinION low detectability.zip"),
+# fetched by comparison/fetch_raghavendra.sh.
+#
+# Covers Ec_R1 / Ec_R2 / Ec_R3, the paper's Table 2 row
+# "10 pg of E. coli lenticule discs extract".
+#
+# WHY THIS EXISTS
+# This is not our data. It is a re-analysis of a prior study's deposited reads
+# under THIS pipeline's competitive-mapping assignment, so that the prior study
+# can be compared like-for-like against our numbers instead of Kraken2-against-
+# PlusPF-8 versus minimap2-against-a-known-reference. See comparison/README.md.
+#
+# NO CARRIER
+# Raghavendra et al. used no genomic carrier. Methods, "Library preparation":
+# "The gDNA for the nanopore library was prepared using nuclease-free water and
+# the low concentration of the DNA to be tested was directly pipetted from the
+# previously diluted samples" and "The whole amount of DNA ... was diluted in
+# 25 ul for library preparation", with SQK-LSK114 at halved reagent volumes on
+# an R10.4.1 Flongle. Nothing anywhere in the paper adds lambda or any other
+# filler DNA. There is therefore no role=carrier row here and carrier_dna_ng=0
+# in the samplesheet, which makes input_sample_fraction = 1.0 and enrichment
+# = output_sample_fraction (i.e. enrichment is not a meaningful quantity for
+# this study -- only the per-fg yields are).
+#
+# ACCESSION CHOICE -- Escherichia coli, GCA_900706755.1
+# Methods, "Test samples": "Escherichia coli (NCTC 9001 Lenticule disc, Sigma
+# Aldrich, UK) with an average genomic size of ~ 5 Mb". NCTC 9001 is a named
+# strain, and it was sequenced by the Sanger Institute's NCTC 3000 project
+# (BioProject PRJEB6403, BioSample SAMEA2517362, assembly 27731_A01):
+#   GCA_900706755.1  5,040,580 bp in 5 contigs, contig N50 1,476,437 bp
+# 5.04 Mb corroborates the paper's stated "~5 Mb". This is the exact strain, so
+# it is preferred over a generic K-12 reference; lowinput_s1.tsv sets the same
+# precedent of taking a contig-level assembly when it is the exact strain.
+# NOTE the GenBank (GCA_) accession is deliberate: the paired RefSeq assembly
+# GCF_900706755.1 is SUPPRESSED, so `datasets download genome accession` cannot
+# retrieve it. bin/build_reference_set.py and main.nf both accept GC[AF]_.
+#
+# HOMO SAPIENS IS DELIBERATELY ABSENT
+# The paper reports human reads in every sample and in the negative controls
+# (Table 2: 0-2 human reads here; Table 3: up to 53). Human is nevertheless not
+# included as a contaminant reference, for two reasons. (1) Cost: the pipeline
+# fetches and indexes references once per reference set, and this study needs
+# four sets, so GRCh38 would be downloaded and indexed four times. (2) Direction
+# of the error: adding a competitor to a competitive assignment can only move
+# reads AWAY from E. coli / S. cerevisiae, never toward them, so omitting human
+# makes these counts an UPPER BOUND on the prior study -- the conservative
+# direction with respect to any advantage we claim. Unmapped human reads land in
+# the `unassigned` bin, which compute_metrics.py reconciles explicitly, so they
+# are visible rather than lost. To account for them instead, add:
+#   Homo sapiens<TAB>GCF_000001405.40<TAB>contaminant<TAB>0<TAB>GRCh38.p14<TAB>documented cross-contamination
+#
+# theoretical_dna_fraction: single-organism library, so 1.0 by construction.
+#
+organism	accession	role	theoretical_dna_fraction	strain	notes
+Escherichia coli	GCA_900706755.1	sample	1.0	NCTC 9001	contig-level (5 contigs) exact strain named in Methods; 5,040,580 bp

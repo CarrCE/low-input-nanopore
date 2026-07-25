@@ -1,0 +1,72 @@
+# Reference set -- raghavendra_2023_mix2
+# Two-organism libraries, 10 pg S. cerevisiae + 2 pg E. coli, from
+#   Basapathi Raghavendra J, Zorzano M-P, Kumaresan D, Martin-Torres J.
+#   "DNA sequencing at the picogram level to investigate life on Mars and Earth."
+#   Sci Rep 13:15277 (2023). doi:10.1038/s41598-023-42170-6
+#   Author Correction: Sci Rep 15:14107 (2025). doi:10.1038/s41598-025-98000-4
+# Reads: https://zenodo.org/records/8208597 ("MinION low detectability.zip"),
+# fetched by comparison/fetch_raghavendra.sh.
+#
+# Covers Mix2_R1 / Mix2_R2, the paper's Table 3 row
+# "10 pg of S. cerevisiae + 2 pg of E. coli".
+#
+# THIS SET IS THE MIRROR OF raghavendra_2023_mix1: same two organisms, mass
+# fractions SWAPPED. The two files are kept separate rather than parameterised
+# precisely so the fractions cannot be attached to the wrong organism.
+#
+# WHY THIS EXISTS
+# A re-analysis of a prior study's deposited reads under THIS pipeline's
+# competitive-mapping assignment, so the prior study can be compared
+# like-for-like against our numbers rather than Kraken2-against-PlusPF-8 versus
+# minimap2-against-a-known-reference. See comparison/README.md.
+#
+# NO CARRIER
+# Raghavendra et al. used no genomic carrier. Methods, "Library preparation":
+# "The gDNA for the nanopore library was prepared using nuclease-free water and
+# the low concentration of the DNA to be tested was directly pipetted from the
+# previously diluted samples" and "The whole amount of DNA ... was diluted in
+# 25 ul for library preparation", with SQK-LSK114 at halved reagent volumes on
+# an R10.4.1 Flongle. No lambda or other filler DNA appears anywhere in the
+# paper. There is therefore no role=carrier row and carrier_dna_ng=0 in the
+# samplesheet.
+#
+# ACCESSION CHOICES
+# Escherichia coli -- GCA_900706755.1
+#   Methods, "Test samples": "Escherichia coli (NCTC 9001 Lenticule disc, Sigma
+#   Aldrich, UK) with an average genomic size of ~ 5 Mb". NCTC 9001 was
+#   sequenced by the Sanger Institute's NCTC 3000 project (BioProject PRJEB6403,
+#   BioSample SAMEA2517362): 5,040,580 bp in 5 contigs, N50 1,476,437 bp, which
+#   corroborates the stated "~5 Mb". Exact strain, so preferred over K-12. The
+#   GenBank (GCA_) accession is deliberate -- the paired RefSeq assembly
+#   GCF_900706755.1 is SUPPRESSED and cannot be fetched by `datasets download`.
+# Saccharomyces cerevisiae -- GCF_000146045.2 (ASSUMPTION)
+#   Methods: "yeast from Saccharomyces cerevisiae, Type II (YSC-2, 51,475, Sigma
+#   Aldrich) with an average genomic size of ~ 12 Mb". Sigma YSC-2 is a dried
+#   commercial preparation sold by activity with no strain designation, so the
+#   standard reference genome (strain S288C, assembly R64, complete,
+#   12,071,326 bp, matching the stated "~12 Mb") is used and recorded as an
+#   assumption rather than a strain identification.
+#
+# HOMO SAPIENS IS DELIBERATELY ABSENT
+# Table 3 reports 19 and 53 human reads for these two replicates -- the highest
+# human load in the study. Human is nevertheless not included as a contaminant
+# reference. (1) Cost: references are fetched and indexed once per reference set
+# and this study needs four sets, so GRCh38 would be downloaded and indexed four
+# times. (2) Direction of the error: adding a competitor to a competitive
+# assignment can only move reads AWAY from the target organisms, never toward
+# them, so omitting human makes these counts an UPPER BOUND on the prior study
+# -- the conservative direction with respect to any advantage we claim.
+# Unmapped human reads land in the `unassigned` bin, which compute_metrics.py
+# reconciles explicitly. To account for them instead, add:
+#   Homo sapiens<TAB>GCF_000001405.40<TAB>contaminant<TAB>0<TAB>GRCh38.p14<TAB>documented cross-contamination
+# These two samples are the ones where that choice would matter most; if the
+# unassigned fraction here is large, revisit it.
+#
+# theoretical_dna_fraction is by DNA mass into library prep, from the Table 3
+# sample-type label (the paper states the masses directly; nothing is derived):
+#   Saccharomyces cerevisiae  10 pg / 12 pg = 0.833333
+#   Escherichia coli           2 pg / 12 pg = 0.166667
+#
+organism	accession	role	theoretical_dna_fraction	strain	notes
+Saccharomyces cerevisiae	GCF_000146045.2	sample	0.833333	S288C (assumed; YSC-2 is strain-undefined)	10 pg of the 12 pg library; complete R64 reference genome
+Escherichia coli	GCA_900706755.1	sample	0.166667	NCTC 9001	2 pg of the 12 pg library; contig-level (5 contigs) exact strain

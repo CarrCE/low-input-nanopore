@@ -1,0 +1,59 @@
+# Reference set -- raghavendra_2023_scerevisiae
+# Single-organism 10 pg S. cerevisiae libraries from
+#   Basapathi Raghavendra J, Zorzano M-P, Kumaresan D, Martin-Torres J.
+#   "DNA sequencing at the picogram level to investigate life on Mars and Earth."
+#   Sci Rep 13:15277 (2023). doi:10.1038/s41598-023-42170-6
+#   Author Correction: Sci Rep 15:14107 (2025). doi:10.1038/s41598-025-98000-4
+# Reads: https://zenodo.org/records/8208597 ("MinION low detectability.zip"),
+# fetched by comparison/fetch_raghavendra.sh.
+#
+# Covers YSC_R1 / YSC_R2 / YSC_R3, the paper's Table 2 row
+# "10 pg of YSC-2 yeast extract".
+#
+# WHY THIS EXISTS
+# A re-analysis of a prior study's deposited reads under THIS pipeline's
+# competitive-mapping assignment, so the prior study can be compared
+# like-for-like against our numbers rather than Kraken2-against-PlusPF-8 versus
+# minimap2-against-a-known-reference. See comparison/README.md.
+#
+# NO CARRIER
+# Raghavendra et al. used no genomic carrier. Methods, "Library preparation":
+# "The gDNA for the nanopore library was prepared using nuclease-free water and
+# the low concentration of the DNA to be tested was directly pipetted from the
+# previously diluted samples" and "The whole amount of DNA ... was diluted in
+# 25 ul for library preparation", with SQK-LSK114 at halved reagent volumes on
+# an R10.4.1 Flongle. No lambda or other filler DNA appears anywhere in the
+# paper. There is therefore no role=carrier row and carrier_dna_ng=0 in the
+# samplesheet.
+#
+# ACCESSION CHOICE -- Saccharomyces cerevisiae, GCF_000146045.2 (ASSUMPTION)
+# Methods, "Test samples": "yeast from Saccharomyces cerevisiae, Type II (YSC-2,
+# 51,475, Sigma Aldrich) with an average genomic size of ~ 12 Mb". Sigma YSC-2
+# is a dried commercial yeast preparation sold by activity, NOT a strain-defined
+# culture-collection deposit: no strain designation is given by the supplier or
+# by the paper, and no genome assembly is attributable to it. We therefore use
+# the standard S. cerevisiae reference genome
+#   GCF_000146045.2  strain S288C, assembly R64, complete, 12,071,326 bp
+# and record this as an ASSUMPTION, not a strain identification. 12.07 Mb
+# corroborates the paper's stated "~12 Mb". Practical impact is small: the
+# competing reference here is a bacterium, so strain-level divergence within
+# S. cerevisiae cannot reassign reads between the two organisms; it can only
+# slightly change the number of reads that map at all.
+#
+# HOMO SAPIENS IS DELIBERATELY ABSENT
+# The paper reports human reads in every sample and in the negative controls
+# (Table 2: 0-1 human reads here). Human is nevertheless not included as a
+# contaminant reference. (1) Cost: references are fetched and indexed once per
+# reference set and this study needs four sets, so GRCh38 would be downloaded
+# and indexed four times. (2) Direction of the error: adding a competitor to a
+# competitive assignment can only move reads AWAY from the target organisms,
+# never toward them, so omitting human makes these counts an UPPER BOUND on the
+# prior study -- the conservative direction with respect to any advantage we
+# claim. Unmapped human reads land in the `unassigned` bin, which
+# compute_metrics.py reconciles explicitly. To account for them instead, add:
+#   Homo sapiens<TAB>GCF_000001405.40<TAB>contaminant<TAB>0<TAB>GRCh38.p14<TAB>documented cross-contamination
+#
+# theoretical_dna_fraction: single-organism library, so 1.0 by construction.
+#
+organism	accession	role	theoretical_dna_fraction	strain	notes
+Saccharomyces cerevisiae	GCF_000146045.2	sample	1.0	S288C (assumed; YSC-2 is strain-undefined)	complete R64 reference genome; 12,071,326 bp
