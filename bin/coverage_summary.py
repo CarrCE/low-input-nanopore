@@ -39,10 +39,10 @@ streamed rather than loaded.
 from __future__ import annotations
 
 import argparse
-import gzip
 from collections import defaultdict
 
 import numpy as np
+import pandas as pd
 
 
 def parse_args():
@@ -96,33 +96,51 @@ def main():
     args = parse_args()
     contig2org = load_contig_map(args.contig_map)
 
-    per_org_depths = defaultdict(list)
-    bins = defaultdict(lambda: defaultdict(lambda: [0, 0]))  # org -> bin -> [sum, n]
+    # `samtools depth -a` emits one line per position of every reference in the
+    # BAM header, which for these datasets is tens of millions of lines. A
+    # per-line Python loop is far too slow at that scale (it dominated the whole
+    # pipeline on lowinput_s2), so parse in chunks with pandas' C engine and do
+    # the arithmetic in numpy.
+    sample_contigs = {c for c, (_o, role) in contig2org.items() if role == "sample"}
+    if not sample_contigs:
+        print("[coverage] warning: contig map declares no role=sample contigs")
 
-    opener = gzip.open if args.depth.endswith(".gz") else open
-    with opener(args.depth, "rt") as fh:
-        for line in fh:
-            parts = line.rstrip("\n").split("\t")
-            if len(parts) < 3:
-                continue
-            contig, pos, depth = parts[0], int(parts[1]), int(parts[2])
-            entry = contig2org.get(contig)
-            if entry is None:
-                continue
-            organism, role = entry
-            if role != "sample":
-                continue
-            per_org_depths[organism].append(depth)
-            b = (pos - 1) // args.window
-            slot = bins[organism][(contig, b)]
-            slot[0] += depth
-            slot[1] += 1
+    depth_chunks = defaultdict(list)                      # organism -> [ndarray]
+    bin_sum = defaultdict(lambda: defaultdict(float))     # organism -> (contig, bin) -> depth sum
+    bin_n = defaultdict(lambda: defaultdict(int))         # organism -> (contig, bin) -> n positions
+
+    reader = pd.read_csv(
+        args.depth, sep="\t", header=None, names=["contig", "pos", "depth"],
+        dtype={"contig": str, "pos": np.int64, "depth": np.int32},
+        chunksize=8_000_000, compression="gzip" if args.depth.endswith(".gz") else None,
+    )
+
+    for chunk in reader:
+        chunk = chunk[chunk["contig"].isin(sample_contigs)]
+        if chunk.empty:
+            continue
+        for contig, sub in chunk.groupby("contig", sort=False):
+            organism = contig2org[contig][0]
+            d = sub["depth"].to_numpy()
+            depth_chunks[organism].append(d)
+
+            b = ((sub["pos"].to_numpy() - 1) // args.window).astype(np.int64)
+            nbins = int(b.max()) + 1
+            sums = np.bincount(b, weights=d.astype(np.float64), minlength=nbins)
+            cnts = np.bincount(b, minlength=nbins)
+            hit = np.nonzero(cnts)[0]
+            for i in hit:
+                bin_sum[organism][(contig, int(i))] += float(sums[i])
+                bin_n[organism][(contig, int(i))] += int(cnts[i])
+
+    per_org_depths = {org: np.concatenate(chunks)
+                      for org, chunks in depth_chunks.items()}
 
     with open(args.out_summary, "w") as fh:
         fh.write("sample_id\torganism\tpositions\tmean_depth\tmedian_depth\t"
                  "breadth_1x\tbreadth_5x\tbreadth_10x\tcv\tgini\tdropout_fraction\n")
         for organism in sorted(per_org_depths):
-            d = np.asarray(per_org_depths[organism], dtype=np.int64)
+            d = per_org_depths[organism]
             n = d.size
             mean = float(d.mean()) if n else float("nan")
             sd = float(d.std()) if n else float("nan")
@@ -139,8 +157,10 @@ def main():
 
     with open(args.out_profile, "w") as fh:
         fh.write("sample_id\torganism\tcontig\tbin_start\tmean_depth\tn_positions\n")
-        for organism in sorted(bins):
-            for (contig, b), (total, count) in sorted(bins[organism].items()):
+        for organism in sorted(bin_sum):
+            for (contig, b) in sorted(bin_sum[organism]):
+                total = bin_sum[organism][(contig, b)]
+                count = bin_n[organism][(contig, b)]
                 fh.write(f"{args.sample_id}\t{organism}\t{contig}\t{b * args.window}\t"
                          f"{total / count:.6g}\t{count}\n")
 
