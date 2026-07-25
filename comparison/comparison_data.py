@@ -46,14 +46,51 @@ NUMERIC_COLUMNS = ["replicate_idx", "reads", "bases", "dna_pg",
 STUDIES = ["Mojarro et al. 2019", "B. Raghavendra et al. 2023", "Zorzano et al. 2025"]
 
 #: Which classifier variant is plotted for each prior study by default.
+#:
+#: Zorzano defaults to kraken2_q1 deliberately, even though Raghavendra is
+#: reanalysed at q10 and a quality-matched Zorzano q10 set is available. minQ1
+#: is effectively unfiltered and inflates Zorzano's counts (Blank 213 -> 9 hits
+#: at q10; Microbialites 0.86 MGy 497 -> 51), which makes THEIR yield per fg
+#: look higher and therefore makes this study's improvement factor SMALLER.
+#: Defaulting to the inflated numbers is the conservative choice: the claim then
+#: holds even after granting Zorzano every unfiltered read. It is also arguably
+#: the fairer one, since their samples are ancient degraded DNA where a Q10 cut
+#: discards genuine signal rather than noise.
+#:
+#: Pass --zorzano-classifier kraken2_q10 for the quality-matched comparison,
+#: which is the like-for-like contrast with Raghavendra. Report both.
 DEFAULT_CLASSIFIERS = {
     "Mojarro et al. 2019": "published_table1",
-    "Zorzano et al. 2025": "kraken2_q1",          # internally consistent on both axes
+    "Zorzano et al. 2025": "kraken2_q1",          # conservative; see note above
     "B. Raghavendra et al. 2023": "kraken2_q10",  # only variant with base counts
 }
 
-ZORZANO_CHOICES = ["kraken2_q1", "published_squeezemeta", "legacy_hybrid_workbook"]
-RAGHAVENDRA_CHOICES = ["kraken2_q10", "published"]
+def classifier_choices(study, tsv=PRIOR_TSV):
+    """
+    Classifier variants actually present for a study, read from the TSV.
+
+    Derived rather than hardcoded: variants get added as the comparison is
+    tightened (Zorzano gained a quality-matched kraken2_q10 set; Raghavendra
+    will gain minimap2_competitive), and a stale literal list silently rejects
+    data that is sitting right there in the file.
+    """
+    try:
+        with open(tsv, encoding="utf-8") as fh:
+            header = fh.readline().rstrip("\n").split("\t")
+            i_study, i_cls = header.index("study"), header.index("classifier")
+            seen = []
+            for line in fh:
+                f = line.rstrip("\n").split("\t")
+                if len(f) > max(i_study, i_cls) and f[i_study] == study:
+                    if f[i_cls] and f[i_cls] not in seen:
+                        seen.append(f[i_cls])
+        return seen
+    except (OSError, ValueError):
+        return []
+
+
+ZORZANO_CHOICES = classifier_choices("Zorzano et al. 2025")
+RAGHAVENDRA_CHOICES = classifier_choices("B. Raghavendra et al. 2023")
 
 #: experiment id -> figure series label.
 ROUND_BY_EXPERIMENT = {"lowinput_s1": "Round 1", "lowinput_s2": "Round 2"}
