@@ -90,18 +90,34 @@ basis and the comparison is not yet defensible. Resolve by reanalysing both
 studies through a single, pinned classifier (see item 6) or by stating the
 comparison as classifier-conditional with both values shown.
 
-## 6. Prior-study reanalysis needs pinned databases
+## 6. Prior-study reanalysis databases are pinned; the reanalysis has not been re-run
 
-Any reanalysis of prior studies must pin exactly what it classified against, or
-it is not reproducible and not comparable:
+**Done.** `comparison/kraken2_db.manifest.tsv` is now the authoritative record of
+what the `kraken2_q1` and `kraken2_q10` rows classified against — URL, exact
+byte count, checksum, and the provenance of each checksum:
 
-- Kraken2 PlusPF-8 database: `k2_pluspf_08gb_20241228.tar.gz`
-- NCBI taxonomy: `new_taxdump_2025-01-01.zip`
+- Kraken2 PlusPF-8, 2024-12-28 build (`k2_pluspf_08gb_20241228.tar.gz`,
+  5,925,280,339 B, MD5 `01b8b1eb…`, published upstream)
+- NCBI new_taxdump 2025-01-01 (139,761,991 B, MD5 `171470a1…`, SHA-256
+  `7ff98c65…`, computed locally — NCBI publishes no sidecar for archived dumps)
 
-Neither is currently referenced anywhere in the pipeline: there is no Kraken2
-container, no database download step, and no record of these versions in
-`conf/base.config`. Pin both (URL + checksum) alongside the container tags before
-running the comparison.
+Both URLs were verified to be the ones `epi2me-labs/wf-metagenomics` v2.14.1
+(commit `a57ff73c…`) hard-codes for `--database_set PlusPF-8`, so the pin records
+what was actually used rather than a plausible substitute.
+`comparison/fetch_kraken2_db.sh` downloads and verifies them and stops on any
+mismatch; `comparison/run_kraken2_reanalysis.sh` is the headless equivalent of
+the EPI2ME desktop run, and re-checks that the workflow tag still resolves to the
+recorded commit.
+
+**Still open:** the committed numbers were produced through the EPI2ME desktop
+application and have *not* been regenerated through the scripted path. Doing so
+would convert "pinned and reproducible in principle" into "reproduced", and is
+the natural response if a reviewer questions the prior-study values. It needs a
+~5.5 GiB download, ~8 GiB of RAM, and the Zorzano raw reads, which are not staged
+locally (the Basapathi Raghavendra reads are, under `data/raghavendra_2023/`).
+
+Nothing here touches the main pipeline, which does not use Kraken2 at all —
+`conf/base.config` deliberately gains no Kraken2 container.
 
 ## 7. `lowinput_s2_r0` has an unquantified input mass
 

@@ -18,6 +18,10 @@ on log-log axes: **reads / fg DNA into library prep** (x) against
 | `comparison_data.py` | Loader: reads the TSVs, selects one classifier per study, and optionally supersedes the seeded this-study rows with live pipeline output. Run directly for a data-integrity check. |
 | `plot_comparison.py` | Regenerates the figure and its display-item outputs. |
 | `extract_workbook.py` | **Build-time only.** The one-time xlsx -> TSV extraction, committed so the derivation is auditable. Nothing in the runtime path opens the workbook. |
+| `kraken2_db.manifest.tsv` | The pinned classification databases behind every `kraken2_*` row: URL, size, checksum and where the checksum came from. Authoritative; both scripts below read it. |
+| `fetch_kraken2_db.sh` | Downloads and verifies those databases. Idempotent; refuses to proceed on any size or checksum mismatch. |
+| `run_kraken2_reanalysis.sh` | Headless `wf-metagenomics` run pinned to v2.14.1, against the verified local databases. The command-line equivalent of the EPI2ME desktop run that produced the committed numbers. |
+| `fetch_raghavendra.sh` | Stages the 10 deposited Basapathi Raghavendra FASTQs from Zenodo. |
 | `figures/` | Generated outputs (PDF / PNG / CSV / JSON). |
 
 ## Formulas
@@ -283,6 +287,61 @@ the workbook's own computed cell. Commit the regenerated TSVs. The workbook
 lives under the gitignored `ignore/` tree, so this step is not reproducible from
 a clean clone — which is the point of committing the TSVs.
 
+## Classification provenance: what the `kraken2_*` rows ran against
+
+Every row in `prior_studies.tsv` with `classifier=kraken2_q1` or
+`kraken2_q10` is a reanalysis of published raw reads, and a reanalysis is only
+as reproducible as the database it classified against. Kraken2 assigns a read to
+the lowest common ancestor of its k-mer hits, so the database build determines
+both what can be found and where in the taxonomy it lands. Two builds of "PlusPF"
+are not interchangeable and swapping them changes counts.
+
+The pin lives in **`kraken2_db.manifest.tsv`**:
+
+| | |
+|---|---|
+| workflow | `epi2me-labs/wf-metagenomics` v2.14.1, commit `a57ff73c22b77c2754b7910cd8d24ab6056ed8cc` |
+| classifier | kraken2 |
+| database | Kraken2 PlusPF-8, **2024-12-28** build (`k2_pluspf_08gb_20241228.tar.gz`, 5,925,280,339 B, MD5 `01b8b1eb…`) |
+| taxonomy | NCBI new_taxdump **2025-01-01** (139,761,991 B, MD5 `171470a1…`, SHA-256 `7ff98c65…`) |
+
+Those two URLs are not a reconstruction. wf-metagenomics v2.14.1 hard-codes them
+in its `database_sets` map under the key `PlusPF-8`, so `--database_set PlusPF-8`
+on that revision resolves to exactly these files; the manifest records what the
+reanalysis used rather than a plausible substitute.
+
+One trap worth naming: NCBI serves the taxonomy at two paths. The one under
+`pub/taxonomy/new_taxdump/new_taxdump.zip` is **rolling** — rewritten daily, and
+today it returns a file with today's date. Only the dated copy under
+`taxdump_archive/` is stable, and that is what is pinned. Substituting the
+rolling path would silently reclassify against a different taxonomy.
+
+```bash
+bash comparison/fetch_kraken2_db.sh                    # ~5.5 GiB, verified
+bash comparison/run_kraken2_reanalysis.sh \
+     --fastq data/raghavendra_2023 --out results_kraken2 --min-qual 10
+```
+
+`fetch_kraken2_db.sh` stops on any size or checksum mismatch rather than
+redownloading, because a mismatch means the URL has started serving something
+other than the pinned build — the exact event this pin exists to catch. The
+runner additionally re-resolves the workflow tag and stops if it no longer points
+at the recorded commit; upstream tags can move.
+
+**What this does and does not claim.** The committed `kraken2_q1` and
+`kraken2_q10` values were produced through the EPI2ME desktop application, which
+records its parameters only inside the run directory it creates. The scripts here
+are the command-line equivalent with the same pinned inputs, added so the
+provenance lives in version control; the committed numbers have **not** been
+regenerated through them. Anyone re-running should expect agreement and should
+report it if not.
+
+Note also that `--min_read_qual` in wf-metagenomics thresholds on the mean
+**Phred** value of a read, while this repository's own filter averages in
+error-probability space per the ONT convention. They are different thresholds
+with the same name; the value is passed through unchanged so that a re-run
+reproduces the committed rows rather than a corrected version of them.
+
 ## Requirements
 
 Python 3.12+, and only `numpy`, `pandas`, `matplotlib` (plus `openpyxl` for the
@@ -290,6 +349,13 @@ build-time extractor) — all present in the repo's analysis container. All
 scripts derive their paths from `Path(__file__).resolve().parent` and accept
 `--outdir`, so the module can be run from any working directory or relocated
 wholesale.
+
+The two shell scripts need more: `fetch_kraken2_db.sh` wants curl, tar, unzip and
+one of md5sum/md5, plus ~13 GiB of free space while unpacking;
+`run_kraken2_reanalysis.sh` additionally wants nextflow, docker and git, and at
+least 8 GiB of RAM available to the workflow (the PlusPF-8 index is memory-mapped
+unless `--kraken2_memory_mapping` is set). Neither is needed to regenerate the
+figure — the committed TSVs cover that.
 
 ## Style notes
 

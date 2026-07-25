@@ -1,0 +1,34 @@
+# Pinned classification databases for the prior-study Kraken2 reanalysis.
+#
+# This file is the single authoritative record of what the `kraken2_q1` and
+# `kraken2_q10` rows in prior_studies.tsv were classified against. It is read by
+# comparison/fetch_kraken2_db.sh, which downloads and verifies every entry, and
+# by comparison/run_kraken2_reanalysis.sh, which points the workflow at the
+# verified local copies rather than letting it resolve the URLs itself.
+#
+# Why these exact URLs: epi2me-labs/wf-metagenomics v2.14.1 hard-codes them in
+# its `database_sets` map under the key `PlusPF-8`. Selecting
+# `--database_set PlusPF-8` on that revision resolves to precisely these two
+# files, so the pin below records what the reanalysis actually used rather than
+# a plausible substitute. Verified on 2026-07-25 against
+# https://raw.githubusercontent.com/epi2me-labs/wf-metagenomics/v2.14.1/nextflow.config
+# (tag v2.14.1 = commit d8f780d9e03daee7cd3251c8928ddbcde7b3793e).
+#
+# Both URLs are dated and immutable. Note in particular that the *undated* NCBI
+# path (pub/taxonomy/new_taxdump/new_taxdump.zip) is a rolling file rewritten
+# daily and must never be substituted here; only the dated copy under
+# taxdump_archive/ is reproducible.
+#
+# Columns
+#   key           stable identifier used by the scripts
+#   role          database | taxonomy
+#   url           immutable download URL
+#   bytes         exact Content-Length, checked before hashing
+#   md5           MD5 of the downloaded file
+#   sha256        SHA-256 where we computed one, "-" otherwise
+#   checksum_src  where the checksum came from, so a reader can re-derive it
+#   note          what the file is and what depends on it
+#
+key	role	url	bytes	md5	sha256	checksum_src	note
+kraken2_pluspf8	database	https://genome-idx.s3.amazonaws.com/kraken/k2_pluspf_08gb_20241228.tar.gz	5925280339	01b8b1ebe60ec8f338382ffb7205e11c	-	Published upstream at https://genome-idx.s3.amazonaws.com/kraken/pluspf_08gb_20241228/pluspf08gb.md5, entry "k2_pluspf08gb_20241228.tar.gz" (the archive is served under a slightly different basename than the checksum file names it). Not independently recomputed here; fetch_kraken2_db.sh recomputes it on download.	Kraken2 PlusPF capped at 8 GB, 2024-12-28 build. k=35, l=31, 51472 taxonomy nodes, table capacity 2000000000 (from the accompanying inspect.txt). The tarball ships its own nodes.dmp, names.dmp and ktaxonomy.tsv, so k-mer assignment does not consult the taxdump below.
+ncbi_taxdump	taxonomy	https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_archive/new_taxdump_2025-01-01.zip	139761991	171470a179e43face9b68d97b48d12fc	7ff98c656906c805f89ad0c1baa001a39d9d48b0e7291777f4adfafbc009f3ca	Computed locally on 2026-07-25 from a complete download whose size matched Content-Length and whose CRCs all verified; NCBI publishes no .md5 sidecar for archived taxdumps.	NCBI new_taxdump snapshot of 2025-01-01 (17 members, names.dmp 237704544 B, nodes.dmp 247648029 B). wf-metagenomics uses it for lineage lookup and abundance-table rollup, not for the k-mer assignment itself.
