@@ -10,8 +10,14 @@ data/*
 !data/reference_genomes.md
 
 refs/
-results/
 work/
+
+# Pipeline outputs. `results/` is the default outdir; the other two come from
+# `--outdir results_q10` (quality-matched rerun) and the Raghavendra reanalysis.
+# Matched by prefix so a new `--outdir results_<something>` cannot be committed
+# by accident -- these directories hold tens of GB.
+results/
+results_*/
 .nextflow/
 .nextflow.log*
 
