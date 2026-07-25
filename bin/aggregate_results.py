@@ -21,8 +21,8 @@ metric divides by an input mass those samples do not have.
 from __future__ import annotations
 
 import argparse
-import gzip
 import json
+from collections import defaultdict
 from pathlib import Path
 
 import matplotlib
@@ -37,6 +37,7 @@ ROLE_COLORS = {
     "carrier":     "#0072B2",
     "contaminant": "#D55E00",
     "ambiguous":   "#CC79A7",
+    "none":        "#999999",   # unmapped; assign_reads.py labels these "none"
     "unassigned":  "#999999",
 }
 
@@ -238,28 +239,59 @@ def main():
 
     # ---- Figure: read length by role (the ejection signature) -------------
     if args.readlengths:
-        frames = []
-        for f in args.readlengths:
-            sid = Path(f).name.split(".")[0]
-            with gzip.open(f, "rt") as fh:
-                df = pd.read_csv(fh, sep="\t")
-            df["sample_id"] = sid
-            frames.append(df[["sample_id", "role", "read_length"]])
-        rl = pd.concat(frames, ignore_index=True)
+        # These files hold one row per read -- ~120 million rows across this
+        # study's replicates. Concatenating them into a single DataFrame needs
+        # well over 10 GB and gets the process OOM-killed, so accumulate
+        # per-role histograms in fixed bins instead and never hold more than one
+        # chunk at a time. Counts, sums and maxima stay exact; quantiles are
+        # derived from the histogram and are therefore approximate, to within
+        # the bin width (2000 log-spaced bins over 1 bp - 2 Mb, so well under 1%).
+        BINS = np.logspace(0, np.log10(2_000_000), 2001)
+        widths = np.diff(BINS)
+        hist = defaultdict(lambda: np.zeros(len(BINS) - 1, dtype=np.int64))
+        exact = defaultdict(lambda: {"n": 0, "sum": 0, "max": 0})
 
-        roles = [r for r in ["carrier", "contaminant", "sample", "ambiguous", "unassigned"]
-                 if (rl["role"] == r).any()]
+        for f in args.readlengths:
+            for chunk in pd.read_csv(f, sep="\t", compression="gzip",
+                                     usecols=["role", "read_length"],
+                                     dtype={"role": str, "read_length": np.int64},
+                                     chunksize=4_000_000):
+                chunk = chunk[chunk["read_length"] > 0]
+                for role, sub in chunk.groupby("role", sort=False):
+                    v = sub["read_length"].to_numpy()
+                    hist[role] += np.histogram(v, bins=BINS)[0]
+                    e = exact[role]
+                    e["n"] += int(v.size)
+                    e["sum"] += int(v.sum())
+                    e["max"] = max(e["max"], int(v.max()))
+
+        def hist_quantile(counts, q):
+            """Quantile from binned counts, interpolated within the bin."""
+            total = counts.sum()
+            if total == 0:
+                return float("nan")
+            cum = np.cumsum(counts)
+            i = int(np.searchsorted(cum, q * total))
+            i = min(i, len(counts) - 1)
+            lo, hi = BINS[i], BINS[i + 1]
+            before = cum[i - 1] if i > 0 else 0
+            frac = ((q * total - before) / counts[i]) if counts[i] else 0.0
+            return float(lo + frac * (hi - lo))
+
+        # assign_reads.py writes role="none" for reads no reference aligned, so
+        # "none" must be listed or unmapped reads silently vanish from the figure.
+        roles = [r for r in ["carrier", "contaminant", "sample", "ambiguous",
+                             "none", "unassigned"] if exact.get(r, {}).get("n")]
+
         fig, ax = plt.subplots(figsize=(6.4, 4.4))
-        bins = np.logspace(np.log10(max(rl["read_length"].min(), 10)),
-                           np.log10(max(rl["read_length"].max(), 100)), 70)
         for role in roles:
-            v = rl.loc[rl["role"] == role, "read_length"]
-            v = v[v > 0]
-            if not len(v):
-                continue
-            ax.hist(v, bins=bins, histtype="step", density=True, linewidth=1.3,
-                    color=ROLE_COLORS.get(role, "0.5"),
-                    label=f"{role} (n={len(v):,}, median {int(v.median()):,} bp)")
+            counts = hist[role]
+            n = exact[role]["n"]
+            med = hist_quantile(counts, 0.5)
+            # Match what ax.hist(density=True) would draw: counts / (N * width).
+            ax.stairs(counts / (n * widths), BINS, color=ROLE_COLORS.get(role, "0.5"),
+                      linewidth=1.3,
+                      label=f"{role} (n={n:,}, median {med:,.0f} bp)")
         ax.set_xscale("log")
         ax.set_xlabel("Read length (bp)")
         ax.set_ylabel("Density")
@@ -271,11 +303,15 @@ def main():
         fig.savefig(outdir / "readlengths.png", bbox_inches="tight", dpi=600)
         plt.close(fig)
 
-        stats = (rl.groupby("role")["read_length"]
-                   .agg(n="size", mean="mean", median="median",
-                        p25=lambda s: s.quantile(0.25),
-                        p75=lambda s: s.quantile(0.75), max="max")
-                   .reset_index())
+        stats = pd.DataFrame([{
+            "role": role,
+            "n": exact[role]["n"],
+            "mean": exact[role]["sum"] / exact[role]["n"],
+            "median": hist_quantile(hist[role], 0.50),
+            "p25": hist_quantile(hist[role], 0.25),
+            "p75": hist_quantile(hist[role], 0.75),
+            "max": exact[role]["max"],
+        } for role in roles])
         stats.to_csv(outdir / "readlengths.csv", index=False)
         write_sidecar(
             outdir / "readlengths.json", "readlengths",
@@ -284,7 +320,10 @@ def main():
             "as carrier, truncating that read, while molecules that are not rejected "
             "are sequenced to full length. Carrier reads are therefore expected to be "
             "systematically shorter than community reads; this figure tests that "
-            "expectation directly. Densities are normalised per class.",
+            "expectation directly. Densities are normalised per class. Counts, means "
+            "and maxima are exact; medians and quartiles are derived from 2000 "
+            "log-spaced bins spanning 1 bp to 2 Mb (accurate to well under 1%), "
+            "because the per-read tables are too large to hold in memory at once.",
             [Path(f).name for f in args.readlengths],
             {r["role"]: {"n": int(r["n"]), "median_bp": float(r["median"])}
              for _, r in stats.iterrows()})

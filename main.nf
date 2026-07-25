@@ -298,13 +298,18 @@ process COVERAGE_SUMMARY {
 
 process AGGREGATE {
     label 'analysis'
-    label 'process_low'
+    label 'process_medium'
     publishDir "${params.outdir}/summary", mode: 'copy'
 
     input:
-    path metrics
-    path summaries
-    path readlengths
+    // With --mode both, competitive and sequential emit identically named files
+    // for the same sample (they are kept apart by publishDir, not by filename).
+    // Collecting them into one process would therefore collide, so each file is
+    // staged into its own numbered subdirectory. Basenames are preserved, which
+    // matters because aggregate_results.py recovers the sample id from them.
+    path metrics,     stageAs: 'metrics*/*'
+    path summaries,   stageAs: 'summaries*/*'
+    path readlengths, stageAs: 'readlengths*/*'
     path samplesheet
     path script
 
@@ -486,7 +491,13 @@ workflow {
     AGGREGATE(
         COMPUTE_METRICS.out.metrics.map { meta, mode, m -> m }.collect(),
         COMPUTE_METRICS.out.summary.collect(),
-        ASSIGN_READS.out.readlengths.map { meta, mode, rl -> rl }.collect(),
+        // One mode only. With --mode both the same reads appear twice (relabelled
+        // by the other rule), which would double-count every read in the
+        // length distribution. Competitive is the primary rule.
+        ASSIGN_READS.out.readlengths
+            .filter { meta, mode, rl -> mode == (params.mode == 'sequential' ? 'sequential' : 'competitive') }
+            .map { meta, mode, rl -> rl }
+            .collect(),
         file(params.samplesheet),
         ch_script_agg
     )
