@@ -1,0 +1,68 @@
+{
+  "id": "estimated_control",
+  "display_type": "calculation",
+  "source_files": [
+    "comparison/estimated_control.py (constants from the cited Table 1 and Methods; no input file is read)"
+  ],
+  "software": [
+    "python 3.12",
+    "scipy (Garwood exact Poisson interval)"
+  ],
+  "title": "Estimated no-adaptive-sampling control from Mojarro et al. 2019",
+  "caption": "No control library was sequenced for this study with adaptive sampling disabled. Mojarro et al. 2019 provides the closest published substitute: the same 1 ug lambda genomic carrier, a 2 pg DNA sample, and a standard 48 h MinION run with no real-time selective sequencing. Applying this study's enrichment definition to their Table 1 gives 0.30x on a base basis - that is, without adaptive sampling the sample's share of output bases is about three-fold LOWER than its share of input mass, because carrier molecules sequence to full length (whole-run mean 6,675 bp) while target molecules do not (mean 1,054 bp). Depletion-mode adaptive sampling inverts that relationship, truncating carrier reads on rejection. The comparison is an estimate across experiments, not a control.",
+  "source": "Mojarro A, Hachey J, Bailey R, Brown M, Doebler R, Ruvkun G, Zuber MT, Carr CE. Astrobiology 2019;19(9):1139-1152. doi:10.1089/ast.2018.1929. Table 1 and Methods.",
+  "inputs": {
+    "sample_pg": 2.0,
+    "carrier_pg": 1000000.0,
+    "total_reads": 1303007,
+    "total_bases": 8698026598,
+    "target_reads": 5,
+    "target_bases": 5270
+  },
+  "estimated_control": {
+    "input_sample_fraction": 1.999996000008e-06,
+    "output_fraction_bases": 6.058845579078557e-07,
+    "output_fraction_reads": 3.837277927133162e-06,
+    "enrichment_bases": 0.30294288483848575,
+    "enrichment_reads": 1.918642800844508,
+    "enrichment_bases_95ci": [
+      0.09836473010369871,
+      0.7069676362726913
+    ],
+    "whole_run_mean_read_bp": 6675.34909482451,
+    "target_mean_read_bp": 1054.0
+  },
+  "comparisons": [
+    {
+      "experiment": "lowinput_s1",
+      "enrichment_bases": 59.49,
+      "enrichment_reads": 17.87,
+      "fold_over_estimated_control_bases": 196.37364987699627,
+      "fold_over_estimated_control_reads": 9.313875408249185,
+      "fold_over_estimated_control_bases_ci": [
+        84.14812354586135,
+        604.7899479547605
+      ]
+    },
+    {
+      "experiment": "lowinput_s2",
+      "enrichment_bases": 43.01,
+      "enrichment_reads": 18.39,
+      "fold_over_estimated_control_bases": 141.97395665169958,
+      "fold_over_estimated_control_reads": 9.584900322199356,
+      "fold_over_estimated_control_bases_ci": [
+        60.8372969189359,
+        437.2502212394393
+      ]
+    }
+  ],
+  "caveats": [
+    "Different flow cell chemistry: R9.4 (Mojarro) vs R10.4.1 (this study).",
+    "Different basecaller: Albacore 1.10 vs dorado sup v5.0.0.",
+    "Different sample: B. subtilis spore DNA vs ZymoBIOMICS mock communities.",
+    "Different target-detection method: CarrierSeq bioinformatic filtering vs competitive alignment against known reference genomes.",
+    "The estimate rests on 5 target reads, so its Poisson interval is wide; the interval is reported and never collapsed to a point.",
+    "Carrier mass matches (1 ug lambda) and both are picogram-to-nanogram carrier-sequencing experiments, which is what makes the comparison meaningful at all.",
+    "This is not a substitute for a matched control run on the same platform."
+  ]
+}

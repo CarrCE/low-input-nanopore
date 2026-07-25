@@ -1,0 +1,20 @@
+# lowinput_s1 -- D6311 Microbial Community DNA Standard II (Log Distribution)
+# ~1 ng community DNA + ~1000 ng lambda carrier, depletion-mode adaptive sampling.
+#
+# Columns
+#   sample_id            unique id, also the results/ subdirectory name
+#   experiment           groups replicates for aggregate statistics
+#   replicate            replicate index as reported
+#   fastq                path to basecalled reads; relative paths resolve under repo root
+#   sra_accession        reserved; populated once reads are deposited (see docs/TODO.md)
+#   reference_set        TSV under assets/references/
+#   library_dna_ng       sample (non-carrier) DNA into library prep, ng  -> denominator for reads/fg
+#   carrier_dna_ng       lambda carrier DNA into library prep, ng
+#   dna_into_extraction_ng   blank: D6311 ships as purified DNA, there is no extraction step
+#   cells_into_extraction    blank: DNA standard, not cells
+#   include_in_headline  1 = contributes to the headline per-fg statistics
+#   notes
+sample_id,experiment,replicate,fastq,sra_accession,reference_set,library_dna_ng,carrier_dna_ng,dna_into_extraction_ng,cells_into_extraction,include_in_headline,notes
+lowinput_s1_r1,lowinput_s1,1,data/lowinput_s1_r1.fastq,,assets/references/lowinput_s1.tsv,1.20672,1000,,,1,
+lowinput_s1_r2,lowinput_s1,2,data/lowinput_s1_r2.fastq,,assets/references/lowinput_s1.tsv,1.00000,1000,,,1,
+lowinput_s1_r3,lowinput_s1,3,data/lowinput_s1_r3.fastq,,assets/references/lowinput_s1.tsv,1.34064,1000,,,1,

@@ -1,0 +1,71 @@
+# raghavendra_2023 -- mapping-based re-analysis of a PRIOR STUDY, not our data
+#
+# Basapathi Raghavendra J, Zorzano M-P, Kumaresan D, Martin-Torres J.
+# "DNA sequencing at the picogram level to investigate life on Mars and Earth."
+# Sci Rep 13:15277 (2023). doi:10.1038/s41598-023-42170-6
+# Author Correction: Sci Rep 15:14107 (2025). doi:10.1038/s41598-025-98000-4
+#   The correction is confined to Fig. 4a/4b (MMS-2 regolith DNA-yield curves,
+#   interchanged data points and a non-zero negative control). It does NOT touch
+#   Table 2 or Table 3, i.e. none of the read counts for the 10 samples below.
+#
+# Reads are the authors' own deposited fastq_pass files from
+# https://zenodo.org/records/8208597 ("MinION low detectability.zip").
+# Populate data/raghavendra_2023/ first:
+#     bash comparison/fetch_raghavendra.sh
+#
+# WHY THIS SAMPLESHEET EXISTS
+# comparison/prior_studies.tsv currently compares this study to ours across a
+# methodological gap: their reads were classified with Kraken2 against PlusPF-8,
+# ours are assigned by competitive minimap2 alignment to a known reference.
+# Direct alignment to the exact organisms present is strictly more sensitive
+# than classification against a broad database, so that comparison inflates our
+# apparent advantage. Running their reads through THIS pipeline removes the gap.
+# See comparison/README.md, "Mapping-based re-analysis of Raghavendra et al.".
+#
+# Columns are as documented in lowinput_s1.csv, with these study-specific values:
+#   library_dna_ng   TOTAL sample DNA mass into library prep, ng. Stated by the
+#                    paper, not measured by us: 10 pg = 0.010 ng for the
+#                    single-organism libraries, 10 pg + 2 pg = 12 pg = 0.012 ng
+#                    for the mixes. Qubit could not quantify at these levels
+#                    ("The Qubit 4.0. fluorometer sensitivity is limited to
+#                    10 pg/ul"), so these are dilution-derived nominal masses.
+#   carrier_dna_ng   0 for every row. Raghavendra et al. used NO genomic carrier
+#                    -- SQK-LSK114 was run directly on the diluted sample DNA in
+#                    25 ul of nuclease-free water, with no lambda or other
+#                    filler. Consequence: input_sample_fraction = 1.0, so
+#                    `enrichment` is identically equal to output_sample_fraction
+#                    and is not a meaningful quantity for this study. Only the
+#                    per-fg yields (reads_per_fg / bases_per_fg) are comparable.
+#   dna_into_extraction_ng, cells_into_extraction
+#                    blank: the libraries are aliquots of a serial dilution of a
+#                    bulk extract, so no per-library extraction input exists.
+#   include_in_headline
+#                    0 for every row. This is a prior study; it must never enter
+#                    our headline statistics.
+#   reference_set    differs per row because theoretical_dna_fraction differs by
+#                    design: 1.0 for the single-organism sets, 0.833333/0.166667
+#                    for the mixes, assigned to whichever organism was the 10 pg
+#                    component.
+#
+# The `notes` column carries two read counts per file, as a cross-check that the
+# fetched FASTQ is the right one:
+#   "MinKNOW total pass+fail N"  the paper's own Table 2 / Table 3 value
+#   "deposited fastq_pass N"     reads actually in the deposited fastq_pass file,
+#                                counted here after extraction
+# These are very different numbers (e.g. ANP471: 224 vs 8) because the deposit
+# contains pass and fail in separate files and only fastq_pass is used, matching
+# the paper's own analysis ("The passed Fastq files were analysed using EPI2ME").
+# One consequence is worth flagging: APN068 has exactly 263 reads in fastq_pass,
+# and 263 is the value Table 3 reports as its S. cerevisiae pass-read count. That
+# confirms the transcription error already suspected in comparison/prior_studies.tsv.
+sample_id,experiment,replicate,fastq,sra_accession,reference_set,library_dna_ng,carrier_dna_ng,dna_into_extraction_ng,cells_into_extraction,include_in_headline,notes
+raghavendra_2023_ec_r1,raghavendra_2023_ec,1,data/raghavendra_2023/Ec_R1.fastq.gz,,assets/references/raghavendra_2023_ecoli.tsv,0.010,0,,,0,Table 2 R1; ANP471; MinKNOW total pass+fail 224 reads; deposited fastq_pass 8 reads
+raghavendra_2023_ec_r2,raghavendra_2023_ec,2,data/raghavendra_2023/Ec_R2.fastq.gz,,assets/references/raghavendra_2023_ecoli.tsv,0.010,0,,,0,Table 2 R2; ANP315; MinKNOW total pass+fail 73 reads; deposited fastq_pass 4 reads
+raghavendra_2023_ec_r3,raghavendra_2023_ec,3,data/raghavendra_2023/Ec_R3.fastq.gz,,assets/references/raghavendra_2023_ecoli.tsv,0.010,0,,,0,Table 2 R3; ANR193; MinKNOW total pass+fail 313 reads; deposited fastq_pass 27 reads
+raghavendra_2023_ysc_r1,raghavendra_2023_ysc,1,data/raghavendra_2023/YSC_R1.fastq.gz,,assets/references/raghavendra_2023_scerevisiae.tsv,0.010,0,,,0,Table 2 R1; ANR915; MinKNOW total pass+fail 337 reads; deposited fastq_pass 23 reads
+raghavendra_2023_ysc_r2,raghavendra_2023_ysc,2,data/raghavendra_2023/YSC_R2.fastq.gz,,assets/references/raghavendra_2023_scerevisiae.tsv,0.010,0,,,0,Table 2 R2; ANQ439; MinKNOW total pass+fail 37 reads; deposited fastq_pass 8 reads
+raghavendra_2023_ysc_r3,raghavendra_2023_ysc,3,data/raghavendra_2023/YSC_R3.fastq.gz,,assets/references/raghavendra_2023_scerevisiae.tsv,0.010,0,,,0,Table 2 R3; ANP378; MinKNOW total pass+fail 190 reads; deposited fastq_pass 2 reads
+raghavendra_2023_mix1_r1,raghavendra_2023_mix1,1,data/raghavendra_2023/Mix1_R1.fastq.gz,,assets/references/raghavendra_2023_mix1.tsv,0.012,0,,,0,Table 3 R1; APM812; 10 pg E. coli + 2 pg S. cerevisiae; MinKNOW total pass+fail 411 reads; deposited fastq_pass 7 reads
+raghavendra_2023_mix1_r2,raghavendra_2023_mix1,2,data/raghavendra_2023/Mix1_R2.fastq.gz,,assets/references/raghavendra_2023_mix1.tsv,0.012,0,,,0,Table 3 R2; AQD920; 10 pg E. coli + 2 pg S. cerevisiae; MinKNOW total pass+fail 1180 reads; deposited fastq_pass 455 reads
+raghavendra_2023_mix2_r1,raghavendra_2023_mix2,1,data/raghavendra_2023/Mix2_R1.fastq.gz,,assets/references/raghavendra_2023_mix2.tsv,0.012,0,,,0,Table 3 R1; APU620; 10 pg S. cerevisiae + 2 pg E. coli; MinKNOW total pass+fail 2110 reads; deposited fastq_pass 520 reads
+raghavendra_2023_mix2_r2,raghavendra_2023_mix2,2,data/raghavendra_2023/Mix2_R2.fastq.gz,,assets/references/raghavendra_2023_mix2.tsv,0.012,0,,,0,Table 3 R2; APN068; 10 pg S. cerevisiae + 2 pg E. coli; MinKNOW total pass+fail 4700 reads; deposited fastq_pass 263 reads
