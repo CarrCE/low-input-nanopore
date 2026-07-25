@@ -141,7 +141,16 @@ sequencing failure and would quietly inflate the apparent noise floor.
   substrate; the cost is that reads which would fail to map to the reduced index
   but do map to the combined one are treated slightly differently than a literal
   re-mapping would treat them.
-- The quantitative delta between the two modes on these data has not been
-  measured yet — the runs are pending. Until that number exists, the claim that
-  subtraction over-removes the community's *E. coli* is a mechanistic argument,
-  not a measurement.
+- The delta between the two modes has now been measured on these data and is a
+  display item (`results/summary/mode_delta.*`): under subtraction *E. coli*
+  retains **1.18%** of its reads (20,166 → 238), *Salmonella* 96.5%, and every
+  other organism ≥99.4%. Both affected organisms are Enterobacteriaceae, which
+  is what the mechanism predicts. The claim that subtraction over-removes the
+  community's *E. coli* is therefore a measurement, not an argument.
+- That measurement subtracts against the **stock MG1655 reference**. The
+  original analysis subtracted against a breseq consensus of the *E. coli*
+  actually present in the carrier prep, which is implemented
+  (`--breseq_consensus`) but has not yet been run on a full replicate. A
+  consensus can only match the carrier's own reads *better* than the stock
+  reference does, so it can only subtract more — the 1.18% figure is an upper
+  bound on what the original method retained.
