@@ -197,11 +197,17 @@ def main():
             span = [lo * 0.3, hi * 3]
             ax.plot(span, span, color="0.6", lw=0.8, ls=(0, (4, 3)), zorder=1)
 
-            for _, r in grp.iterrows():
-                if r["mean"] > 0:
-                    ax.annotate(italicize(r["organism"]), (r["theory"], r["mean"]),
-                                textcoords="offset points", xytext=(5, 4),
-                                fontsize=7, color="0.25")
+            # Alternate the label side by rank so neighbouring points in a
+            # log-distributed community (which crowd along the diagonal) do not
+            # overprint each other.
+            ranked = grp[grp["mean"] > 0].sort_values("theory").reset_index(drop=True)
+            for i, r in ranked.iterrows():
+                right = (i % 2 == 0)
+                ax.annotate(italicize(r["organism"]), (r["theory"], r["mean"]),
+                            textcoords="offset points",
+                            xytext=(6, 5) if right else (-6, -11),
+                            ha="left" if right else "right",
+                            fontsize=6.5, color="0.25")
 
             ax.set_xscale("log"); ax.set_yscale("log")
             ax.set_xlim(*span); ax.set_ylim(*span)
