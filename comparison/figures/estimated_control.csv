@@ -1,0 +1,10 @@
+quantity,value
+input_sample_fraction,1.999996000008e-06
+output_fraction_bases,6.058845579078557e-07
+output_fraction_reads,3.837277927133162e-06
+enrichment_bases,0.30294288483848575
+enrichment_reads,1.918642800844508
+enrichment_bases_ci_lo,0.09836473010369871
+enrichment_bases_ci_hi,0.7069676362726913
+lowinput_s1_fold_over_control_bases,196.37364987699627
+lowinput_s2_fold_over_control_bases,141.97395665169958
