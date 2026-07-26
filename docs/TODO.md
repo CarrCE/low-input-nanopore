@@ -24,7 +24,7 @@ the samplesheet parser to prefer the accession when `--fetch_from_sra` is set.
 The container for it does not exist yet either — `docker/tools` has no SRA
 toolkit.
 
-## 2. `--breseq_consensus` is wired but has never been run at full depth
+## 2. `--breseq_consensus` is implemented, run, and found unnecessary
 
 `--mode competitive | sequential | both` are all wired, and the per-organism
 delta between the two modes is a display item
@@ -50,22 +50,52 @@ to a contaminant organism, that a read matching the consensus but aligning
 nowhere is still subtracted, and that contaminant reads which *miss* the
 consensus fall through rather than vanish. All seven pass.
 
-**What is not.** No replicate has been run end to end with
-`--breseq_consensus`. The bundled test profile cannot do it: 40,000 reads give
-~0.3× contaminant depth, and below roughly 10× breseq predicts missing coverage
-across the whole reference and returns a deleted genome instead of a consensus.
-That is now caught up front by `--breseq_min_depth` (default 10) with a
-diagnostic naming the measured depth, and again after breseq by a check for a
-whole-reference `DEL`. The real replicates carry 20–56× contaminant depth
-(s1: 33.8×, 21.4×, 20.5×; s2: 52.7×, 40.2×, 56.3×, 49.1×), so the path should
-run — but "should" is not "did", and the consensus has not been inspected.
+**Depth is the operative constraint.** The bundled test profile cannot exercise
+the option: 40,000 reads give ~0.3× contaminant depth, and below roughly 10×
+breseq predicts missing coverage across the whole reference and returns a
+deleted genome instead of a consensus. That is caught up front by
+`--breseq_min_depth` (default 10) with a diagnostic naming the measured depth,
+and again after breseq by a check for a whole-reference `DEL`.
 
-Until a full run happens, the claim that subtraction over-removes rests on the
-measured competitive-vs-sequential delta against the *stock* reference, not
-against the consensus the original analysis actually used. The delta is already
-stark (*E. coli* retains 1.18% of its reads under subtraction), and building the
-consensus can only make the subtraction more aggressive, so the conclusion is
-conservative as it stands.
+**The consensus has now been built for all seven replicates, and it turns out
+not to be needed.** `bin/contaminant_divergence.sh` runs breseq over the
+competitively-assigned contaminant reads of a finished run — no re-mapping, since
+the assignments already record which reads won the contaminant:
+
+| replicate | reads | mapped | depth | SNPs | indels | structural |
+|---|---:|---:|---:|---:|---:|---:|
+| s1_r1 | 159,229 | 92.3% | 31.2× | 20 | 0 | 0 |
+| s1_r2 | 91,920 | 91.2% | 19.7× | 16 | 0 | 0 |
+| s1_r3 | 76,826 | 91.1% | 19.1× | 10 | 1 | 0 |
+| s2_r0 | 577,647 | 86.7% | 40.8× | 100 | 8 | 0 |
+| s2_r1 | 435,677 | 86.5% | 31.5× | 84 | 3 | 0 |
+| s2_r2 | 579,853 | 87.8% | 44.8× | 100 | 3 | 0 |
+| s2_r3 | 446,495 | 89.4% | 39.9× | 69 | 3 | 0 |
+
+86–92% of contaminant reads map to stock MG1655 in every replicate, no
+replicate shows a single structural variant, and the worst case is ~100 SNPs in
+4,641,652 bp — one per 46 kb. A 1 kb ONT read has a ~2% chance of overlapping
+even one. Refining the reference to the strain actually present therefore cannot
+move a read across the assignment margin, and the stock reference is adequate.
+
+**An unresolved side observation.** S2 calls roughly 4× the variants of S1, and
+it is not a depth artifact: s1_r1 (31.2×) and s2_r1 (31.5×) are depth-matched
+and call 20 vs 84. Calls are stable within each session — 9 positions recur in
+all three S1 replicates, 52 in all four S2 — so the difference is real and
+between sessions. Two candidate explanations, which this design cannot separate:
+a different NEB lambda lot (the sessions are 14 months apart), or the seed sets
+not being comparable, because S1's community contains *E. coli* B-1109 so
+ambiguous reads never reach breseq while in S2 nothing competes with *E. coli*
+and every enterobacterial read is assigned to the contaminant. The second also
+explains S2's lower mapping rate. Separating them needs a lambda-only control
+library, which is a different experiment; it is out of scope and is reported in
+the SI as an open observation rather than adjudicated.
+
+The claim that subtraction over-removes rests on the measured
+competitive-vs-sequential delta against the stock reference (*E. coli* retains
+1.18% of its reads). Given the divergence measured above, subtracting against a
+consensus instead would remove the same reads, so that delta is not an artifact
+of reference choice.
 
 ## 3. Aggregation exists; coverage-artifact analysis does not
 

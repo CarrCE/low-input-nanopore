@@ -157,6 +157,13 @@ indistinguishable, not about a single alignment being weak.
 | `sequential` | The classic subtraction chain: remove carrier, then remove contaminant, then map survivors to the community | **Implemented** |
 | `both` | Run both and emit a per-organism delta table quantifying what subtraction costs (`results/summary/mode_delta.*`) | **Implemented** |
 
+`bin/contaminant_divergence.sh` measures how far the carrier-derived
+contaminant actually is from the stock reference, using a finished run's
+assignments rather than re-mapping. Across all seven replicates 86-92% of
+contaminant reads map to stock MG1655, with no structural variants and at
+worst ~100 SNPs in 4.64 Mb, so the stock reference is adequate and the
+consensus below is not needed for these data. See `docs/TODO.md` item 2.
+
 `--breseq_consensus` (sequential and both only) subtracts against a
 reference-guided consensus of the contaminant actually present in the carrier
 prep, built with breseq, instead of against the stock reference. That is what
