@@ -28,13 +28,21 @@ are order statistics and need no such care.
 
 Three aggregates are reported per replicate:
 
-  all            every read in the FASTQ
-  depleted       reads left after removing everything attributed to the carrier
-                 or the contaminant, INCLUDING ambiguous classes whose tied
-                 organisms are all carrier or contaminant. Those reads are
-                 carrier-derived whichever way the tie is broken, so leaving
-                 them in would overstate what depletion leaves behind.
-  community      reads assigned to a community organism (role=sample)
+  all               every read in the FASTQ. Note this is ALREADY the output of
+                    depletion-mode adaptive sampling -- carrier reads were
+                    rejected on the instrument during the run -- so there is no
+                    pre-adaptive-sampling read set to compare against.
+  carrier_removed   what is left after computationally removing everything
+                    attributed to the carrier OR the contaminant, INCLUDING
+                    ambiguous classes whose tied organisms are all carrier or
+                    contaminant. Those reads are carrier-derived whichever way
+                    the tie is broken, so leaving them in would flatter the
+                    result. Note this removes BOTH organisms, whereas adaptive
+                    sampling on the instrument targeted the carrier alone --
+                    the two are different operations at different stages, and
+                    the subset is deliberately not named "depleted" to keep
+                    them apart.
+  community         reads assigned to a community organism (role=sample)
 
 Usage:
     python3 bin/sequencing_summary.py --out results/summary/sequencing_summary.tsv
@@ -168,7 +176,7 @@ def main():
         drop = carrier_derived(roles, orgs)
         groups = {
             "all":       np.ones(len(lengths), dtype=bool),
-            "depleted":  ~drop,
+            "carrier_removed": ~drop,
             "community": roles == "sample",
         }
         for name, m in groups.items():
@@ -183,7 +191,7 @@ def main():
                 "mean_read_length": round(float(L.mean()), 1),
                 "median_qscore": round(float(np.median(Q[good])), 2) if good.any() else "",
             })
-        print(f"  reads {len(lengths):,}  depleted {int((~drop).sum()):,}  "
+        print(f"  reads {len(lengths):,}  carrier_removed {int((~drop).sum()):,}  "
               f"community {int((roles=='sample').sum()):,}", file=sys.stderr)
 
     cols = ["sample_id", "subset", "reads", "bases", "median_read_length",
