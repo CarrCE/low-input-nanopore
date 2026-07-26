@@ -32,7 +32,7 @@ DEMO_READS  ?= 40000
 
 .DEFAULT_GOAL := help
 
-.PHONY: help images test check s1 s2 demo-data clean
+.PHONY: help images test check measurements s1 s2 demo-data clean
 
 help: ## Show this help
 	@printf 'low-input-nanopore -- make targets\n\n'
@@ -103,6 +103,9 @@ check: ## Assert consensus subtraction preserves read accounting (needs `make te
 	    -v "$(ROOT)":/repo -w /repo "$(ANALYSIS_IMAGE)" \
 	    python3 tests/consensus_accounting.py \
 	        --bam "$(TEST_BAM)" --contig-map "$(TEST_CONTIG_MAP)"
+
+measurements: ## Check assets/measurements.tsv for gaps and inconsistencies
+	@python3 "$(ROOT)/bin/check_measurements.py" || test $$? -eq 2
 
 clean: ## Remove Nextflow scratch (work/, .nextflow*); leaves results/ alone
 	@rm -rf "$(ROOT)/work" "$(ROOT)/.nextflow"

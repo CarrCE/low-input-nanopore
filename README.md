@@ -113,7 +113,9 @@ These mirror the conventions used across the lab's analysis repositories.
 | `bin/coverage_dropouts.py` | Locates low-coverage regions in a depth profile and annotates them against a GFF3; answers *where* and *what*, where the coverage summary answers only *how uneven* |
 | `assets/references/lowinput_s1.tsv` | Reference set A: D6311 community (10 organisms) + lambda carrier + K-12 contaminant |
 | `assets/references/lowinput_s2.tsv` | Reference set B: D6321 spike-in (3 organisms) + lambda carrier + K-12 contaminant |
-| `assets/samplesheets/*.csv` | Per-dataset sample definitions, including input DNA masses |
+| `assets/samplesheets/*.csv` | Per-dataset sample definitions: keys and FASTQ paths |
+| `assets/measurements.tsv` | The experimental quantities the headline numbers divide by — DNA masses, each with the basis it was obtained on. Kept separate from the samplesheets so a measurement is never confused with a local file path. **Draft; see the PENDING entries.** |
+| `bin/check_measurements.py` | `make measurements` — asserts the two agree and that nothing nominal or unmeasured feeds a headline statistic |
 | `docker/tools/` | minimap2 2.28, htslib/samtools 1.21, seqkit 2.8.2, NCBI `datasets`, built natively for amd64 and arm64 |
 | `docker/analysis/` | Python 3.12 + pinned `requirements.txt` (pysam, pandas, numpy, matplotlib, scipy, openpyxl) |
 | `docs/benchmarks.md` | Native arm64 vs emulated amd64 timing, projected run cost, `breseq` notes |
