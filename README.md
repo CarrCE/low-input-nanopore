@@ -110,6 +110,7 @@ These mirror the conventions used across the lab's analysis repositories.
 | `bin/build_reference_set.py` | Concatenates fetched genomes into one FASTA + contig→organism→role map + genome sizes + provenance |
 | `bin/assign_reads.py` | Competitive per-read assignment from a qname-grouped BAM; emits counts, per-read calls, read lengths |
 | `bin/compute_metrics.py` | Enrichment and per-femtogram metrics; enforces the read-accounting reconciliation |
+| `bin/sequencing_summary.py` | `make seqsummary` — per-replicate reads, bases, median read length and median ONT qscore, before and after depleting carrier and contaminant. Quality comes from the FASTQ `qs` tag, joined positionally to the assignments with a per-read identity assertion |
 | `bin/coverage_dropouts.py` | Locates low-coverage regions in a depth profile and annotates them against a GFF3; answers *where* and *what*, where the coverage summary answers only *how uneven* |
 | `assets/references/lowinput_s1.tsv` | Reference set A: D6311 community (10 organisms) + lambda carrier + K-12 contaminant |
 | `assets/references/lowinput_s2.tsv` | Reference set B: D6321 spike-in (3 organisms) + lambda carrier + K-12 contaminant |
