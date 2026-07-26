@@ -33,15 +33,21 @@ Three aggregates are reported per replicate:
                     rejected on the instrument during the run -- so there is no
                     pre-adaptive-sampling read set to compare against.
   carrier_removed   what is left after computationally removing everything
-                    attributed to the carrier OR the contaminant, INCLUDING
-                    ambiguous classes whose tied organisms are all carrier or
-                    contaminant. Those reads are carrier-derived whichever way
-                    the tie is broken, so leaving them in would flatter the
-                    result. Note this removes BOTH organisms, whereas adaptive
-                    sampling on the instrument targeted the carrier alone --
-                    the two are different operations at different stages, and
-                    the subset is deliberately not named "depleted" to keep
-                    them apart.
+                    attributed to the CARRIER, INCLUDING
+                    ambiguous classes tied only among carrier organisms. This
+                    is the in-silico analogue of what adaptive sampling did on
+                    the instrument, and is the like-for-like comparison.
+  carrier_contaminant_removed
+                    as above but also removing the contaminant. This is what is
+                    left once every organism traceable to the carrier
+                    preparation is gone.
+
+  The subsets are deliberately NOT named "depleted": depletion-mode adaptive
+  sampling is a real-time instrument behaviour that targeted the carrier alone,
+  and every read here is already its output. There is no pre-adaptive-sampling
+  read set to compare against.
+  contaminant       the carrier-derived contaminant on its own, so its read
+                    length and quality can be compared with the community's
   community         reads assigned to a community organism (role=sample)
 
 Usage:
@@ -121,22 +127,19 @@ def collect(sample_id, results, sheet_dir, mode):
             np.array(roles), np.array(orgs))
 
 
-def carrier_derived(roles, orgs, depleted_roles=("carrier", "contaminant")):
-    """Reads attributable to the carrier or contaminant, ties included.
+def attributable(roles, orgs, drop_roles, drop_orgs):
+    """Reads attributable to the given roles, ties included.
 
-    An `ambiguous:A|B` read whose tied organisms are all carrier or contaminant
-    came from one of them whichever way the tie falls, so it is carrier-derived
-    regardless. Keeping it would flatter the depleted set.
+    An `ambiguous:A|B` read whose tied organisms all belong to the roles being
+    dropped came from one of them whichever way the tie falls, so it is
+    attributable regardless. Keeping it would flatter whatever remains.
     """
-    mask = np.isin(roles, depleted_roles)
+    mask = np.isin(roles, drop_roles)
     for i in np.flatnonzero(roles == "ambiguous"):
         tied = orgs[i].split(":", 1)[1].split("|") if ":" in orgs[i] else []
-        if tied and all(t in CARRIER_ORGS for t in tied):
+        if tied and all(t in drop_orgs for t in tied):
             mask[i] = True
     return mask
-
-
-CARRIER_ORGS = set()
 
 
 def main():
@@ -163,21 +166,27 @@ def main():
                     if len(f) > 5 and f[5]:
                         set_name = Path(f[5]).stem
         cmap = results / "references" / (set_name or sid.rsplit("_r", 1)[0]) / "contig_map.tsv"
-        CARRIER_ORGS.clear()
+        carrier_orgs, contam_orgs = set(), set()
         if cmap.is_file():
             for line in cmap.read_text().splitlines()[1:]:
                 f = line.split("\t")
-                if len(f) >= 3 and f[2] in ("carrier", "contaminant"):
-                    CARRIER_ORGS.add(f[1])
+                if len(f) >= 3 and f[2] == "carrier":
+                    carrier_orgs.add(f[1])
+                elif len(f) >= 3 and f[2] == "contaminant":
+                    contam_orgs.add(f[1])
 
         print(f"[sequencing-summary] {sid}: reading", file=sys.stderr)
         lengths, qs, roles, orgs = collect(sid, results, sheets, args.mode)
 
-        drop = carrier_derived(roles, orgs)
+        drop_carrier = attributable(roles, orgs, ("carrier",), carrier_orgs)
+        drop_both = attributable(roles, orgs, ("carrier", "contaminant"),
+                                 carrier_orgs | contam_orgs)
         groups = {
-            "all":       np.ones(len(lengths), dtype=bool),
-            "carrier_removed": ~drop,
-            "community": roles == "sample",
+            "all":                          np.ones(len(lengths), dtype=bool),
+            "carrier_removed":              ~drop_carrier,
+            "carrier_contaminant_removed":  ~drop_both,
+            "contaminant":                  roles == "contaminant",
+            "community":                    roles == "sample",
         }
         for name, m in groups.items():
             if not m.any():
@@ -191,7 +200,8 @@ def main():
                 "mean_read_length": round(float(L.mean()), 1),
                 "median_qscore": round(float(np.median(Q[good])), 2) if good.any() else "",
             })
-        print(f"  reads {len(lengths):,}  carrier_removed {int((~drop).sum()):,}  "
+        print(f"  reads {len(lengths):,}  -carrier {int((~drop_carrier).sum()):,}  "
+              f"-carrier-contam {int((~drop_both).sum()):,}  "
               f"community {int((roles=='sample').sum()):,}", file=sys.stderr)
 
     cols = ["sample_id", "subset", "reads", "bases", "median_read_length",
