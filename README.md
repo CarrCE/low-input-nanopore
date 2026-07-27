@@ -118,6 +118,7 @@ These mirror the conventions used across the lab's analysis repositories.
 | `assets/measurements.tsv` | The experimental quantities the headline numbers divide by — DNA masses, each with the basis it was obtained on, and `include_in_headline`. Read directly by the workflow; authoritative for every sample it names. Kept separate from the samplesheets so a measurement is never confused with a local file path |
 | `bin/check_measurements.py` | `make measurements` — asserts the two files agree and that nothing nominal or unmeasured feeds a headline statistic |
 | `bin/software_versions.sh` | `make versions` — records what the built images actually contain, by asking them rather than by transcribing the Dockerfiles |
+| `bin/run_metadata.py` | `make runmeta` — per-run acquisition id, basecalling model and acquisition window, derived from the reads. The window is a minimum/maximum over *every* read: a dorado FASTQ is not sorted by time, so reading the first header gives the wrong date (it did, by two days, in a manuscript table). Slow by necessity — a full pass over every FASTQ |
 | `docker/tools/` | minimap2 2.28, htslib/samtools 1.21, seqkit 2.8.2, NCBI `datasets`, built natively for amd64 and arm64 |
 | `docker/analysis/` | Python 3.12 + pinned `requirements.txt` (pysam, pandas, numpy, matplotlib, scipy, openpyxl) |
 | `docs/benchmarks.md` | Native arm64 vs emulated amd64 timing, projected run cost, `breseq` notes |
