@@ -33,7 +33,8 @@ import csv
 import sys
 from pathlib import Path
 
-MEASURED = {"qubit_hs", "qubit_hs_inferred", "raw_fluorescence_extrapolated"}
+MEASURED = {"qubit_hs", "qubit_hs_measured", "qubit_hs_inferred",
+            "qubit_hs_shared_tube", "raw_fluorescence_extrapolated"}
 NOT_MEASURED = {"nominal_unmeasured", "PENDING"}
 SAMPLE_BASES = MEASURED | NOT_MEASURED
 CARRIER_BASES = {"direct_addition", "dilution_series", "PENDING"}
@@ -41,7 +42,7 @@ CARRIER_BASES = {"direct_addition", "dilution_series", "PENDING"}
 # A basis that is an extrapolation below an assay's validated range is a
 # measurement, but a weaker one. Feeding it to a headline statistic is a
 # decision, so it is surfaced rather than silently allowed.
-WEAK = {"raw_fluorescence_extrapolated"}
+WEAK = {"raw_fluorescence_extrapolated", "qubit_hs_shared_tube"}
 
 
 def read_tsv(path):
@@ -119,8 +120,8 @@ def main():
             errors.append(f"{sid}: contributes to the headline but its sample mass "
                           f"is nominal, not measured")
         if head and sb in WEAK:
-            warnings.append(f"{sid}: contributes to the headline on a mass "
-                            f"extrapolated below the assay range ({sb})")
+            warnings.append(f"{sid}: contributes to the headline on a mass that is "
+                            f"a weaker measurement than a direct in-range reading ({sb})")
         if not head and not r.get("include_reason", "").strip():
             errors.append(f"{sid}: excluded from the headline with no stated reason")
 

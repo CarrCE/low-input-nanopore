@@ -31,6 +31,8 @@ import argparse
 import sys
 from pathlib import Path
 
+import csv
+
 import pandas as pd
 
 HERE = Path(__file__).resolve().parent
@@ -201,6 +203,30 @@ def load_prior(path: Path = PRIOR_TSV,
 
 
 # ---------------------------------------------------------------------------
+def _headline_flags(root: Path) -> dict:
+    """sample_id -> include_in_headline, from assets/measurements.tsv.
+
+    Read explicitly rather than inferred. Until this existed the loader
+    excluded lowinput_s2_r0 only because its input mass was blank, so the
+    moment that mass was filled in the replicate silently rejoined the figure
+    and moved the Round 2 mean. An exclusion that depends on a value being
+    absent is not an exclusion.
+    """
+    path = root / "assets" / "measurements.tsv"
+    if not path.is_file():
+        return {}
+    flags = {}
+    rows = [r for r in csv.reader(path.read_text().splitlines(), delimiter="\t")
+            if r and not r[0].lstrip().startswith("#") and any(c.strip() for c in r)]
+    if not rows:
+        return {}
+    hdr = rows[0]
+    for r in rows[1:]:
+        d = dict(zip(hdr, r))
+        flags[d.get("sample_id", "")] = d.get("include_in_headline", "1").strip() != "0"
+    return flags
+
+
 def _live_rows(results_dir: Path, mode: str = "competitive") -> pd.DataFrame:
     """
     Scan results/<sample_id>/<mode>/<sample_id>.metrics.tsv for headline rows.
@@ -210,6 +236,8 @@ def _live_rows(results_dir: Path, mode: str = "competitive") -> pd.DataFrame:
     replicate on the figure twice -- inflating n and shrinking the apparent
     spread. Competitive is this study's primary rule.
     """
+    flags = _headline_flags(Path(__file__).resolve().parent.parent)
+    excluded = []
     rows = []
     for path in sorted(Path(results_dir).glob(f"*/{mode}/*.metrics.tsv")):
         m = pd.read_csv(path, sep="\t", dtype=str, keep_default_na=False, na_values=[""])
@@ -225,8 +253,12 @@ def _live_rows(results_dir: Path, mode: str = "competitive") -> pd.DataFrame:
             dna_fg = to_float(r.get("dna_fg"))
             rpf = to_float(r.get("reads_per_fg"))
             bpf = to_float(r.get("bases_per_fg"))
+            sample_id = r.get("sample_id", "")
+            if not flags.get(sample_id, True):
+                excluded.append(sample_id)
+                continue          # include_in_headline=0 in assets/measurements.tsv
             if pd.isna(rpf) or pd.isna(bpf):
-                continue          # unquantified input mass (e.g. lowinput_s2_r0)
+                continue          # no quantified input mass, so no per-fg value
             rows.append({
                 "study": "This study",
                 "study_short": "This study",
@@ -254,6 +286,9 @@ def _live_rows(results_dir: Path, mode: str = "competitive") -> pd.DataFrame:
                 "sample_id": r.get("sample_id", ""),
                 "mode": r.get("mode", ""),
             })
+    if excluded:
+        print(f"[data] excluded from the figure by include_in_headline=0: "
+              f"{', '.join(sorted(set(excluded)))}", file=sys.stderr)
     return pd.DataFrame(rows)
 
 

@@ -13,7 +13,7 @@
 #
 # See columns documented in lowinput_s1.csv.
 sample_id,experiment,replicate,fastq,sra_accession,reference_set,library_dna_ng,carrier_dna_ng,dna_into_extraction_ng,cells_into_extraction,include_in_headline,notes
-lowinput_s2_r0,lowinput_s2,0,data/lowinput_s2_r0.fastq,,assets/references/lowinput_s2.tsv,,1000,,,0,Qubit HS off-scale low; input mass unquantified; fewer preps into extraction
+lowinput_s2_r0,lowinput_s2,0,data/lowinput_s2_r0.fastq,,assets/references/lowinput_s2.tsv,0.223,1000,,,0,Qubit HS off-scale low; input mass unquantified; fewer preps into extraction
 lowinput_s2_r1,lowinput_s2,1,data/lowinput_s2_r1.fastq,,assets/references/lowinput_s2.tsv,0.26,1000,,,1,
 lowinput_s2_r2,lowinput_s2,2,data/lowinput_s2_r2.fastq,,assets/references/lowinput_s2.tsv,0.32,1000,,,1,
 lowinput_s2_r3,lowinput_s2,3,data/lowinput_s2_r3.fastq,,assets/references/lowinput_s2.tsv,0.40,1000,,,1,

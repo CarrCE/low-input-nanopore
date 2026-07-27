@@ -1,5 +1,14 @@
 # lowinput_s1 -- D6311 Microbial Community DNA Standard II (Log Distribution)
-# ~1 ng community DNA + ~1000 ng lambda carrier, depletion-mode adaptive sampling.
+# ~1 ng community DNA + 1272 ng lambda carrier, depletion-mode adaptive sampling.
+#
+# The carrier mass is 1272 ng, NOT the nominal 1000 ng the dilution targeted.
+# Sample and carrier were brought to a nominal 1:1000 ratio by two dilution
+# steps with a FRESH carrier aliquot added at each step, so the carrier was not
+# diluted along with the sample. Working the scheme through (community
+# 11 ng/uL, lambda 500 ng/uL; 3 + 3 + 44 uL twice; 40 of the final 50 uL taken
+# forward) gives 1272 ng of carrier and a ratio of 1:803. Enrichment divides by
+# the input sample fraction, so the nominal value understated it by 1.272x.
+# Derivation and provenance: assets/measurements.tsv.
 #
 # Columns
 #   sample_id            unique id, also the results/ subdirectory name
@@ -15,6 +24,6 @@
 #   include_in_headline  1 = contributes to the headline per-fg statistics
 #   notes
 sample_id,experiment,replicate,fastq,sra_accession,reference_set,library_dna_ng,carrier_dna_ng,dna_into_extraction_ng,cells_into_extraction,include_in_headline,notes
-lowinput_s1_r1,lowinput_s1,1,data/lowinput_s1_r1.fastq,,assets/references/lowinput_s1.tsv,1.20672,1000,,,1,
-lowinput_s1_r2,lowinput_s1,2,data/lowinput_s1_r2.fastq,,assets/references/lowinput_s1.tsv,1.00000,1000,,,1,
-lowinput_s1_r3,lowinput_s1,3,data/lowinput_s1_r3.fastq,,assets/references/lowinput_s1.tsv,1.34064,1000,,,1,
+lowinput_s1_r1,lowinput_s1,1,data/lowinput_s1_r1.fastq,,assets/references/lowinput_s1.tsv,1.21,1272,,,1,
+lowinput_s1_r2,lowinput_s1,2,data/lowinput_s1_r2.fastq,,assets/references/lowinput_s1.tsv,1.21,1272,,,1,
+lowinput_s1_r3,lowinput_s1,3,data/lowinput_s1_r3.fastq,,assets/references/lowinput_s1.tsv,1.34,1272,,,1,
