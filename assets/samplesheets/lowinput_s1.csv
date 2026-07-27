@@ -24,6 +24,6 @@
 #   include_in_headline  1 = contributes to the headline per-fg statistics
 #   notes
 sample_id,experiment,replicate,fastq,sra_accession,reference_set,library_dna_ng,carrier_dna_ng,dna_into_extraction_ng,cells_into_extraction,include_in_headline,notes
-lowinput_s1_r1,lowinput_s1,1,data/lowinput_s1_r1.fastq,,assets/references/lowinput_s1.tsv,1.20672,1272,,,1,
-lowinput_s1_r2,lowinput_s1,2,data/lowinput_s1_r2.fastq,,assets/references/lowinput_s1.tsv,1.00000,1272,,,1,
-lowinput_s1_r3,lowinput_s1,3,data/lowinput_s1_r3.fastq,,assets/references/lowinput_s1.tsv,1.34064,1272,,,1,
+lowinput_s1_r1,lowinput_s1,1,data/lowinput_s1_r1.fastq,,assets/references/lowinput_s1.tsv,1.21,1272,,,1,
+lowinput_s1_r2,lowinput_s1,2,data/lowinput_s1_r2.fastq,,assets/references/lowinput_s1.tsv,1.21,1272,,,1,
+lowinput_s1_r3,lowinput_s1,3,data/lowinput_s1_r3.fastq,,assets/references/lowinput_s1.tsv,1.34,1272,,,1,
