@@ -1,0 +1,16 @@
+# Editing a .tsv in Excel or another GUI tool round-trips it through CRLF line
+# endings, and Excel additionally quotes any row whose first cell begins with a
+# character it wants to escape, then pads every row out to the full column count
+# with empty tabs. That has happened twice to assets/measurements.tsv and both
+# times it broke the TSV parsers that read it.
+#
+# Forcing LF in the working tree means git normalises the file on checkout, so a
+# GUI round-trip produces a diff in the values that changed and nothing else.
+# It does not stop the quoting or the padding, which is why
+# bin/check_measurements.py tolerates both on read.
+*.tsv text eol=lf
+*.csv text eol=lf
+*.py  text eol=lf
+*.sh  text eol=lf
+*.md  text eol=lf
+*.nf  text eol=lf
