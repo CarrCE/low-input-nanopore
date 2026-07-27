@@ -49,7 +49,7 @@
 #
 #   sample_dna_basis
 #       How that number was obtained. One of:
-#         qubit_hs                        reading within the assay's range
+#         qubit_hs_measured               reading within the assay's range
 #         raw_fluorescence_extrapolated   below range; computed from the raw
 #                                         fluorescence of standards and sample.
 #                                         An extrapolation, not a reading.

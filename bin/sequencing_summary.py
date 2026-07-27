@@ -26,29 +26,28 @@ On the qscore: ONT reports the mean read quality in error-probability space,
 `qs:f:` tag already carries that number, so it is used as given. Medians of it
 are order statistics and need no such care.
 
-Three aggregates are reported per replicate:
+Five subsets are reported per replicate:
 
-  all               every read in the FASTQ. Note this is ALREADY the output of
+  all               every read in the FASTQ. This is ALREADY the output of
                     depletion-mode adaptive sampling -- carrier reads were
                     rejected on the instrument during the run -- so there is no
                     pre-adaptive-sampling read set to compare against.
   carrier_removed   what is left after computationally removing everything
-                    attributed to the CARRIER, INCLUDING
-                    ambiguous classes tied only among carrier organisms. This
-                    is the in-silico analogue of what adaptive sampling did on
-                    the instrument, and is the like-for-like comparison.
+                    attributed to the CARRIER, including ambiguous classes tied
+                    only among carrier organisms. This is the in-silico
+                    analogue of what adaptive sampling did on the instrument.
   carrier_contaminant_removed
                     as above but also removing the contaminant. This is what is
                     left once every organism traceable to the carrier
                     preparation is gone.
-
-  The subsets are deliberately NOT named "depleted": depletion-mode adaptive
-  sampling is a real-time instrument behaviour that targeted the carrier alone,
-  and every read here is already its output. There is no pre-adaptive-sampling
-  read set to compare against.
   contaminant       the carrier-derived contaminant on its own, so its read
-                    length and quality can be compared with the community's
-  community         reads assigned to a community organism (role=sample)
+                    length and quality can be compared with the community's.
+  community         reads assigned to a community organism (role=sample).
+
+None of these is named "depleted". Depletion here is a real-time instrument
+behaviour that targeted the carrier alone, and every read in every subset is
+already its output; the removals above are computational and happen afterwards.
+Naming them "depleted" would conflate the two.
 
 Usage:
     python3 bin/sequencing_summary.py --out results/summary/sequencing_summary.tsv

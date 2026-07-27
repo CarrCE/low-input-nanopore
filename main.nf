@@ -538,6 +538,7 @@ process AGGREGATE {
     path metrics,     stageAs: 'metrics*/*'
     path summaries,   stageAs: 'summaries*/*'
     path readlengths, stageAs: 'readlengths*/*'
+    path measurements
     path samplesheet
     path script
 
@@ -556,6 +557,7 @@ process AGGREGATE {
         --metrics     ${metrics} \\
         --summaries   ${summaries} \\
         --readlengths ${readlengths} \\
+        --measurements ${measurements} \\
         --samplesheet ${samplesheet} \\
         --outdir      .
     """
@@ -565,50 +567,141 @@ process AGGREGATE {
 // Samplesheet parsing
 // ---------------------------------------------------------------------------
 
-def parseSamplesheet(path) {
-    // The samplesheets carry a `#` comment preamble documenting every column.
-    // splitCsv would take the first comment line as the header, so strip
-    // comments and blank lines before parsing.
-    def sheet = file(path, checkIfExists: true)
-    def body = sheet.readLines()
-                    .findAll { line -> line.trim() && !line.trim().startsWith('#') }
-                    .join('\n')
-    if (!body) exit 1, "error: ${path} contains no data rows"
-
-    Channel
-        .of(body)
-        .splitCsv(header: true, strip: true, sep: ',')
-        .filter { row -> row.sample_id }
-        .map { row ->
-            def meta = [
-                sample_id:           row.sample_id,
-                experiment:          row.experiment,
-                replicate:           row.replicate,
-                reference_set:       row.reference_set,
-                library_dna_ng:      row.library_dna_ng?.trim(),
-                carrier_dna_ng:      (row.carrier_dna_ng?.trim() ?: '0'),
-                include_in_headline: (row.include_in_headline?.trim() ?: '1') == '1',
-                sra_accession:       row.sra_accession?.trim(),
-            ]
-
-            if (params.fetch_from_sra) {
-                exit 1, "error: --fetch_from_sra is not implemented yet; see docs/TODO.md"
+// Quote-aware split of one delimited line. Nextflow's splitCsv is a channel
+// operator, and parsing inside an operator would push validation onto a
+// dataflow thread where error messages are swallowed (see parseSamplesheet).
+// Ten lines here buy eager parsing and diagnostics that actually reach the user.
+def splitDelimited(String line, char delim) {
+    def out = []
+    def cur = new StringBuilder()
+    boolean inQuotes = false
+    for (int i = 0; i < line.length(); i++) {
+        char c = line.charAt(i)
+        if (c == '"' as char) {
+            if (inQuotes && i + 1 < line.length() && line.charAt(i + 1) == ('"' as char)) {
+                cur.append('"'); i++
+            } else {
+                inQuotes = !inQuotes
             }
-            if (!row.fastq?.trim()) {
-                exit 1, "error: ${meta.sample_id} has no fastq path. Reads are not yet " +
-                        "deposited, so a local path is required (see docs/TODO.md)."
-            }
-
-            def fq = file(row.fastq.trim())
-            if (!fq.isAbsolute()) fq = file("${projectDir}/${row.fastq.trim()}")
-            if (!fq.exists()) exit 1, "error: FASTQ not found for ${meta.sample_id}: ${fq}"
-
-            def ref = file(row.reference_set.trim())
-            if (!ref.isAbsolute()) ref = file("${projectDir}/${row.reference_set.trim()}")
-            if (!ref.exists()) exit 1, "error: reference set not found: ${ref}"
-
-            tuple(meta, fq, ref)
+        } else if (c == delim && !inQuotes) {
+            out << cur.toString(); cur = new StringBuilder()
+        } else {
+            cur.append(c)
         }
+    }
+    out << cur.toString()
+    return out
+}
+
+// Rows of a delimited file as maps, with `#` comments and blank lines dropped.
+def readTable(path, char delim) {
+    def lines = file(path).readLines()
+                    .findAll { l -> l.trim() && !l.trim().startsWith('#') }
+    if (!lines) return []
+    def cols = splitDelimited(lines[0], delim)*.trim()
+    return lines.drop(1).collect { l ->
+        def vals = splitDelimited(l, delim)
+        def row = [:]
+        cols.eachWithIndex { c, i -> row[c] = (i < vals.size() ? vals[i].trim() : '') }
+        return row
+    }
+}
+
+def loadMeasurements(path) {
+    // Experimental masses live in assets/measurements.tsv, not in the
+    // samplesheets. A samplesheet mixes local file paths with experimental
+    // facts, and keeping a second copy of a mass next to a path is how a stale
+    // carrier value once survived beside a Methods section that contradicted
+    // it. This file is the single source for every quantity a per-femtogram or
+    // enrichment number divides by; `make measurements` checks it.
+    if (!file(path).exists()) return [:]
+    def out = [:]
+    readTable(path, '\t' as char).each { row ->
+        if (!row.sample_id) return
+        out[row.sample_id] = [
+            sample_dna_ng:       row.sample_dna_ng,
+            carrier_dna_ng:      row.carrier_dna_ng,
+            include_in_headline: row.include_in_headline == '1',
+        ]
+    }
+    return out
+}
+
+def parseSamplesheet(path) {
+    // The samplesheets carry a `#` comment preamble documenting every column;
+    // readTable drops it, so the first non-comment line is the header.
+    file(path, checkIfExists: true)
+    def rows = readTable(path, ',' as char)
+    if (!rows) error "${path} contains no data rows"
+
+    if (params.fetch_from_sra) {
+        error "--fetch_from_sra is not implemented yet; see docs/TODO.md"
+    }
+
+    def measured = loadMeasurements(params.measurements)
+
+    // Validation happens HERE, in the function body, and not inside a channel
+    // operator. `error "message"` raised from inside a `.map{}` closure runs on
+    // a dataflow thread: the process does exit non-zero, but the message is
+    // swallowed and the user gets a bare exit code with no diagnostic. Every
+    // check below used to live in that closure and was therefore silent.
+    def records = []
+    rows.each { row ->
+        if (!row.sample_id) return
+
+        // measurements.tsv is authoritative for every sample it names. The
+        // synthetic smoke-test sheet and the reanalysed prior-study sheet are not
+        // experiments of ours and carry their masses inline; those fall through
+        // to the samplesheet columns.
+        def m = measured[row.sample_id]
+        if (m) {
+            [library_dna_ng: 'sample_dna_ng', carrier_dna_ng: 'carrier_dna_ng'].each { sheetCol, measCol ->
+                def v = row[sheetCol]?.trim()
+                if (v && v != m[measCol]) {
+                    error "${row.sample_id}: ${path} says ${sheetCol}=${v} but " +
+                            "${params.measurements} says ${measCol}=${m[measCol]}. Masses belong " +
+                            "in measurements.tsv only; remove the column from the samplesheet."
+                }
+            }
+        }
+
+        def meta = [
+            sample_id:           row.sample_id,
+            experiment:          row.experiment,
+            replicate:           row.replicate,
+            reference_set:       row.reference_set,
+            library_dna_ng:      m ? m.sample_dna_ng  : row.library_dna_ng?.trim(),
+            carrier_dna_ng:      (m ? m.carrier_dna_ng : row.carrier_dna_ng?.trim()) ?: '0',
+            include_in_headline: m ? m.include_in_headline
+                                   : (row.include_in_headline?.trim() ?: '1') == '1',
+            sra_accession:       row.sra_accession?.trim(),
+        ]
+
+        // A mass still marked PENDING is not a number; treat it as absent so
+        // downstream code emits blanks rather than trying to parse "PENDING".
+        if (meta.library_dna_ng == 'PENDING') meta.library_dna_ng = ''
+        if (meta.carrier_dna_ng == 'PENDING') meta.carrier_dna_ng = '0'
+
+        if (!row.fastq?.trim()) {
+            error "${meta.sample_id} has no fastq path. Reads are not yet " +
+                    "deposited, so a local path is required (see docs/TODO.md)."
+        }
+        def fq = file(row.fastq.trim())
+        if (!fq.isAbsolute()) fq = file("${projectDir}/${row.fastq.trim()}")
+        if (!fq.exists()) error "FASTQ not found for ${meta.sample_id}: ${fq}"
+
+        if (!row.reference_set?.trim()) {
+            error "${meta.sample_id} has no reference_set"
+        }
+        def ref = file(row.reference_set.trim())
+        if (!ref.isAbsolute()) ref = file("${projectDir}/${row.reference_set.trim()}")
+        if (!ref.exists()) error "reference set not found: ${ref}"
+
+        records << tuple(meta, fq, ref)
+    }
+
+    if (!records) error "${path} yielded no usable samples"
+    Channel.fromList(records)
 }
 
 // ---------------------------------------------------------------------------
@@ -769,6 +862,7 @@ workflow {
             .filter { meta, mode, rl -> mode == (params.mode == 'sequential' ? 'sequential' : 'competitive') }
             .map { meta, mode, rl -> rl }
             .collect(),
+        file(params.measurements, checkIfExists: true),
         file(params.samplesheet),
         ch_script_agg
     )

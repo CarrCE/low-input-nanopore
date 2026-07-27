@@ -106,7 +106,7 @@ These mirror the conventions used across the lab's analysis repositories.
 | `nextflow.config` | Manifest, all `params` defaults, `docker`/`singularity`/`test` profiles, provenance reporting |
 | `conf/base.config` | Container pinning, per-label CPU/memory/time, `check_max` clamping |
 | `run.sh` | Launcher that works around Nextflow's inability to handle spaces in the project path |
-| `Makefile` | `images`, `test`, `s1`, `s2`, `demo-data`, `clean`, `help` |
+| `Makefile` | `images`, `test`, `check`, `measurements`, `seqsummary`, `versions`, `s1`, `s2`, `demo-data`, `clean`, `help` |
 | `bin/build_reference_set.py` | Concatenates fetched genomes into one FASTA + contig→organism→role map + genome sizes + provenance |
 | `bin/assign_reads.py` | Competitive per-read assignment from a qname-grouped BAM; emits counts, per-read calls, read lengths |
 | `bin/compute_metrics.py` | Enrichment and per-femtogram metrics; enforces the read-accounting reconciliation |
@@ -115,8 +115,9 @@ These mirror the conventions used across the lab's analysis repositories.
 | `assets/references/lowinput_s1.tsv` | Reference set A: D6311 community (10 organisms) + lambda carrier + K-12 contaminant |
 | `assets/references/lowinput_s2.tsv` | Reference set B: D6321 spike-in (3 organisms) + lambda carrier + K-12 contaminant |
 | `assets/samplesheets/*.csv` | Per-dataset sample definitions: keys and FASTQ paths |
-| `assets/measurements.tsv` | The experimental quantities the headline numbers divide by — DNA masses, each with the basis it was obtained on. Kept separate from the samplesheets so a measurement is never confused with a local file path. **Draft; see the PENDING entries.** |
-| `bin/check_measurements.py` | `make measurements` — asserts the two agree and that nothing nominal or unmeasured feeds a headline statistic |
+| `assets/measurements.tsv` | The experimental quantities the headline numbers divide by — DNA masses, each with the basis it was obtained on, and `include_in_headline`. Read directly by the workflow; authoritative for every sample it names. Kept separate from the samplesheets so a measurement is never confused with a local file path |
+| `bin/check_measurements.py` | `make measurements` — asserts the two files agree and that nothing nominal or unmeasured feeds a headline statistic |
+| `bin/software_versions.sh` | `make versions` — records what the built images actually contain, by asking them rather than by transcribing the Dockerfiles |
 | `docker/tools/` | minimap2 2.28, htslib/samtools 1.21, seqkit 2.8.2, NCBI `datasets`, built natively for amd64 and arm64 |
 | `docker/analysis/` | Python 3.12 + pinned `requirements.txt` (pysam, pandas, numpy, matplotlib, scipy, openpyxl) |
 | `docs/benchmarks.md` | Native arm64 vs emulated amd64 timing, projected run cost, `breseq` notes |
@@ -243,9 +244,18 @@ to them. Aligned bases are reported alongside as `aligned_bases` for internal us
 counts hard clips and is therefore the only value consistent across primary,
 secondary and supplementary records of the same read.
 
-Rows where the input mass is unquantified (blank `library_dna_ng`, e.g.
-`lowinput_s2_r0`) emit blank per-fg fields rather than a fabricated number, and
-carry `include_in_headline=0` in the samplesheet.
+Masses come from `assets/measurements.tsv`, not from the samplesheets. Each is
+paired with a `basis` column recording how it was obtained, and
+`include_in_headline` is an explicit field there. A row with no usable mass
+emits blank per-fg fields rather than a fabricated number.
+
+The separation is deliberate. A samplesheet mixes local file paths — meaningless
+in someone else's clone — with experimental facts that belong to the paper.
+Keeping a second copy of a mass beside a path is how a stale carrier value once
+survived next to a Methods section that contradicted it. The pipeline now aborts
+if a samplesheet carries a mass that disagrees with `measurements.tsv`, and
+`make measurements` fails if an unmeasured value feeds a headline statistic or
+an exclusion has no stated reason.
 
 ---
 

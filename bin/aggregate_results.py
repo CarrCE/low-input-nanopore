@@ -13,10 +13,11 @@ compute_metrics.py and emits:
                             adaptive-sampling ejection signature
     <item>.csv/.json        data + provenance sidecar for each display item
 
-Replicates flagged include_in_headline=0 in the samplesheet (e.g. lowinput_s2_r0,
-whose input mass was below Qubit quantification) are carried in the per-sample
-table but excluded from the experiment-level statistics, because every per-fg
-metric divides by an input mass those samples do not have.
+Replicates flagged include_in_headline=0 in assets/measurements.tsv (e.g.
+lowinput_s2_r0, whose mass is an extrapolation below the Qubit HS reporting
+range rather than a reading within it) are carried in the per-sample table but
+excluded from the experiment-level statistics. The exclusion rests on the
+recorded basis of the mass, not on the mass being missing -- r0 has one.
 """
 from __future__ import annotations
 
@@ -61,13 +62,24 @@ def parse_args():
                    help="per-sample *.summary.json files")
     p.add_argument("--readlengths", nargs="+", default=[],
                    help="per-sample *.readlengths.tsv.gz files")
+    p.add_argument("--measurements", default=None,
+                   help="assets/measurements.tsv; authoritative for include_in_headline")
     p.add_argument("--samplesheet", default=None,
-                   help="samplesheet CSV, for include_in_headline flags")
+                   help="fallback include_in_headline for samples measurements.tsv "
+                        "does not name (the smoke test and the reanalysed prior study)")
     p.add_argument("--outdir", required=True)
     return p.parse_args()
 
 
-def read_samplesheet(path):
+def read_headline_flags(path, delimiter="\t"):
+    """Which replicates contribute to the headline statistics.
+
+    Read from measurements.tsv rather than from a samplesheet: the flag belongs
+    with the mass whose provenance justifies it. An exclusion must be an
+    explicit 0, never inferred from a value being blank -- inferring it is how a
+    replicate silently rejoined a published mean the moment its mass was filled
+    in.
+    """
     if not path:
         return {}
     lines = [l for l in Path(path).read_text().splitlines()
@@ -76,9 +88,9 @@ def read_samplesheet(path):
         return {}
     import csv
     import io
-    rows = list(csv.DictReader(io.StringIO("\n".join(lines))))
+    rows = list(csv.DictReader(io.StringIO("\n".join(lines)), delimiter=delimiter))
     return {r["sample_id"]: (str(r.get("include_in_headline", "1")).strip() == "1")
-            for r in rows}
+            for r in rows if r.get("sample_id")}
 
 
 def italicize(name):
@@ -109,7 +121,10 @@ def main():
     outdir = Path(args.outdir)
     outdir.mkdir(parents=True, exist_ok=True)
 
-    headline_flags = read_samplesheet(args.samplesheet)
+    # measurements.tsv wins wherever it speaks; the samplesheet answers only for
+    # samples it does not name.
+    headline_flags = read_headline_flags(args.samplesheet, delimiter=",")
+    headline_flags.update(read_headline_flags(args.measurements))
 
     per_org = pd.concat([pd.read_csv(f, sep="\t") for f in args.metrics],
                         ignore_index=True)
