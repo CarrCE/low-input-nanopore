@@ -1,25 +1,23 @@
-# DRAFT -- awaiting definitive values from J. McKaig. Every field marked PENDING
-# is a real gap, not a formatting placeholder. Do not substitute a plausible
-# number for a PENDING: a wrong denominator is worse than a visible hole,
-# because it propagates silently into every per-femtogram quantity in the paper.
-#
-# ---------------------------------------------------------------------------
 # The experimental measurements this study's headline numbers divide by.
-# ---------------------------------------------------------------------------
-# This file exists because the samplesheets mix two different kinds of thing.
-# A `fastq` path is local plumbing, meaningless in someone else's clone. A DNA
-# mass is an experimental fact that belongs to the paper. Keeping them in one
-# row is how `carrier_dna_ng = 1000` -- a rough prior calculation -- survived
-# alongside a documented dilution scheme that yields 1272 ng, without the
-# contradiction ever being visible.
 #
-# Here, every quantity that divides a headline carries its provenance in the
-# same row. A value whose basis is `nominal_unmeasured` is legible as such at a
-# glance, which is the entire point.
+# Authoritative: the workflow reads masses and include_in_headline from here,
+# and aborts if a samplesheet carries a mass that disagrees. The samplesheets
+# supply file paths and keys; the two are joined on sample_id and every sample
+# must appear in both. `make measurements` (bin/check_measurements.py) checks
+# that, and fails if a nominal or unmeasured value feeds a headline statistic,
+# if a basis is unrecognised, or if an exclusion has no stated reason.
 #
-# Relationship to the samplesheets: `assets/samplesheets/*.csv` supply file
-# paths and keys; this file supplies measurements. The two are joined on
-# `sample_id` and every sample must appear in both.
+# This file is separate from the samplesheets because a `fastq` path is local
+# plumbing, meaningless in someone else's clone, while a DNA mass is an
+# experimental fact that belongs to the paper. Keeping them in one row is how
+# carrier_dna_ng = 1000 -- a rough prior calculation -- survived alongside a
+# documented dilution scheme yielding 1272 ng, with the contradiction never
+# visible.
+#
+# Fields marked PENDING are real gaps, not formatting placeholders. Do not
+# substitute a plausible number: a wrong denominator propagates silently into
+# every per-femtogram quantity in the paper, where a visible hole does not.
+# Outstanding: the standard and carrier lot numbers.
 #
 # ---------------------------------------------------------------------------
 # Columns
@@ -50,13 +48,13 @@
 #   sample_dna_basis
 #       How that number was obtained. One of:
 #         qubit_hs_measured               reading within the assay's range
+#         qubit_hs_shared_tube            a reading taken on a source tube shared
+#                                         with another replicate: measured, but
+#                                         not independently for this library
 #         raw_fluorescence_extrapolated   below range; computed from the raw
-#                                         fluorescence of standards and sample.
-#                                         An extrapolation, not a reading.
-#         qubit_hs_shared_tube            a Qubit reading taken on a source tube
-#                                         shared with another replicate, so the
-#                                         mass is measured but not measured
-#                                         independently for this library
+#                                         fluorescence of the calibration
+#                                         standards and the sample. An
+#                                         extrapolation, not a reading.
 #         nominal_unmeasured              no measurement; the intended value
 #         PENDING                         not yet established
 #
@@ -66,11 +64,11 @@
 #                           Exact; nothing propagates.
 #         dilution_series   the endpoint of a serial dilution. Must be computed
 #                           from the scheme, NOT assumed to equal the nominal
-#                           target -- see the lowinput_s1 note below.
+#                           target -- see below.
 #
 #   carrier_catalogue, carrier_lot
 #       Lambda source. Same catalogue number across both sessions; the lots are
-#       14 months apart and may differ. See docs/TODO.md item 2, which reports a
+#       14 months apart and may differ. docs/TODO.md section 5 reports a
 #       reproducible difference in the carrier-derived E. coli between sessions
 #       that a lot difference is one candidate explanation for.
 #
@@ -78,7 +76,8 @@
 #       Whether the library contributes to the headline per-femtogram and
 #       enrichment statistics, and why not when it does not. The reason is here
 #       rather than only in prose so that excluding a library is a recorded
-#       decision rather than a convention.
+#       decision. An exclusion must never rest on a field being blank: filling
+#       the field in then silently reverses it.
 #
 #   notes
 #       Anything that qualifies the row.
@@ -99,18 +98,21 @@
 #   40 uL taken into library preparation
 #            community 1.584 ng, lambda 1272 ng   -> a ratio of 1:803
 #
-# The nominal 1000 ng is therefore wrong by a factor of 1.272, and enrichment --
+# The nominal 1000 ng is therefore low by a factor of 1.272, and enrichment --
 # which divides by the input sample fraction -- is understated by that factor.
-# The sample masses below are inferred from Qubit measurements and are lower
-# than the 1.584 ng the nominal scheme predicts, consistent with the stocks
-# having been re-quantified and volumes adjusted. Whether the carrier was
-# adjusted in the same way is exactly what needs confirming.
+#
+# The per-replicate sample masses below are inferred from Qubit readings and are
+# lower than the 1.584 ng this scheme predicts. The manuscript attributes that
+# to the stocks having been re-quantified and the step volumes adjusted; that is
+# the most economical explanation, but it is an inference from the discrepancy,
+# not something the run records establish. Whether the carrier was adjusted in
+# the same way is unconfirmed. If it was, 1272 ng is itself an upper estimate.
 #
 sample_id	experiment	replicate	legacy_label	standard	standard_catalogue	standard_lot	input_format	preps_per_extraction	polyA_ug	sample_dna_ng	sample_dna_basis	carrier_dna_ng	carrier_dna_basis	carrier_catalogue	carrier_lot	include_in_headline	include_reason	notes
-lowinput_s1_r1	lowinput_s1	1	r1	ZymoBIOMICS Microbial Community DNA Standard II (Log Distribution)	D6311	252976	extracted_dna	n/a	n/a	1.21	qubit_hs_measured	1272	dilution_series	NEB N3011	PENDING	1		Sample mass inferred from Qubit measurement. Carrier computed from the dilution scheme; confirm whether volumes were adjusted after re-quantification.
-lowinput_s1_r2	lowinput_s1	2	r2	ZymoBIOMICS Microbial Community DNA Standard II (Log Distribution)	D6311	252976	extracted_dna	n/a	n/a	1.21	qubit_hs_shared_tube	1272	dilution_series	NEB N3011	PENDING	1		Same source tube as lowinput_s1_r1, so its Qubit reading applies to both; the mass is measured, but once, not independently per library. Previously recorded as nominal_unmeasured, which is no longer accurate.
-lowinput_s1_r3	lowinput_s1	3	r3	ZymoBIOMICS Microbial Community DNA Standard II (Log Distribution)	D6311	252976	extracted_dna	n/a	n/a	1.34	qubit_hs_measured	1272	dilution_series	NEB N3011	PENDING	1		Sample mass inferred from Qubit measurement.
-lowinput_s2_r0	lowinput_s2	0	r1	ZymoBIOMICS Spike-in Control II (Low Microbial Load)	D6321	PENDING	intact_cells	3	1	0.223	raw_fluorescence_extrapolated	1000	direct_addition	NEB N3011	PENDING	0	Sample mass is an extrapolation below the Qubit HS reporting range, not a reading within it	Extracted from 3 preps (60 uL). A concentration WAS computed from raw fluorescence -- that value should be recorded here rather than left blank, with the exclusion resting on its basis rather than on its absence. 8 uL of extract went forward with 1 ug lambda.
-lowinput_s2_r1	lowinput_s2	1	r2	ZymoBIOMICS Spike-in Control II (Low Microbial Load)	D6321-10	PENDING	intact_cells	25	0	0.26	qubit_hs_measured	1000	direct_addition	NEB N3011	PENDING	1		Preps recollected as 10-25; polyA was 0, 0.1 or 1 ug across r1-r3 but the mapping to replicates is not established. sample_dna_basis is PENDING because the supplied protocol states these were also below the Qubit range, which may be a copy of the r0 text -- if it is not, this is raw_fluorescence_extrapolated and the r0 exclusion needs revisiting.
-lowinput_s2_r2	lowinput_s2	2	r3	ZymoBIOMICS Spike-in Control II (Low Microbial Load)	D6321-10	PENDING	intact_cells	25	0.1	0.32	qubit_hs_measured	1000	direct_addition	NEB N3011	PENDING	1		As r1.
-lowinput_s2_r3	lowinput_s2	3	r4	ZymoBIOMICS Spike-in Control II (Low Microbial Load)	D6321-10	PENDING	intact_cells	25	1	0.40	qubit_hs_measured	1000	direct_addition	NEB N3011	PENDING	1		As r1.
+lowinput_s1_r1	lowinput_s1	1	r1	ZymoBIOMICS Microbial Community DNA Standard II (Log Distribution)	D6311	252976	extracted_dna	n/a	n/a	1.21	qubit_hs_measured	1272	dilution_series	NEB N3011	PENDING	1		Sample mass inferred from a Qubit HS reading. Carrier mass computed from the dilution scheme in the header, not read off a nominal target.
+lowinput_s1_r2	lowinput_s1	2	r2	ZymoBIOMICS Microbial Community DNA Standard II (Log Distribution)	D6311	252976	extracted_dna	n/a	n/a	1.21	qubit_hs_shared_tube	1272	dilution_series	NEB N3011	PENDING	1		Same source tube as lowinput_s1_r1, so that tube's Qubit reading applies to both. The mass is measured, but once, not independently per library.
+lowinput_s1_r3	lowinput_s1	3	r3	ZymoBIOMICS Microbial Community DNA Standard II (Log Distribution)	D6311	252976	extracted_dna	n/a	n/a	1.34	qubit_hs_measured	1272	dilution_series	NEB N3011	PENDING	1		Sample mass inferred from a Qubit HS reading.
+lowinput_s2_r0	lowinput_s2	0	r1	ZymoBIOMICS Spike-in Control II (Low Microbial Load)	D6321	PENDING	intact_cells	3	1	0.223	raw_fluorescence_extrapolated	1000	direct_addition	NEB N3011	PENDING	0	Sample mass is an extrapolation below the Qubit HS reporting range, not a reading within it	Extracted from 3 preps (60 uL); 8 uL of extract went forward with 1 ug lambda. Fewer preps than r1-r3 and correspondingly less DNA.
+lowinput_s2_r1	lowinput_s2	1	r2	ZymoBIOMICS Spike-in Control II (Low Microbial Load)	D6321-10	PENDING	intact_cells	25	0	0.26	qubit_hs_measured	1000	direct_addition	NEB N3011	PENDING	1		
+lowinput_s2_r2	lowinput_s2	2	r3	ZymoBIOMICS Spike-in Control II (Low Microbial Load)	D6321-10	PENDING	intact_cells	25	0.1	0.32	qubit_hs_measured	1000	direct_addition	NEB N3011	PENDING	1		
+lowinput_s2_r3	lowinput_s2	3	r4	ZymoBIOMICS Spike-in Control II (Low Microbial Load)	D6321-10	PENDING	intact_cells	25	1	0.40	qubit_hs_measured	1000	direct_addition	NEB N3011	PENDING	1		
