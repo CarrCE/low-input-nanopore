@@ -32,7 +32,7 @@ DEMO_READS  ?= 40000
 
 .DEFAULT_GOAL := help
 
-.PHONY: help images test check measurements seqsummary s1 s2 demo-data clean
+.PHONY: help images test check measurements seqsummary versions s1 s2 demo-data clean
 
 help: ## Show this help
 	@printf 'low-input-nanopore -- make targets\n\n'
@@ -110,6 +110,9 @@ measurements: ## Check assets/measurements.tsv for gaps and inconsistencies
 seqsummary: ## Per-replicate yield, read length and read quality (needs finished runs + FASTQs)
 	@docker run --rm -u "$$(id -u):$$(id -g)" -v "$(ROOT)":/repo -w /repo "$(ANALYSIS_IMAGE)" \
 	    python3 bin/sequencing_summary.py --out results/summary/sequencing_summary.tsv
+
+versions: ## Record the software the built images actually contain
+	@"$(ROOT)/bin/software_versions.sh" --out "$(ROOT)/results/summary/software_versions.tsv"
 
 clean: ## Remove Nextflow scratch (work/, .nextflow*); leaves results/ alone
 	@rm -rf "$(ROOT)/work" "$(ROOT)/.nextflow"

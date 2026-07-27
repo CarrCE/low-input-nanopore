@@ -33,8 +33,11 @@ import csv
 import sys
 from pathlib import Path
 
-MEASURED = {"qubit_hs", "qubit_hs_measured", "qubit_hs_inferred",
-            "qubit_hs_shared_tube", "raw_fluorescence_extrapolated"}
+# Exactly the bases in use. An accepted-but-unused synonym is how a typo passes
+# validation, so this vocabulary is kept closed: adding a basis to the file means
+# adding it here and saying which kind it is.
+MEASURED = {"qubit_hs_measured", "qubit_hs_shared_tube",
+            "raw_fluorescence_extrapolated"}
 NOT_MEASURED = {"nominal_unmeasured", "PENDING"}
 SAMPLE_BASES = MEASURED | NOT_MEASURED
 CARRIER_BASES = {"direct_addition", "dilution_series", "PENDING"}
