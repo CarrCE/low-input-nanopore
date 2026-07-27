@@ -1,66 +1,100 @@
 # Known gaps
 
-An honest list of what is not done, not sourced, or not yet trustworthy in this
-repository. Items 1–7 are the ones that block publication or that a reader of the
-results needs to know about; 8 onward are smaller loose ends.
+What is not done, not sourced, or not yet trustworthy in this repository.
+
+Items 1–4 are open. Section 5 records questions that were open, were
+investigated, and were closed; they are kept because the manuscript's
+Supplementary Information refers to several of them, and because "we checked and
+it did not matter" is a result a reader may want to audit rather than take on
+trust.
+
+---
 
 ## 1. Reads are not deposited, and `--fetch_from_sra` is not implemented
 
 The FASTQs for `lowinput_s1` (r1–r3) and `lowinput_s2` (r0–r3) have not been
-submitted to SRA/ENA. Consequences today:
+submitted to SRA/ENA. Until they are, nothing here is clone-and-run for anyone
+outside the lab. Consequences today:
 
 - Every samplesheet row must carry a local `fastq` path. `parseSamplesheet` in
-  `main.nf` exits with an error if that column is blank, and again if the file
-  does not exist.
+  `main.nf` errors if that column is blank, and again if the file does not
+  exist.
 - The `sra_accession` column in `assets/samplesheets/*.csv` is reserved but
   empty in every row.
 - `params.fetch_from_sra` exists in `nextflow.config` but is a placeholder:
   setting it exits immediately with
-  `error: --fetch_from_sra is not implemented yet`.
+  `--fetch_from_sra is not implemented yet`.
 
-To close: deposit the reads, populate `sra_accession`, then add a
-`FETCH_READS` process (`fasterq-dump`/ENA FTP, pinned in a container) and switch
-the samplesheet parser to prefer the accession when `--fetch_from_sra` is set.
-The container for it does not exist yet either — `docker/tools` has no SRA
-toolkit.
+To close: deposit the reads, populate `sra_accession`, then add a `FETCH_READS`
+process (`fasterq-dump`/ENA FTP, pinned in a container) and switch the
+samplesheet parser to prefer the accession when `--fetch_from_sra` is set. The
+container does not exist yet either — `docker/tools` has no SRA toolkit.
 
-## 2. `--breseq_consensus` is implemented, run, and found unnecessary
+## 2. The prior-study reanalysis is pinned but has not been re-run through the scripted path
 
-`--mode competitive | sequential | both` are all wired, and the per-organism
-delta between the two modes is a display item
-(`results/summary/mode_delta.{pdf,csv,json}`, `bin/plot_mode_delta.py`).
-Sequential applies the subtraction chain (carrier → contaminant → community) as a
-decision rule over the *same* alignments competitive mode uses, so `--mode both`
-costs one extra pass over the existing BAM rather than a second mapping run. The
-deliberate deviation from a literal sequential pipeline — which would re-map
-survivors against a smaller index — is documented in `ecoli-partitioning.md`.
+`comparison/kraken2_db.manifest.tsv` records exactly what the `kraken2_q1` and
+`kraken2_q10` rows classified against — URL, byte count, checksum, and the
+provenance of each checksum:
 
-`--breseq_consensus` is now implemented: `EXTRACT_CONTAMINANT_READS` →
-`BRESEQ_CONSENSUS` → `MAP_CONSENSUS` build a reference-guided consensus of the
-*E. coli* actually present in the carrier prep and feed the matching read IDs to
-`assign_reads.py --consensus-hits`, which subtracts against that consensus
-instead of the stock MG1655 reference. That is what the original `lowinput_s1`
-analysis did, so the option exists to reproduce it faithfully rather than to
-approximate it.
+- Kraken2 PlusPF-8, 2024-12-28 build (`k2_pluspf_08gb_20241228.tar.gz`,
+  5,925,280,339 B, MD5 `01b8b1eb…`, published upstream)
+- NCBI new_taxdump 2025-01-01 (139,761,991 B, MD5 `171470a1…`, SHA-256
+  `7ff98c65…`, computed locally — NCBI publishes no sidecar for archived dumps)
 
-**What is verified.** The accounting is tested: `make check`
-(`tests/consensus_accounting.py`) asserts seven properties over the smoke-test
-BAM, including that no read is lost, that consensus-subtracted reads are booked
-to a contaminant organism, that a read matching the consensus but aligning
-nowhere is still subtracted, and that contaminant reads which *miss* the
-consensus fall through rather than vanish. All seven pass.
+Both URLs were verified to be the ones `epi2me-labs/wf-metagenomics` v2.14.1
+(commit `a57ff73c…`) hard-codes for `--database_set PlusPF-8`, so the pin records
+what was actually used rather than a plausible substitute.
 
-**Depth is the operative constraint.** The bundled test profile cannot exercise
-the option: 40,000 reads give ~0.3× contaminant depth, and below roughly 10×
-breseq predicts missing coverage across the whole reference and returns a
-deleted genome instead of a consensus. That is caught up front by
-`--breseq_min_depth` (default 10) with a diagnostic naming the measured depth,
-and again after breseq by a check for a whole-reference `DEL`.
+**The gap:** the committed numbers were produced through the EPI2ME desktop
+application and have *not* been regenerated through
+`comparison/run_kraken2_reanalysis.sh`. Doing so would convert "pinned and
+reproducible in principle" into "reproduced", and is the natural response if a
+reviewer questions the prior-study values. It needs a ~5.5 GiB download, ~8 GiB
+of RAM, and the Zorzano raw reads, which are not staged locally (the Basapathi
+Raghavendra reads are, under `data/raghavendra_2023/`).
 
-**The consensus has now been built for all seven replicates, and it turns out
-not to be needed.** `bin/contaminant_divergence.sh` runs breseq over the
-competitively-assigned contaminant reads of a finished run — no re-mapping, since
-the assignments already record which reads won the contaminant:
+Nothing here touches the main pipeline, which does not use Kraken2 at all.
+
+## 3. Declared parameters that nothing reads
+
+`params.min_readlen`, `params.community`, `params.carrier_accession` and
+`params.contaminant_accession` are defined in `nextflow.config` but no process
+uses them. Either implement them or delete them — advertised knobs that do
+nothing are a reproducibility hazard.
+
+(`params.min_qscore` and `params.coverage_window` were on this list and are now
+both consumed.)
+
+## 4. Genome-set caveats not assessed
+
+Two `lowinput_s1` references are contig-level rather than complete
+(*S. cerevisiae* `GCA_030867715.1`, *C. neoformans* `GCA_028975465.1`). Complete
+chromosome-level substitutes from different strains are noted in
+`data/readme.md` (`GCF_000146045.2`, `GCF_000149245.1`). A fragmented reference
+can lose alignment-score competitions at contig boundaries; the size of that
+effect has not been measured. Stated as a limitation in the manuscript.
+
+Relatedly, `data/readme.md` and `assets/references/*.tsv` describe the same
+genomes twice and can drift. The TSVs are authoritative — the pipeline reads
+them; `data/readme.md` should point at them rather than restate them.
+
+---
+
+## 5. Closed
+
+### `--breseq_consensus`: implemented, run, and found unnecessary
+
+The original `lowinput_s1` analysis subtracted against a `breseq`
+reference-guided consensus of the *E. coli* actually present in the carrier prep,
+on the reasonable grounds that the λ production host need not be identical to
+MG1655. That option is implemented here (`EXTRACT_CONTAMINANT_READS` →
+`BRESEQ_CONSENSUS` → `MAP_CONSENSUS` → `assign_reads.py --consensus-hits`) so the
+earlier work can be reproduced faithfully rather than approximated. Its
+accounting is asserted by `make check` (`tests/consensus_accounting.py`, 7
+checks).
+
+It turns out not to be needed. `bin/contaminant_divergence.sh` runs breseq over
+the competitively-assigned contaminant reads of a finished run:
 
 | replicate | reads | mapped | depth | SNPs | indels | structural |
 |---|---:|---:|---:|---:|---:|---:|
@@ -72,145 +106,75 @@ the assignments already record which reads won the contaminant:
 | s2_r2 | 579,853 | 87.8% | 44.8× | 100 | 3 | 0 |
 | s2_r3 | 446,495 | 89.4% | 39.9× | 69 | 3 | 0 |
 
-86–92% of contaminant reads map to stock MG1655 in every replicate, no
-replicate shows a single structural variant, and the worst case is ~100 SNPs in
-4,641,652 bp — one per 46 kb. A 1 kb ONT read has a ~2% chance of overlapping
-even one. Refining the reference to the strain actually present therefore cannot
-move a read across the assignment margin, and the stock reference is adequate.
+86–92% of contaminant reads map to stock MG1655 in every replicate, no replicate
+shows a single structural variant, and the worst case is ~100 SNPs in 4,641,652
+bp — one per 46 kb. A 1 kb ONT read has a ~2% chance of overlapping even one.
+Refining the reference to the strain actually present cannot move a read across
+the assignment margin, so the stock reference is adequate. This also disposes of
+an objection to the competitive-vs-sequential comparison: at this divergence,
+subtracting against a consensus would have removed the same reads, so the
+measured cost of subtraction is not an artifact of reference choice.
 
-**An unresolved side observation.** S2 calls roughly 4× the variants of S1, and
-it is not a depth artifact: s1_r1 (31.2×) and s2_r1 (31.5×) are depth-matched
-and call 20 vs 84. Calls are stable within each session — 9 positions recur in
-all three S1 replicates, 52 in all four S2 — so the difference is real and
-between sessions. Two candidate explanations, which this design cannot separate:
-a different NEB lambda lot (the sessions are 14 months apart), or the seed sets
-not being comparable, because S1's community contains *E. coli* B-1109 so
-ambiguous reads never reach breseq while in S2 nothing competes with *E. coli*
-and every enterobacterial read is assigned to the contaminant. The second also
-explains S2's lower mapping rate. Separating them needs a lambda-only control
-library, which is a different experiment; it is out of scope and is reported in
-the SI as an open observation rather than adjudicated.
+Depth is the operative constraint on the option: below roughly 10× breseq
+predicts missing coverage across the whole reference and returns a deleted
+genome instead of a consensus. `--breseq_min_depth` (default 10) catches that up
+front, and a whole-reference `DEL` check catches it after. The bundled test
+profile reaches ~0.3× and therefore cannot exercise the option.
 
-The claim that subtraction over-removes rests on the measured
-competitive-vs-sequential delta against the stock reference (*E. coli* retains
-1.18% of its reads). Given the divergence measured above, subtracting against a
-consensus instead would remove the same reads, so that delta is not an artifact
-of reference choice.
+**One observation left unresolved.** S2 calls roughly 4× the variants of S1, and
+it is not a depth artifact: s1_r1 (31.2×) and s2_r1 (31.5×) are depth-matched and
+call 20 vs 84. Calls are stable within each session — 9 positions recur in all
+three S1 replicates, 52 in all four S2 — so the difference is real and between
+sessions. Two candidate explanations this design cannot separate: a different NEB
+λ lot (the sessions are 14 months apart), or seed sets that are not comparable in
+kind, because S1's community contains *E. coli* B-1109 so ambiguous reads never
+reach breseq, while in S2 nothing competes with *E. coli* and every
+enterobacterial read is assigned to the contaminant. The second also explains
+S2's lower mapping rate. Separating them needs a λ-only control library, which is
+a different experiment. Reported in the SI as an open observation rather than
+adjudicated.
 
-## 3. Aggregation exists; coverage-artifact analysis does not
+### Coverage-artifact analysis
 
-`AGGREGATE` (`bin/aggregate_results.py`) pools replicates into
-`results/summary/{per_organism,per_sample,experiment_summary}.tsv`, honours
-`include_in_headline` when computing experiment-level statistics, and emits two
-display items with CSV + JSON sidecars: `abundance.*` (theoretical vs measured)
-and `readlengths.*` (the adaptive-sampling ejection signature, from
-`readlengths.tsv.gz`).
+Was missing; `COVERAGE_PROFILE` wrote depth files nothing consumed. Now
+`bin/coverage_summary.py` and `bin/plot_coverage.py` produce the coverage figure
+and table, and `bin/coverage_dropouts.py` locates low-coverage regions and
+annotates them against a GFF3. The two *Listeria* dropouts both turned out to be
+mobile genetic elements at ~half median depth.
 
-Still missing:
+### Mojarro 2019 reads/bases were unsourced literals
 
-- **The coverage-artifact analysis.** `COVERAGE_PROFILE` writes
-  `<sample>.depth.tsv.gz` per sample and nothing consumes it. The uneven-coverage
-  behaviour observed for some community members — one of the motivating
-  observations for this work — is therefore not yet characterised or plotted, and
-  `params.coverage_window` is declared but unused.
-- Confidence intervals: `experiment_summary.tsv` reports count/mean/SD/min/max
-  only. With n=3 replicates an SD is thin; decide whether to report CIs or to
-  present replicates individually.
-- No figure yet contrasts the competitive and sequential modes (see item 2).
+Traced to Table 1 ("Low-Input Carrier Sequencing Metrics"), row "*B. subtilis*
+reads": 5 reads, 5,270 bases, with the 2 pg input from that paper's abstract. The
+row now carries `verified=TRUE` and `classifier=published_table1` in
+`comparison/prior_studies.tsv`. The drop-unverified-rows flag is no longer
+needed.
 
-## 4. Mojarro 2019 reads/bases values are unsourced literals
+### The Zorzano comparison mixed two classifiers across the two axes
 
-The prior-study comparison carries reads-per-femtogram and bases-per-femtogram
-figures attributed to Mojarro et al. 2019 that were transcribed as bare numbers.
-They need a citation with the exact table/figure they came from, and a
-restatement of that paper's denominator (DNA into library prep vs DNA into
-extraction vs cell count) so it can be confirmed that it matches the convention
-in `bin/compute_metrics.py`. Until sourced, do not report them.
+Resolved by carrying three variants of each condition. The published figure uses
+`kraken2_q1`, where both axes come from the same reanalysis of the published raw
+reads. The defective hybrid is retained only so the earlier figure can be
+reproduced for audit, and is not published.
 
-## 5. The Zorzano comparison mixes two classifiers across the two axes
+### `lowinput_s2_r0`'s input mass
 
-The comparison against Zorzano et al. currently puts values derived from one
-classifier on one axis and values derived from a different classifier on the
-other. Classifier choice changes both the numerator (what counts as assigned)
-and the effective denominator, so the two axes are not measured on a common
-basis and the comparison is not yet defensible. Resolve by reanalysing both
-studies through a single, pinned classifier (see item 6) or by stating the
-comparison as classifier-conditional with both values shown.
+Recorded as 0.223 ng in `assets/measurements.tsv`, with
+`sample_dna_basis=raw_fluorescence_extrapolated` — an extrapolation from the raw
+fluorescence of the calibration standards and the sample, below the Qubit HS
+reporting range. It is excluded from the headline statistics on that basis, with
+the reason recorded in `include_reason`, and `bin/check_measurements.py` enforces
+that an exclusion carries a stated reason.
 
-## 6. Prior-study reanalysis databases are pinned; the reanalysis has not been re-run
+The earlier form of this entry described r0 as having *no* mass and being
+excluded because the field was blank. That is the anti-pattern the measurements
+file exists to prevent: an exclusion resting on absence reverses itself the
+moment the value is filled in, which is exactly what happened once — filling in
+0.223 silently returned r0 to a figure and moved a published mean.
 
-**Done.** `comparison/kraken2_db.manifest.tsv` is now the authoritative record of
-what the `kraken2_q1` and `kraken2_q10` rows classified against — URL, exact
-byte count, checksum, and the provenance of each checksum:
+### No automated test beyond the smoke run
 
-- Kraken2 PlusPF-8, 2024-12-28 build (`k2_pluspf_08gb_20241228.tar.gz`,
-  5,925,280,339 B, MD5 `01b8b1eb…`, published upstream)
-- NCBI new_taxdump 2025-01-01 (139,761,991 B, MD5 `171470a1…`, SHA-256
-  `7ff98c65…`, computed locally — NCBI publishes no sidecar for archived dumps)
-
-Both URLs were verified to be the ones `epi2me-labs/wf-metagenomics` v2.14.1
-(commit `a57ff73c…`) hard-codes for `--database_set PlusPF-8`, so the pin records
-what was actually used rather than a plausible substitute.
-`comparison/fetch_kraken2_db.sh` downloads and verifies them and stops on any
-mismatch; `comparison/run_kraken2_reanalysis.sh` is the headless equivalent of
-the EPI2ME desktop run, and re-checks that the workflow tag still resolves to the
-recorded commit.
-
-**Still open:** the committed numbers were produced through the EPI2ME desktop
-application and have *not* been regenerated through the scripted path. Doing so
-would convert "pinned and reproducible in principle" into "reproduced", and is
-the natural response if a reviewer questions the prior-study values. It needs a
-~5.5 GiB download, ~8 GiB of RAM, and the Zorzano raw reads, which are not staged
-locally (the Basapathi Raghavendra reads are, under `data/raghavendra_2023/`).
-
-Nothing here touches the main pipeline, which does not use Kraken2 at all —
-`conf/base.config` deliberately gains no Kraken2 container.
-
-## 7. `lowinput_s2_r0` has an unquantified input mass
-
-For r0, fewer D6321 preps went into the extraction and the Qubit HS reading came
-back off-scale low, so the sample DNA mass into library prep is not quantified.
-Because every per-femtogram metric divides by that mass, r0:
-
-- has a blank `library_dna_ng` in `assets/samplesheets/lowinput_s2.csv`;
-- is flagged `include_in_headline=0`;
-- yields blank `dna_fg`, `reads_per_fg`, `bases_per_fg` and a null
-  `input_sample_fraction`/`enrichment` in its outputs (by design — the code emits
-  blanks rather than a fabricated denominator).
-
-It should be reported separately as a detection-at-unquantified-input result, not
-folded into the headline per-fg statistics. That separation is currently a
-convention in the samplesheet only; see item 3 — nothing enforces it downstream.
-
----
-
-## 8. Declared parameters that nothing reads
-
-`params.min_qscore`, `params.min_readlen`, `params.coverage_window`,
-`params.community`, `params.carrier_accession` and `params.contaminant_accession`
-are defined in `nextflow.config` but no process uses them. In particular
-`COVERAGE_PROFILE` emits per-base `samtools depth` output and never bins by
-`coverage_window`. Either implement them or delete them — advertised knobs that
-do nothing are a reproducibility hazard.
-
-## 9. No automated test beyond the smoke run
-
-`-profile docker,test` runs 40,000 reads end to end, but nothing asserts anything
-about the result: there is no expected-output check, and no CI workflow. At
-minimum, assert that the read accounting reconciles and that the counts file
-contains the expected organism classes.
-
-## 10. `data/readme.md` and the reference TSVs describe the same genomes twice
-
-The accession tables in `data/readme.md` and in `assets/references/*.tsv` are
-maintained separately and can drift. The TSVs are authoritative (the pipeline
-reads them); `data/readme.md` should point at them rather than restate them.
-
-## 11. Genome-set caveats not yet assessed
-
-Two `lowinput_s1` references are contig-level rather than complete
-(*S. cerevisiae* `GCA_030867715.1`, *C. neoformans* `GCA_028975465.1`). Complete
-chromosome-level substitutes from different strains are noted in `data/readme.md`
-(`GCF_000146045.2`, `GCF_000149245.1`). The effect of the fragmented references on
-competitive assignment — a fragmented reference can lose alignment-score
-competitions at contig boundaries — has not been measured.
+`make check` (`tests/consensus_accounting.py`) asserts seven properties of the
+consensus-subtraction accounting over the smoke-test BAM, including that no read
+is lost. There is still no CI workflow, and no assertion over the full-run
+outputs.

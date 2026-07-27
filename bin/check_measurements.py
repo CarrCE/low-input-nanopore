@@ -118,6 +118,15 @@ def main():
                 pendings.append(f"{sid}: {field} is PENDING"
                                 + (" and this sample is in the headline" if head else ""))
 
+        # Lot numbers do not enter any calculation, so an outstanding lot is a
+        # pending, never an error. They are still tracked: a lot difference is
+        # one of the two candidate explanations for the between-session variant
+        # counts reported in docs/TODO.md, and that cannot be revisited later if
+        # nothing recorded which lots were used.
+        for field in ("standard_lot", "carrier_lot"):
+            if r.get(field, "").strip() in ("PENDING", ""):
+                pendings.append(f"{sid}: {field} is not recorded")
+
         # The check this file exists for.
         if head and sb == "nominal_unmeasured":
             errors.append(f"{sid}: contributes to the headline but its sample mass "
