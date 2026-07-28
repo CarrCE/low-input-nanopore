@@ -14,10 +14,10 @@ on log-log axes: **reads / fg DNA into library prep** (x) against
 | File | Role |
 |---|---|
 | `prior_studies.tsv` | One row per prior-study sample **per classifier variant**. Every row carries explicit provenance. Committed; never regenerated at runtime. |
-| `this_study.tsv` | Round 1 / Round 2 headline values, schema-compatible with `prior_studies.tsv`. Seeded from the workbook (`source=legacy_spreadsheet`) so the module runs standalone. |
+| `this_study.tsv` | Round 1 / Round 2 headline values, schema-compatible with `prior_studies.tsv`. A committed snapshot of pipeline output (`source=pipeline_run_snapshot`, written by `seed_this_study.py`) so the module runs standalone and plots the published values. |
 | `comparison_data.py` | Loader: reads the TSVs, selects one classifier per study, and optionally supersedes the seeded this-study rows with live pipeline output. Run directly for a data-integrity check. |
 | `plot_comparison.py` | Regenerates the figure and its display-item outputs. |
-| `extract_workbook.py` | **Build-time only.** The one-time xlsx -> TSV extraction, committed so the derivation is auditable. Nothing in the runtime path opens the workbook. |
+| `seed_this_study.py` | Regenerates `this_study.tsv` as a snapshot of pipeline output, so the figure can be redrawn without the reads and the seeded and live paths cannot disagree. |
 | `kraken2_db.manifest.tsv` | The pinned classification databases behind every `kraken2_*` row: URL, size, checksum and where the checksum came from. Authoritative; both scripts below read it. |
 | `fetch_kraken2_db.sh` | Downloads and verifies those databases. Idempotent; refuses to proceed on any size or checksum mismatch. |
 | `run_kraken2_reanalysis.sh` | Headless `wf-metagenomics` run pinned to v2.14.1, against the verified local databases. The command-line equivalent of the EPI2ME desktop run that produced the committed numbers. |
@@ -203,7 +203,7 @@ Both TSVs share these columns:
 | `dna_basis` | How `dna_pg` was obtained (measured vs back-calculated). |
 | `reads_per_fg`, `bases_per_fg` | Derived per the formulas above. |
 | `verified` | `FALSE` when the counts have no traceable citation. Triggers the plot warning. |
-| `source` | Coarse provenance class: `published_table`, `kraken2_reanalysis`, `unsourced_literal`, `legacy_spreadsheet`, `pipeline_run`. |
+| `source` | Coarse provenance class: `published_table`, `kraken2_reanalysis`, `minimap2_reanalysis_this_pipeline`, `legacy_spreadsheet`, `pipeline_run`, `pipeline_run_snapshot`. |
 | `source_detail` | Exact provenance: workbook sheet and cell references, accessions, tool versions, URLs. |
 | `provenance_note` | Prose explanation, including any defect flags. |
 
@@ -279,7 +279,7 @@ inconsistency.
 Only if the workbook itself is corrected:
 
 ```bash
-python3 extract_workbook.py --workbook "/path/to/2026-04-29 Low-Input Comparison Calculations.xlsx"
+python3 seed_this_study.py --results-dir ../results   # refresh the this_study.tsv snapshot
 ```
 
 This rewrites both TSVs and asserts that every emitted per-fg value reproduces

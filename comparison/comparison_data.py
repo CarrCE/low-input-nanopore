@@ -7,7 +7,8 @@ asked, supersedes the seeded this-study rows with live pipeline output from
 `results/<sample_id>/<mode>/<sample_id>.metrics.tsv`.
 
 Nothing here opens the legacy .xlsx. The workbook is extracted exactly once by
-`extract_workbook.py`; the TSVs are the versioned source of truth.
+a spreadsheet that is not in the repository; the TSVs are now the source of
+truth and each row cites its own published source.
 
 Conventions
 -----------
@@ -279,7 +280,7 @@ def _live_rows(results_dir: Path, mode: str = "competitive") -> pd.DataFrame:
                 "source_detail": str(path),
                 "provenance_note": (
                     f"Live pipeline output; '{HEADLINE_ORGANISM}' row of "
-                    f"{path.name}. Supersedes the legacy_spreadsheet seed value "
+                    f"{path.name}. Supersedes the committed seed value "
                     f"for experiment {experiment}."),
                 "round": ROUND_BY_EXPERIMENT[experiment],
                 "experiment": experiment,
@@ -297,9 +298,11 @@ def load_this_study(path: Path = THIS_STUDY_TSV, results_dir: Path | None = None
     df = read_table(path)
     notes = []
     if results_dir is None:
+        srcs = ",".join(sorted(set(df["source"]))) if "source" in df else "unknown"
         notes.append(f"This study: {len(df)} seeded row(s) from {Path(path).name} "
-                     "(source=legacy_spreadsheet). Pass --results-dir to use live "
-                     "pipeline output instead.")
+                     f"(source={srcs}). This seed is a snapshot of pipeline output "
+                     "written by seed_this_study.py, so it plots the same values "
+                     "--results-dir would; pass --results-dir to read them live.")
         return df, notes
 
     results_dir = Path(results_dir)
