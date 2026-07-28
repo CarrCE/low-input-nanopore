@@ -55,8 +55,16 @@ in log10-log10 space, at 10x / 100x / 1000x.
 
 ## Known defects, and how each is handled
 
-These were all present in the workbook. None of them is silently repaired; each
-is represented explicitly in the data and surfaced by the plot script.
+These were defects in the comparison as originally constructed. None is
+silently repaired; each is represented explicitly in the data and surfaced by
+the plot script.
+
+Rows of `prior_studies.tsv` do not carry these letters. A row that bears on one
+of these issues says so in words -- the 28 Basapathi Raghavendra rows begin
+`Mapping vs classification:` -- because a lettered index is opaque to a reader
+who does not come here to decode it, and (a) and (b) no longer apply to any row
+in any case. Those notes mark what a row is, not that anything is wrong with it:
+the Raghavendra counts agree with the published table exactly.
 
 ### (a) Zorzano et al. 2025 — the two axes used different classifiers
 

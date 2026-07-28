@@ -21,7 +21,7 @@ Classifier selection
 Prior-study rows are duplicated per read/base-assignment method. Exactly one
 `classifier` per study is plotted; see `DEFAULT_CLASSIFIERS`. This exists
 because the legacy workbook mixed classifiers across the two axes for Zorzano
-et al. 2025 (see README.md, defect (a)).
+et al. 2025 (see docs/comparison.md, defect (a)).
 
 Run this file directly for a data-integrity check:
     python3 comparison_data.py --help
