@@ -573,9 +573,7 @@ def parse_args(argv=None):
                     help="DEFECT (a): which Zorzano et al. 2025 read/base assignment "
                          "to plot. 'kraken2_q1' (default) is internally consistent on "
                          "both axes; 'published_squeezemeta' uses the paper's own hits "
-                         "on both axes (bases are a derived estimate); "
-                         "'legacy_hybrid_workbook' reproduces the old spreadsheet "
-                         "figure, which mixed classifiers between axes")
+                         "on both axes (bases are a derived estimate)")
     ap.add_argument("--raghavendra-classifier", choices=cd.RAGHAVENDRA_CHOICES,
                     default="kraken2_q10",
                     help="DEFECT (c): 'kraken2_q10' (default) is our reanalysis of the "

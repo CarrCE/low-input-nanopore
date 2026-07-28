@@ -87,14 +87,20 @@ one with `--zorzano-classifier`:
 |---|---|---|---|
 | `kraken2_q1` **(default)** | Kraken2 minQ1 hits | Kraken2 minQ1 hit bases | Internally consistent. Both axes from the same reanalysis of the published raw reads (wf-metagenomics v2.14.1, kraken2, PlusPF-8, minQ 1). |
 | `published_squeezemeta` | Reported Hits | hits x mean read length | Consistent in the sense that both axes derive from the paper's own hit calls, but the paper never publishes hit **bases**, so y is a derived estimate assuming hits have the same length distribution as non-hits. That assumption is demonstrably wrong — our Kraken2 minQ1 hits average 2.7x to 21.5x the overall mean read length, depending on condition — so treat this y as a rough sketch only. |
-| `legacy_hybrid_workbook` | Reported Hits | Kraken2 minQ1 hit bases | The defective combination, kept **only** so the previous figure can be reproduced for audit. Verified to reproduce the old script's 24 plotted points bit-for-bit. Do not publish. |
 
-Switching from `legacy_hybrid_workbook` to the default `kraken2_q1` moves the
-Zorzano points horizontally only — the y values were already Kraken2 — but it
-changes the conclusion. Under the workbook's hybrid the largest Zorzano
-improvement was the **Blank** (7,659x reads); under `kraken2_q1` it is the
-**Microbialite (2800 a)** (4,090x reads, up from the workbook's 614x for that
-same condition). The auto-selected figure callout follows.
+The defective combination itself — x from `published_squeezemeta`, y from
+`kraken2_q1` — is no longer carried as rows of its own. It was, briefly, so the
+earlier figure could be reproduced for audit; but a mixture of two variants that
+are both present adds no information, and 9 rows that must not be plotted are a
+hazard out of proportion to their use. Pair the two variants on `condition` if
+you ever need it back.
+
+The mixing changed the conclusion, which is why it is documented at all. It
+moved the Zorzano points horizontally only — the y values were already Kraken2.
+Under the hybrid the largest Zorzano improvement was the **Blank** (7,659x
+reads); under `kraken2_q1` it is the **Microbialite (2800 a)** (4,090x reads,
+against 614x for that same condition under the hybrid). The figure's
+auto-selected callout follows.
 
 ### (b) Mojarro et al. 2019 — the counts have no recorded citation
 
@@ -233,10 +239,6 @@ Useful options (`--help` on every script lists them all):
 ```bash
 # use live pipeline output instead of the seeded this-study values
 python3 plot_comparison.py --results-dir ../results
-
-# reproduce the old spreadsheet figure exactly, for audit
-python3 plot_comparison.py --zorzano-classifier legacy_hybrid_workbook \
-                           --basename low_input_comparison_legacy
 
 # plot Zorzano on the paper's own hit calls for both axes
 python3 plot_comparison.py --zorzano-classifier published_squeezemeta
