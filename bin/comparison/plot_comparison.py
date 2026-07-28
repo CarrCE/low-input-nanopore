@@ -10,8 +10,9 @@ output. Dashed circles are iso-improvement contours around the Round 1 mean:
 the geometric-mean fold improvement, expressed as Euclidean distance in
 log10-log10 space, at 10x / 100x / 1000x.
 
-Inputs are the versioned TSVs in this directory, NOT the legacy .xlsx:
-    prior_studies.tsv   one row per prior-study sample per classifier variant
+Inputs are the versioned TSVs under assets/comparison/:
+    prior_studies.tsv   one row per prior-study sample per classifier variant,
+                        each citing the published table or reanalysis it rests on
     this_study.tsv      Round 1 / Round 2 values, a committed snapshot of
                         pipeline output (see seed_this_study.py)
     --results-dir       optional; live results/<sample_id>/<mode>/*.metrics.tsv
