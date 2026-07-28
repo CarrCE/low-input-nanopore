@@ -75,16 +75,33 @@ alignment on its genome. For B-1109 the top 1% of 1 kb bins hold 79% of the
 depth, peaking above 10⁵× near 3.06 and 3.09 Mb — λ carrier reads on
 λ-related prophage sequence.
 
-`bin/pool_coverage.py` reports both quantities and the ratio, and both figures
-mark the members where they disagree, so nothing is presented on the alignment
-number alone. That is a mitigation, not a fix.
+**Mostly addressed without re-running.** `bin/coverage_attribution.py`
+(`make attribution`) computes both depths per replicate from `counts.tsv` and the
+reference genome sizes, and the 1× interpretability threshold is now applied to
+the attributable one. That is the correct criterion regardless of how depth is
+measured, and applying it settles the question for the manuscript:
 
-**The fix** is to filter the BAM to reads whose assignment matches the contig's
-organism before `samtools depth`. It needs a re-run: the qname BAMs are not
-retained (only `test_s2.qname.bam` survives), and `assignments.tsv.gz` carries
-no alignment coordinates, so per-base depth cannot be reconstructed from what is
-on disk. Budget a full re-map plus coverage pass, and note that it would move
-the *E. coli* rows of Supplementary Table S5 and both coverage figures.
+- 17 pairs clear 1× on alignment depth; **14** clear it on attributable depth
+- the three that leave are exactly the *E. coli* B-1109 rows (0.83×, 0.62×,
+  0.62× attributable), which should never have been reported as characterised
+- nothing enters, and the 14 that remain agree between the two depths to within
+  0.4%, so their statistics may be read as the organism's own
+
+Both coverage figures mark the panels where the depths disagree rather than
+dropping them, since the *E. coli* panel is the cautionary example the SI
+explains.
+
+The same script fixed a second error: the coverage globs match `test_s2`, the
+40,000-read smoke-test subsample, so the denominator had been 45 pairs rather
+than 42. `--exclude` now drops it in both the table and the figure.
+
+**What is left.** Only *E. coli* B-1109 in the pooled figure, where attributable
+depth is 2.08× and so above threshold, but the profile drawn is still alignment
+depth. Showing its true pooled profile needs the BAM filtered by assignment
+before `samtools depth`, which needs a full re-map — the qname BAMs are not
+retained (only `test_s2.qname.bam`) and `assignments.tsv.gz` carries no alignment
+coordinates. At 2.08× pooled, roughly 0.7× per replicate, that is marginal
+territory where uniformity statistics are weak anyway. Deferred, not blocking.
 
 ## 4. Declared parameters that nothing reads
 
