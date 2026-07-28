@@ -30,7 +30,7 @@ set -euo pipefail
 # every expansion is quoted because the repository path contains spaces.
 # ---------------------------------------------------------------------------
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
-REPO_ROOT="$(cd -- "${SCRIPT_DIR}/.." && pwd -P)"
+REPO_ROOT="$(cd -- "${SCRIPT_DIR}/../.." && pwd -P)"
 OUT_DIR="${REPO_ROOT}/data/raghavendra_2023"
 CACHE_DIR="${OUT_DIR}/.archive"
 

@@ -48,8 +48,11 @@ from matplotlib.lines import Line2D  # noqa: E402
 
 import comparison_data as cd  # noqa: E402
 
-HERE = Path(__file__).resolve().parent
-DEFAULT_OUTDIR = HERE / "figures"
+HERE = Path(__file__).resolve().parent          # bin/comparison
+REPO = HERE.parent.parent                       # repository root
+# Outputs go under results/ with everything else the pipeline produces;
+# results/ is gitignored, so figures are regenerated rather than tracked.
+DEFAULT_OUTDIR = REPO / "results" / "comparison"
 DEFAULT_BASENAME = "low_input_comparison"
 DISPLAY_ITEM_ID = "fig_low_input_comparison"
 
@@ -689,7 +692,7 @@ def main(argv=None):
         """Repo-relative path when possible, absolute otherwise."""
         p = Path(p).resolve()
         try:
-            return str(p.relative_to(HERE.parent))
+            return str(p.relative_to(REPO))
         except ValueError:
             return str(p)
 
@@ -698,9 +701,9 @@ def main(argv=None):
          "sha256": sha256(args.prior_tsv), "role": "prior-study data"},
         {"path": rel(args.this_study_tsv),
          "sha256": sha256(args.this_study_tsv), "role": "this-study data"},
-        {"path": f"comparison/{Path(__file__).name}",
+        {"path": f"bin/comparison/{Path(__file__).name}",
          "sha256": sha256(Path(__file__)), "role": "figure script"},
-        {"path": "comparison/comparison_data.py",
+        {"path": "bin/comparison/comparison_data.py",
          "sha256": sha256(HERE / "comparison_data.py"), "role": "loader"},
     ]
     if args.results_dir is not None:

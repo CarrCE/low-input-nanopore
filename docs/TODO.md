@@ -32,7 +32,7 @@ container does not exist yet either — `docker/tools` has no SRA toolkit.
 
 ## 2. The prior-study reanalysis is pinned but has not been re-run through the scripted path
 
-`comparison/kraken2_db.manifest.tsv` records exactly what the `kraken2_q1` and
+`assets/comparison/kraken2_db.manifest.tsv` records exactly what the `kraken2_q1` and
 `kraken2_q10` rows classified against — URL, byte count, checksum, and the
 provenance of each checksum:
 
@@ -47,7 +47,7 @@ what was actually used rather than a plausible substitute.
 
 **The gap:** the committed numbers were produced through the EPI2ME desktop
 application and have *not* been regenerated through
-`comparison/run_kraken2_reanalysis.sh`. Doing so would convert "pinned and
+`bin/comparison/run_kraken2_reanalysis.sh`. Doing so would convert "pinned and
 reproducible in principle" into "reproduced", and is the natural response if a
 reviewer questions the prior-study values. It needs a ~5.5 GiB download, ~8 GiB
 of RAM, and the Zorzano raw reads, which are not staged locally (the Basapathi
@@ -195,7 +195,7 @@ mobile genetic elements at ~half median depth.
 Traced to Table 1 ("Low-Input Carrier Sequencing Metrics"), row "*B. subtilis*
 reads": 5 reads, 5,270 bases, with the 2 pg input from that paper's abstract. The
 row now carries `verified=TRUE` and `classifier=published_table1` in
-`comparison/prior_studies.tsv`. The drop-unverified-rows flag is no longer
+`assets/comparison/prior_studies.tsv`. The drop-unverified-rows flag is no longer
 needed.
 
 ### The Zorzano comparison mixed two classifiers across the two axes

@@ -36,11 +36,11 @@ import csv
 
 import pandas as pd
 
-HERE = Path(__file__).resolve().parent
-REPO = HERE.parent
+HERE = Path(__file__).resolve().parent          # bin/comparison
+REPO = HERE.parent.parent                       # repository root
 
-PRIOR_TSV = HERE / "prior_studies.tsv"
-THIS_STUDY_TSV = HERE / "this_study.tsv"
+PRIOR_TSV = REPO / "assets" / "comparison" / "prior_studies.tsv"
+THIS_STUDY_TSV = REPO / "assets" / "comparison" / "this_study.tsv"
 DEFAULT_RESULTS_DIR = REPO / "results"
 
 NUMERIC_COLUMNS = ["replicate_idx", "reads", "bases", "dna_pg",
@@ -237,7 +237,7 @@ def _live_rows(results_dir: Path, mode: str = "competitive") -> pd.DataFrame:
     replicate on the figure twice -- inflating n and shrinking the apparent
     spread. Competitive is this study's primary rule.
     """
-    flags = _headline_flags(Path(__file__).resolve().parent.parent)
+    flags = _headline_flags(REPO)
     excluded = []
     rows = []
     for path in sorted(Path(results_dir).glob(f"*/{mode}/*.metrics.tsv")):

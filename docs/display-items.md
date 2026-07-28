@@ -57,8 +57,8 @@ happen by accident.
 | `coverage` | `bin/plot_coverage.py` (needs `bin/coverage_attribution.py` first) | `results/summary/` |
 | `pooled_coverage` | `bin/pool_coverage.py` then `bin/plot_pooled_coverage.py` | `results/summary/` |
 | `mode_delta` | `bin/plot_mode_delta.py` | `results/summary/` |
-| `low_input_comparison` | `comparison/plot_comparison.py` | `comparison/figures/` |
-| `estimated_control` | `comparison/estimated_control.py` | `comparison/figures/` (CSV + JSON only; no figure) |
+| `low_input_comparison` | `bin/comparison/plot_comparison.py` | `results/comparison/` |
+| `estimated_control` | `bin/comparison/estimated_control.py` | `results/comparison/` (CSV + JSON only; no figure) |
 
 ## Regenerating everything
 
@@ -87,13 +87,13 @@ docker run --rm -u $(id -u):$(id -g) -v "$PWD":/w -w /w -e MPLCONFIGDIR=/tmp/mpl
 # the prior-work comparison
 docker run --rm -u $(id -u):$(id -g) -v "$PWD":/w -w /w -e MPLCONFIGDIR=/tmp/mpl \
   low-input-nanopore/analysis:0.1.0 \
-  python3 comparison/plot_comparison.py --results-dir results \
-    --raghavendra-classifier minimap2_competitive --outdir comparison/figures
+  python3 bin/comparison/plot_comparison.py --results-dir results \
+    --raghavendra-classifier minimap2_competitive --outdir results/comparison
 
 # copy vector figures into the manuscript repository
 cp results/summary/{abundance,readlengths,coverage,mode_delta}.pdf \
    ../low-input-nanopore-manuscript/figures/
-cp comparison/figures/low_input_comparison.pdf \
+cp results/comparison/low_input_comparison.pdf \
    ../low-input-nanopore-manuscript/figures/
 ```
 
