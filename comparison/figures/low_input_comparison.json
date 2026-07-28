@@ -15,7 +15,7 @@
     },
     {
       "path": "comparison/plot_comparison.py",
-      "sha256": "30f61d69e6d2f3b83e12c27c408545246721e4793cc777fdfc6f9dbd034e8f16",
+      "sha256": "df614d48ab8eaf2ebd1a888c9b1475c1db5485237af65c838f79d8ebca8c1aa6",
       "role": "figure script"
     },
     {
@@ -24,19 +24,19 @@
       "role": "loader"
     },
     {
-      "path": "results",
+      "path": "../results",
       "sha256": null,
       "role": "live pipeline results directory"
     }
   ],
   "software": {
-    "generated_utc": "2026-07-27T01:10:52+00:00",
+    "generated_utc": "2026-07-28T21:33:34+00:00",
     "python": "3.12.13",
     "platform": "Linux-6.12.76-linuxkit-aarch64-with-glibc2.36",
     "numpy": "2.1.3",
     "pandas": "2.2.3",
     "matplotlib": "3.9.2",
-    "command": "plot_comparison.py --results-dir results --outdir comparison/figures"
+    "command": "plot_comparison.py --results-dir ../results"
   },
   "metrics": {
     "n_plotted_points": 30,
