@@ -6,9 +6,9 @@ Reads the two committed TSVs (`prior_studies.tsv`, `this_study.tsv`) and, when
 asked, supersedes the seeded this-study rows with live pipeline output from
 `results/<sample_id>/<mode>/<sample_id>.metrics.tsv`.
 
-Nothing here opens the legacy .xlsx. The workbook is extracted exactly once by
-a spreadsheet that is not in the repository; the TSVs are now the source of
-truth and each row cites its own published source.
+Nothing here reads a spreadsheet. The TSVs under assets/comparison/ are the
+source of truth, and every row cites the published table or the reanalysis it
+rests on, so the figure can be audited from the repository alone.
 
 Conventions
 -----------

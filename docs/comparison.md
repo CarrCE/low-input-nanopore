@@ -1,8 +1,12 @@
-# `comparison/` — low-input nanopore performance vs prior work
+# Low-input nanopore performance vs prior work
 
-This module replaces a hand-maintained Excel workbook
-(`2026-04-29 Low-Input Comparison Calculations.xlsx`) with versioned, auditable
-text tables plus a script that regenerates the comparison figure.
+Code in `bin/comparison/`, inputs in `assets/comparison/`, outputs written to
+`results/comparison/`.
+
+Every value is held in versioned text tables that cite the published table or
+the reanalysis each row rests on, and the figure regenerates from them. An
+earlier revision of this comparison lived in a hand-maintained spreadsheet; it
+is not in the repository, and nothing here depends on it.
 
 The figure places this study's per-femtogram sequencing performance against
 Mojarro et al. 2019, Basapathi Raghavendra et al. 2023 and Zorzano et al. 2025
@@ -274,18 +278,20 @@ re-derives every `reads_per_fg` / `bases_per_fg` from `reads`, `bases` and
 `dna_pg` to confirm the stored values are consistent. Exits non-zero on any
 inconsistency.
 
-### Re-extracting from the workbook
+### Refreshing the this-study snapshot
 
-Only if the workbook itself is corrected:
+`this_study.tsv` is a committed snapshot of pipeline output, so the figure can be
+redrawn without the reads. Refresh it whenever the pipeline output changes:
 
 ```bash
-python3 seed_this_study.py --results-dir ../results   # refresh the this_study.tsv snapshot
+python3 bin/comparison/seed_this_study.py --results-dir results
 ```
 
-This rewrites both TSVs and asserts that every emitted per-fg value reproduces
-the workbook's own computed cell. Commit the regenerated TSVs. The workbook
-lives under the gitignored `ignore/` tree, so this step is not reproducible from
-a clean clone — which is the point of committing the TSVs.
+It asks the loader for exactly the rows `--results-dir` would produce, so the
+seeded and live paths cannot disagree, and commits nothing that a reader cannot
+trace. Earlier versions of this file were extracted from a hand-maintained
+spreadsheet; that spreadsheet is not in the repository, and the extractor that
+read it has been removed along with the last reference to it.
 
 ## Classification provenance: what the `kraken2_*` rows ran against
 
@@ -555,6 +561,6 @@ experiment, a different sample type, and a fluorometric mass measurement rather
 than a read count. Tables 2 and 3, which are the sole source of the `published`
 rows and the design of the 10 samples re-analysed here, are untouched. The
 correction changes no read count, no input mass and no organism assignment. The
-PDF held under `ignore/` is already the corrected version (its final page reads
+version consulted is the corrected one (its final page reads
 "© The Author(s) 2023, corrected publication 2025"), and the fetched Zenodo
 reads are unchanged by it.
