@@ -74,12 +74,16 @@ ROUND_STYLE = {
 }
 FALLBACK_ROUND_STYLE = {"marker": "P", "s": 150, "legend_ms": 9, "edge_lw": 0.8}
 
-# Per-study callout offsets in log10 units, hand-tuned to avoid overlaps.
-CALLOUT_OFFSET = {
-    "Mojarro et al. 2019":        (+0.20, -0.75),
-    "B. Raghavendra et al. 2023": (-0.10, -0.65),
-    "Zorzano et al. 2025":        (-0.35, +1.25),
-}
+# Label placement is solved, not tabulated. The previous version carried
+# hand-tuned per-study offsets in log10 units; they were correct for the data as
+# it stood when they were tuned, and silently wrong afterwards -- correcting the
+# Round 1 analysis moved that cluster on top of the "bp/read" guide, and the
+# Round 1 box came to sit over two Basapathi Raghavendra points. Offsets that
+# have to be re-tuned whenever a number changes are a defect in a figure that is
+# regenerated from live pipeline output. `Placer` below chooses positions by
+# measuring overlap instead, so the figure stays legible when the data move.
+PLACER_CANDIDATE_ANGLES = 24
+PLACER_CANDIDATE_RADII = (0.45, 0.70, 1.00, 1.35, 1.75)
 
 plt.rcParams.update({
     "font.family":       "sans-serif",
@@ -132,19 +136,168 @@ def fmt_rate(v: float) -> str:
 
 
 # ---------------------------------------------------------------------------
+# Label placement
+# ---------------------------------------------------------------------------
+class Placer:
+    """Chooses label positions that do not cover data.
+
+    Everything is done in log10 data units, which on these log-log axes are
+    linear and so let a text box be treated as a plain rectangle. Obstacles are
+    the plotted points, the marginal rugs, and every label already placed --
+    labels are registered as they are positioned, so later ones route around
+    earlier ones rather than stacking on them.
+
+    The scoring is deliberately blunt: overlapping a data point is a hard cost,
+    overlapping another label a slightly softer one, and among the candidates
+    that clear both, the one nearest its anchor wins so leader lines stay short.
+    """
+
+    #: A point marker is about this many log10 units across; used to give
+    #: scatter points a footprint rather than treating them as infinitesimal.
+    POINT_PAD = 0.055
+
+    def __init__(self, fig, ax, points_xy):
+        self.fig, self.ax = fig, ax
+        (x0, x1), (y0, y1) = ax.get_xlim(), ax.get_ylim()
+        self.xlim = (np.log10(x0), np.log10(x1))
+        self.ylim = (np.log10(y0), np.log10(y1))
+
+        # Font metrics are in points; obstacles are in log10 data units. The
+        # bridge is the axes box in inches, so this must run after the layout is
+        # settled or every box is sized against the wrong axes width.
+        bbox = ax.get_position()
+        w_in = fig.get_size_inches()[0] * bbox.width
+        h_in = fig.get_size_inches()[1] * bbox.height
+        self.logx_per_in = (self.xlim[1] - self.xlim[0]) / w_in
+        self.logy_per_in = (self.ylim[1] - self.ylim[0]) / h_in
+
+        self.obstacles = [self._point_box(x, y) for x, y in points_xy]
+        # The rug ticks live in the top and right margins; nothing may sit there.
+        self.obstacles.append((self.xlim[0], self.ylim[1] - 0.12,
+                               self.xlim[1], self.ylim[1]))
+        self.obstacles.append((self.xlim[1] - 0.12, self.ylim[0],
+                               self.xlim[1], self.ylim[1]))
+        self.labels = []
+
+    def _point_box(self, x, y):
+        lx, ly = np.log10(x), np.log10(y)
+        return (lx - self.POINT_PAD, ly - self.POINT_PAD,
+                lx + self.POINT_PAD, ly + self.POINT_PAD)
+
+    def text_halfsize(self, text, fontsize, pad_pt=3.0):
+        """Half-width and half-height of a rendered text box, in log10 units."""
+        lines = text.split("\n")
+        # 0.58 em average advance for this sans stack; mathtext italics run a
+        # little wider, which the padding absorbs.
+        w_in = (max(len(l) for l in lines) * 0.58 * fontsize + 2 * pad_pt) / 72.0
+        h_in = (len(lines) * 1.30 * fontsize + 2 * pad_pt) / 72.0
+        return (w_in * self.logx_per_in / 2.0, h_in * self.logy_per_in / 2.0)
+
+    @staticmethod
+    def _overlap(a, b):
+        """Area of intersection of two (x0, y0, x1, y1) rectangles."""
+        dx = min(a[2], b[2]) - max(a[0], b[0])
+        dy = min(a[3], b[3]) - max(a[1], b[1])
+        return dx * dy if (dx > 0 and dy > 0) else 0.0
+
+    @staticmethod
+    def _segment_hits(p0, p1, rect, n=32):
+        """Does the leader from p0 to p1 pass through rect?
+
+        Sampled rather than clipped: at this resolution a box narrower than the
+        sample spacing would have to be smaller than the text it contains, and
+        sampling keeps the test to three lines.
+        """
+        for t in np.linspace(0.0, 1.0, n):
+            x = p0[0] + t * (p1[0] - p0[0])
+            y = p0[1] + t * (p1[1] - p0[1])
+            if rect[0] <= x <= rect[2] and rect[1] <= y <= rect[3]:
+                return True
+        return False
+
+    def _cost(self, box, anchor_log):
+        cost = 0.0
+        for o in self.obstacles:
+            cost += 60.0 * self._overlap(box, o)
+        for l in self.labels:
+            cost += 25.0 * self._overlap(box, l)
+
+        # A box can sit in clear space and still ruin a neighbour by dragging its
+        # leader line across it -- which is how the Round 2 leader came to strike
+        # through the Round 1 box. Charge for that too.
+        centre = ((box[0] + box[2]) / 2, (box[1] + box[3]) / 2)
+        for l in self.labels:
+            if self._segment_hits(anchor_log, centre, l):
+                cost += 3.0
+        for o in self.obstacles[:-2]:            # points only, not the rug strips
+            if self._segment_hits(anchor_log, centre, o):
+                cost += 0.4
+        # Staying inside the axes matters more than anything except covering a
+        # point: a box clipped by the frame is unreadable.
+        outside = (max(0.0, self.xlim[0] - box[0]) + max(0.0, box[2] - self.xlim[1])
+                   + max(0.0, self.ylim[0] - box[1]) + max(0.0, box[3] - self.ylim[1]))
+        cost += 120.0 * outside
+        cx, cy = (box[0] + box[2]) / 2, (box[1] + box[3]) / 2
+        cost += 0.35 * np.hypot(cx - anchor_log[0], cy - anchor_log[1])
+        return cost
+
+    def place(self, anchor_xy, text, fontsize, radii=PLACER_CANDIDATE_RADII,
+              angles=PLACER_CANDIDATE_ANGLES, register=True):
+        """Best (x, y) in data coordinates for a label anchored at anchor_xy."""
+        hw, hh = self.text_halfsize(text, fontsize)
+        ax_, ay_ = np.log10(anchor_xy[0]), np.log10(anchor_xy[1])
+        best, best_cost = None, np.inf
+        for r in radii:
+            for t in np.linspace(0, 2 * np.pi, angles, endpoint=False):
+                cx, cy = ax_ + r * np.cos(t) * 1.35, ay_ + r * np.sin(t)
+                box = (cx - hw, cy - hh, cx + hw, cy + hh)
+                c = self._cost(box, (ax_, ay_))
+                if c < best_cost:
+                    best, best_cost = (cx, cy, box), c
+        cx, cy, box = best
+        if register:
+            self.labels.append(box)
+        return 10 ** cx, 10 ** cy
+
+    def place_on_path(self, xs_log, ys_log, text, fontsize, register=True):
+        """Best position from a set of candidate points along a path."""
+        hw, hh = self.text_halfsize(text, fontsize)
+        best, best_cost = None, np.inf
+        for lx, ly in zip(xs_log, ys_log):
+            box = (lx - hw, ly - hh, lx + hw, ly + hh)
+            c = self._cost(box, (lx, ly))
+            if c < best_cost:
+                best, best_cost = (lx, ly, box), c
+        lx, ly, box = best
+        if register:
+            self.labels.append(box)
+        return 10 ** lx, 10 ** ly
+
+    def register_rect(self, x0, y0, x1, y1):
+        """Reserve a region in data coordinates (used for the legend)."""
+        self.labels.append((np.log10(x0), np.log10(y0),
+                            np.log10(x1), np.log10(y1)))
+
+
+# ---------------------------------------------------------------------------
 # Figure pieces
 # ---------------------------------------------------------------------------
-def add_iso_improvement_contour(ax, cx, cy, log_radius, label,
-                                color="0.4", lw=0.7, ls=(0, (3, 3))):
+def draw_iso_improvement_contour(ax, cx, cy, log_radius,
+                                 color="0.4", lw=0.7, ls=(0, (3, 3))):
     """Circle of `log_radius` log10 units around (cx, cy), drawn on log-log axes."""
     theta = np.linspace(0, 2 * np.pi, 400)
     ax.plot(10 ** (np.log10(cx) + log_radius * np.cos(theta)),
             10 ** (np.log10(cy) + log_radius * np.sin(theta)),
             color=color, linewidth=lw, linestyle=ls, alpha=0.55, zorder=1)
-    angle = np.deg2rad(225)   # label lower-left, where the prior studies live
-    ax.text(10 ** (np.log10(cx) + log_radius * np.cos(angle)),
-            10 ** (np.log10(cy) + log_radius * np.sin(angle)), label,
-            color=color, fontsize=7.5, ha="center", va="center",
+
+
+def label_iso_contour(ax, placer, cx, cy, log_radius, label, color="0.4"):
+    """Put the contour's label on the emptiest stretch of its own circle."""
+    theta = np.linspace(0, 2 * np.pi, 180, endpoint=False)
+    xs = np.log10(cx) + log_radius * np.cos(theta)
+    ys = np.log10(cy) + log_radius * np.sin(theta)
+    x, y = placer.place_on_path(xs, ys, label, 7.5)
+    ax.text(x, y, label, color=color, fontsize=7.5, ha="center", va="center",
             bbox=dict(facecolor="white", edgecolor="none", pad=0.8, alpha=0.9),
             zorder=2)
 
@@ -168,7 +321,35 @@ def pick_callouts(prior: pd.DataFrame, ref: dict) -> list[dict]:
     return callouts
 
 
-def build_figure(prior: pd.DataFrame, rounds: dict, title: str):
+def verify_placement(fig, ax, artists, points_xy, pad_px=1.5):
+    """Report any label that ends up covering a plotted point.
+
+    The placer works from estimated text metrics; this checks the rendered
+    result, so a bad estimate surfaces as a warning at generation time instead
+    of as a reviewer's comment. Returns a list of (label, x, y) collisions.
+    """
+    fig.canvas.draw()
+    hits = []
+    for art, name in artists:
+        # The drawn box, not Annotation.get_window_extent(): that returns the
+        # union of the text and its leader, so a label with a long leader claims
+        # a rectangle spanning everything the leader flies over and reports
+        # collisions with points it does not touch. The bbox patch is the white
+        # rectangle the reader actually sees.
+        patch = art.get_bbox_patch()
+        try:
+            bb = patch.get_window_extent() if patch is not None else art.get_window_extent()
+        except Exception:                       # artist never rendered
+            continue
+        for x, y in points_xy:
+            px, py = ax.transData.transform((x, y))
+            if (bb.x0 - pad_px <= px <= bb.x1 + pad_px
+                    and bb.y0 - pad_px <= py <= bb.y1 + pad_px):
+                hits.append((name, float(x), float(y)))
+    return hits
+
+
+def build_figure(prior: pd.DataFrame, rounds: dict, title: str | None):
     fig, ax = plt.subplots(figsize=(7.0, 5.2))
 
     # ---- prior-study points ------------------------------------------------
@@ -185,11 +366,8 @@ def build_figure(prior: pd.DataFrame, rounds: dict, title: str):
                    marker=st["marker"], s=st["s"], c=THIS_STUDY_COLOR,
                    edgecolors="white", linewidths=st["edge_lw"], zorder=6)
 
-    # ---- iso-improvement contours around the reference round ---------------
     ref_name = next(iter(rounds))
     ref = {"reads": rounds[ref_name]["reads_mean"], "bases": rounds[ref_name]["bases_mean"]}
-    for log_r, label in [(1, "10× less"), (2, "100× less"), (3, "1000× less")]:
-        add_iso_improvement_contour(ax, ref["reads"], ref["bases"], log_r, label)
 
     # ---- axis limits -------------------------------------------------------
     all_x = list(prior["reads_per_fg"]) + [v for r in rounds.values() for v in r["reads_values"]]
@@ -200,73 +378,16 @@ def build_figure(prior: pd.DataFrame, rounds: dict, title: str):
     ax.set_xscale("log")
     ax.set_yscale("log")
 
-    # ---- constant bases-per-read reference ---------------------------------
-    bpr_median = float(np.median(prior["bases_per_fg"] / prior["reads_per_fg"]))
-    xs = np.array(ax.get_xlim())
-    ax.plot(xs, bpr_median * xs, color="0.7", linewidth=0.7,
-            linestyle=(0, (1, 2)), zorder=0)
-    ax.text(xs[1] * 0.92, bpr_median * xs[1] * 0.55, f"~{bpr_median:,.0f} bp/read",
-            color="0.5", fontsize=7.5, ha="right", va="center")
-
-    # ---- per-study callouts ------------------------------------------------
-    callouts = pick_callouts(prior, ref)
-    for c in callouts:
-        dx, dy = CALLOUT_OFFSET.get(c["study"], (0.20, 0.45))
-        ax.annotate(
-            c["text"], xy=(c["x"], c["y"]),
-            xytext=(10 ** (np.log10(c["x"]) + dx), 10 ** (np.log10(c["y"]) + dy)),
-            fontsize=7.5, ha="left", va="bottom", color=color_of(c["study"]),
-            bbox=dict(facecolor="white", edgecolor=color_of(c["study"]),
-                      linewidth=0.6, pad=2.5, alpha=0.92),
-            arrowprops=dict(arrowstyle="-", color=color_of(c["study"]),
-                            lw=0.6, alpha=0.7, connectionstyle="arc3,rad=0.12"),
-            zorder=5)
-
-    # ---- this-study labels -------------------------------------------------
-    # Both rounds now sit in the same corner: correcting the Round 1 analysis
-    # (which had been counting carrier-derived E. coli as community) moved it
-    # down into Round 2's range, so the two clusters interleave. Push both
-    # labels left and down, away from the points and away from the title -- the
-    # old "Round 2 up and right" offset ran the box straight through the title.
-    label_offsets = {"Round 1": (-0.55, -0.55, "right", "top"),
-                     "Round 2": (-0.90, +0.18, "right", "center")}
-    for name, info in rounds.items():
-        dx, dy, ha, va = label_offsets.get(name, (+0.25, +0.40, "left", "bottom"))
-        n = len(info["reads_values"])
-        if n > 1:
-            # anchor on the median replicate so the leader lands on a real marker
-            order = np.argsort(info["reads_values"])
-            j = int(order[n // 2])
-            anchor = (info["reads_values"][j], info["bases_values"][j])
-            head = f"{name}\n(n={n}, this study)\nmean:"
-        else:
-            anchor = (info["reads_values"][0], info["bases_values"][0])
-            head = f"{name}\n(this study)"
-        ax.annotate(
-            f"{head}\n{fmt_rate(info['reads_mean'])} reads/fg\n"
-            f"{fmt_rate(info['bases_mean'])} bases/fg",
-            xy=anchor,
-            xytext=(10 ** (np.log10(info["reads_mean"]) + dx),
-                    10 ** (np.log10(info["bases_mean"]) + dy)),
-            fontsize=8, fontweight="bold", ha=ha, va=va,
-            bbox=dict(facecolor="white", edgecolor=THIS_STUDY_COLOR,
-                      linewidth=0.8, pad=2.5, alpha=0.95),
-            arrowprops=dict(arrowstyle="-", color=THIS_STUDY_COLOR, lw=0.6),
-            zorder=7)
-
-    # ---- marginal rugs -----------------------------------------------------
-    y_hi, x_hi = np.log10(ax.get_ylim()[1]), np.log10(ax.get_xlim()[1])
-    for _, r in prior.iterrows():
-        c = color_of(r["study"])
-        ax.plot([r["reads_per_fg"]] * 2, [10 ** (y_hi - 0.10), 10 ** (y_hi - 0.04)],
-                color=c, linewidth=0.8, alpha=0.7, zorder=2)
-        ax.plot([10 ** (x_hi - 0.10), 10 ** (x_hi - 0.04)], [r["bases_per_fg"]] * 2,
-                color=c, linewidth=0.8, alpha=0.7, zorder=2)
-
-    # ---- axes / legend -----------------------------------------------------
+    # ---- axes, legend, layout ----------------------------------------------
+    # These come before any label is positioned. The legend occupies a real
+    # patch of the axes and the layout fixes the axes size in inches, and the
+    # placer needs both: without the layout it sizes every text box against the
+    # wrong axes width, and without the legend it will happily park a callout
+    # underneath it.
     ax.set_xlabel("Reads / fg DNA into library prep")
     ax.set_ylabel("Bases / fg DNA into library prep")
-    ax.set_title(title)
+    if title:
+        ax.set_title(title)
 
     handles = [Line2D([0], [0], marker=marker_of(s), color=color_of(s),
                       markeredgecolor="black", markeredgewidth=0.5,
@@ -278,8 +399,8 @@ def build_figure(prior: pd.DataFrame, rounds: dict, title: str):
                               markeredgecolor="white", markeredgewidth=0.7,
                               linestyle="None", markersize=st["legend_ms"],
                               label=f"{name} (this study)"))
-    ax.legend(handles=handles, loc="lower right", bbox_to_anchor=(0.965, 0.02),
-              frameon=True, framealpha=0.95, edgecolor="0.7")
+    legend = ax.legend(handles=handles, loc="lower right", bbox_to_anchor=(0.965, 0.02),
+                       frameon=True, framealpha=0.95, edgecolor="0.7")
 
     ax.grid(True, which="major", color="0.93", linewidth=0.5, zorder=0)
     ax.grid(True, which="minor", color="0.97", linewidth=0.4, zorder=0)
@@ -287,6 +408,93 @@ def build_figure(prior: pd.DataFrame, rounds: dict, title: str):
         ax.spines[spine].set_color("0.6")
 
     fig.tight_layout()
+    fig.canvas.draw()          # settle the layout so text metrics are meaningful
+
+    # ---- placement ---------------------------------------------------------
+    points = ([(x, y) for x, y in zip(prior["reads_per_fg"], prior["bases_per_fg"])]
+              + [(x, y) for r in rounds.values()
+                 for x, y in zip(r["reads_values"], r["bases_values"])])
+    placer = Placer(fig, ax, points)
+    placed_artists = []
+
+    lb = legend.get_window_extent().transformed(ax.transData.inverted())
+    placer.register_rect(lb.x0, lb.y0, lb.x1, lb.y1)
+
+    # ---- iso-improvement contours around the reference round ---------------
+    for log_r, label in [(1, "10× less"), (2, "100× less"), (3, "1000× less")]:
+        draw_iso_improvement_contour(ax, ref["reads"], ref["bases"], log_r)
+        label_iso_contour(ax, placer, ref["reads"], ref["bases"], log_r, label)
+
+    # ---- constant bases-per-read reference ---------------------------------
+    # The guide line runs corner to corner through the densest part of the plot,
+    # so its label is placed along the line itself rather than pinned to one end
+    # -- pinning it to the right end put it under this study's markers.
+    bpr_median = float(np.median(prior["bases_per_fg"] / prior["reads_per_fg"]))
+    xs = np.array(ax.get_xlim())
+    ax.plot(xs, bpr_median * xs, color="0.7", linewidth=0.7,
+            linestyle=(0, (1, 2)), zorder=0)
+    bpr_text = f"~{bpr_median:,.0f} bp/read"
+    lxs = np.linspace(np.log10(xs[0]) + 0.25, np.log10(xs[1]) - 0.25, 60)
+    lys = np.log10(bpr_median) + lxs
+    bx, by = placer.place_on_path(lxs, lys, bpr_text, 7.5)
+    placed_artists.append((
+        ax.text(bx, by, bpr_text, color="0.5", fontsize=7.5, ha="center", va="center",
+                bbox=dict(facecolor="white", edgecolor="none", pad=0.8, alpha=0.85),
+                zorder=2), bpr_text))
+
+    # ---- per-study callouts ------------------------------------------------
+    callouts = pick_callouts(prior, ref)
+    for c in callouts:
+        tx, ty = placer.place((c["x"], c["y"]), c["text"], 7.5)
+        placed_artists.append((ax.annotate(
+            c["text"], xy=(c["x"], c["y"]), xytext=(tx, ty),
+            fontsize=7.5, ha="center", va="center", color=color_of(c["study"]),
+            bbox=dict(facecolor="white", edgecolor=color_of(c["study"]),
+                      linewidth=0.6, pad=2.5, alpha=0.92),
+            arrowprops=dict(arrowstyle="-", color=color_of(c["study"]),
+                            lw=0.6, alpha=0.7, connectionstyle="arc3,rad=0.12"),
+            zorder=5), c["study"]))
+
+    # ---- this-study labels -------------------------------------------------
+    for name, info in rounds.items():
+        n = len(info["reads_values"])
+        if n > 1:
+            # anchor on the median replicate so the leader lands on a real marker
+            order = np.argsort(info["reads_values"])
+            j = int(order[n // 2])
+            anchor = (info["reads_values"][j], info["bases_values"][j])
+            head = f"{name}\n(n={n}, this study)\nmean:"
+        else:
+            anchor = (info["reads_values"][0], info["bases_values"][0])
+            head = f"{name}\n(this study)"
+        text = (f"{head}\n{fmt_rate(info['reads_mean'])} reads/fg\n"
+                f"{fmt_rate(info['bases_mean'])} bases/fg")
+        tx, ty = placer.place(anchor, text, 8)
+        placed_artists.append((ax.annotate(
+            text, xy=anchor, xytext=(tx, ty),
+            fontsize=8, fontweight="bold", ha="center", va="center",
+            bbox=dict(facecolor="white", edgecolor=THIS_STUDY_COLOR,
+                      linewidth=0.8, pad=2.5, alpha=0.95),
+            arrowprops=dict(arrowstyle="-", color=THIS_STUDY_COLOR, lw=0.6),
+            zorder=7), name))
+
+    # ---- marginal rugs -----------------------------------------------------
+    y_hi, x_hi = np.log10(ax.get_ylim()[1]), np.log10(ax.get_xlim()[1])
+    for _, r in prior.iterrows():
+        c = color_of(r["study"])
+        ax.plot([r["reads_per_fg"]] * 2, [10 ** (y_hi - 0.10), 10 ** (y_hi - 0.04)],
+                color=c, linewidth=0.8, alpha=0.7, zorder=2)
+        ax.plot([10 ** (x_hi - 0.10), 10 ** (x_hi - 0.04)], [r["bases_per_fg"]] * 2,
+                color=c, linewidth=0.8, alpha=0.7, zorder=2)
+
+    collisions = verify_placement(fig, ax, placed_artists, points)
+    if collisions:
+        print("[layout] WARNING: label(s) overlap plotted points:", file=sys.stderr)
+        for name, x, y in collisions:
+            print(f"[layout]   {name!r} covers point ({x:.6g}, {y:.6g})", file=sys.stderr)
+    else:
+        print(f"[layout] {len(placed_artists)} labels placed, none covering a data point")
+
     return fig, callouts, bpr_median, ref_name
 
 
@@ -369,9 +577,16 @@ def parse_args(argv=None):
                     help="DEFECT (c): 'kraken2_q10' (default) is our reanalysis of the "
                          "deposited reads; 'published' uses the paper's pass reads, "
                          "which have no base counts and so cannot be plotted")
+    # The figure carries no drawn title: in the manuscript it sits above a
+    # caption that says the same thing, and a title there is redundant and eats
+    # plot area. The string is still the display item's title in the JSON
+    # sidecar, which is what the display-item registry reads.
     ap.add_argument("--title",
                     default="Low-input nanopore performance — this study vs prior work",
-                    help="figure title")
+                    help="display-item title recorded in the JSON sidecar")
+    ap.add_argument("--draw-title", action="store_true",
+                    help="also render the title above the axes (off by default; "
+                         "the manuscript caption already carries it)")
     ap.add_argument("--dpi", type=int, default=600, help="raster DPI (default: %(default)s)")
     ap.add_argument("--allow-unverified", action="store_true", default=True,
                     help=argparse.SUPPRESS)
@@ -435,7 +650,8 @@ def main(argv=None):
               f"{info['bases_mean']:.6g} bases/fg, source(s)={','.join(info['sources'])}")
 
     # ---- figure ------------------------------------------------------------
-    fig, callouts, bpr_median, ref_name = build_figure(prior, rounds, args.title)
+    fig, callouts, bpr_median, ref_name = build_figure(
+        prior, rounds, args.title if args.draw_title else None)
 
     outdir = args.outdir
     outdir.mkdir(parents=True, exist_ok=True)
