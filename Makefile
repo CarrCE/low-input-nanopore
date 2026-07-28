@@ -32,7 +32,7 @@ DEMO_READS  ?= 40000
 
 .DEFAULT_GOAL := help
 
-.PHONY: help images test check measurements seqsummary versions runmeta s1 s2 demo-data clean
+.PHONY: help images test check measurements seqsummary versions runmeta poolcov s1 s2 demo-data clean
 
 help: ## Show this help
 	@printf 'low-input-nanopore -- make targets\n\n'
@@ -114,6 +114,19 @@ seqsummary: ## Per-replicate yield, read length and read quality (needs finished
 runmeta: ## Per-run acquisition id, model and dates, read from the FASTQs (slow: full pass over ~100 GB)
 	@docker run --rm -u "$$(id -u):$$(id -g)" -v "$(ROOT)":/repo -w /repo "$(ANALYSIS_IMAGE)" \
 	    python3 bin/run_metadata.py --out results/summary/run_metadata.tsv
+
+poolcov: ## Pooled-across-replicates coverage summary and Figure S3 (slow: full pass over the depth files)
+	@docker run --rm -u "$$(id -u):$$(id -g)" -e MPLCONFIGDIR=/tmp/mpl \
+	    -v "$(ROOT)":/repo -w /repo "$(ANALYSIS_IMAGE)" \
+	    python3 bin/pool_coverage.py \
+	        --out-summary results/summary/pooled_coverage_summary.tsv \
+	        --out-profile results/summary/pooled_coverage_profile.tsv
+	@docker run --rm -u "$$(id -u):$$(id -g)" -e MPLCONFIGDIR=/tmp/mpl \
+	    -v "$(ROOT)":/repo -w /repo "$(ANALYSIS_IMAGE)" \
+	    python3 bin/plot_pooled_coverage.py \
+	        --summary results/summary/pooled_coverage_summary.tsv \
+	        --profile results/summary/pooled_coverage_profile.tsv \
+	        --outdir  results/summary
 
 versions: ## Record the software the built images actually contain
 	@"$(ROOT)/bin/software_versions.sh" --out "$(ROOT)/results/summary/software_versions.tsv"

@@ -2,7 +2,7 @@
 
 What is not done, not sourced, or not yet trustworthy in this repository.
 
-Items 1–4 are open. Section 5 records questions that were open, were
+Items 1–5 are open. Section 6 records questions that were open, were
 investigated, and were closed; they are kept because the manuscript's
 Supplementary Information refers to several of them, and because "we checked and
 it did not matter" is a result a reader may want to audit rather than take on
@@ -55,7 +55,38 @@ Raghavendra reads are, under `data/raghavendra_2023/`).
 
 Nothing here touches the main pipeline, which does not use Kraken2 at all.
 
-## 3. Declared parameters that nothing reads
+## 3. `COVERAGE_PROFILE` measures alignments, not assignments
+
+`samtools depth` runs over the primary alignments to community contigs. It is
+not restricted to the reads `assign_reads.py` awarded to each organism, so an
+organism whose sequence is shared with an abundant relative accumulates depth
+from that relative's reads. Pooled over the replicates:
+
+| organism | alignment depth | attributable | ratio |
+|---|---:|---:|---:|
+| *E. faecalis* | 2.09× | 0.0016× | 0.1% |
+| *E. coli* B-1109 | 158× | 2.08× | 1.3% |
+| *S. enterica* | 0.71× | 0.18× | 25% |
+| the other ten | — | — | 97–104% |
+
+*E. faecalis* is awarded 4 reads in `lowinput_s1_r1` and shows 0.88× there:
+1,942 reads tie between it and *Listeria*, and roughly half place their primary
+alignment on its genome. For B-1109 the top 1% of 1 kb bins hold 79% of the
+depth, peaking above 10⁵× near 3.06 and 3.09 Mb — λ carrier reads on
+λ-related prophage sequence.
+
+`bin/pool_coverage.py` reports both quantities and the ratio, and both figures
+mark the members where they disagree, so nothing is presented on the alignment
+number alone. That is a mitigation, not a fix.
+
+**The fix** is to filter the BAM to reads whose assignment matches the contig's
+organism before `samtools depth`. It needs a re-run: the qname BAMs are not
+retained (only `test_s2.qname.bam` survives), and `assignments.tsv.gz` carries
+no alignment coordinates, so per-base depth cannot be reconstructed from what is
+on disk. Budget a full re-map plus coverage pass, and note that it would move
+the *E. coli* rows of Supplementary Table S5 and both coverage figures.
+
+## 4. Declared parameters that nothing reads
 
 `params.min_readlen`, `params.community`, `params.carrier_accession` and
 `params.contaminant_accession` are defined in `nextflow.config` but no process
@@ -65,7 +96,7 @@ nothing are a reproducibility hazard.
 (`params.min_qscore` and `params.coverage_window` were on this list and are now
 both consumed.)
 
-## 4. Genome-set caveats not assessed
+## 5. Genome-set caveats not assessed
 
 Two `lowinput_s1` references are contig-level rather than complete
 (*S. cerevisiae* `GCA_030867715.1`, *C. neoformans* `GCA_028975465.1`). Complete
@@ -80,7 +111,7 @@ them; `data/readme.md` should point at them rather than restate them.
 
 ---
 
-## 5. Closed
+## 6. Closed
 
 ### `--breseq_consensus`: implemented, run, and found unnecessary
 
