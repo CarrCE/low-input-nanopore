@@ -32,7 +32,7 @@ DEMO_READS  ?= 40000
 
 .DEFAULT_GOAL := help
 
-.PHONY: help images test check measurements seqsummary versions runmeta poolcov attribution s1 s2 demo-data clean
+.PHONY: help images test check measurements seqsummary versions runmeta poolcov attribution comparison s1 s2 demo-data clean
 
 help: ## Show this help
 	@printf 'low-input-nanopore -- make targets\n\n'
@@ -131,6 +131,11 @@ poolcov: ## Pooled-across-replicates coverage summary and Figure S3 (slow: full 
 attribution: ## Per-replicate alignment vs attributable depth, and the 1x threshold
 	@docker run --rm -u "$$(id -u):$$(id -g)" -v "$(ROOT)":/repo -w /repo "$(ANALYSIS_IMAGE)" \
 	    python3 bin/coverage_attribution.py --out results/summary/coverage_attribution.tsv
+
+comparison: ## Prior-work comparison figure (Fig. 3) into results/comparison/
+	@docker run --rm -u "$$(id -u):$$(id -g)" -e MPLCONFIGDIR=/tmp/mpl \
+	    -v "$(ROOT)":/repo -w /repo "$(ANALYSIS_IMAGE)" \
+	    python3 bin/comparison/plot_comparison.py --results-dir results
 
 versions: ## Record the software the built images actually contain
 	@"$(ROOT)/bin/software_versions.sh" --out "$(ROOT)/results/summary/software_versions.tsv"

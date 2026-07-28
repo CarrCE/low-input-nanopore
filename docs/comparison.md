@@ -217,7 +217,7 @@ cd comparison
 python3 plot_comparison.py
 ```
 
-Writes to `comparison/figures/`:
+Writes to `results/comparison/`:
 
 * `low_input_comparison.pdf` — vector, Type 42 (editable) fonts
 * `low_input_comparison.png` — 600 dpi
@@ -317,8 +317,8 @@ today it returns a file with today's date. Only the dated copy under
 rolling path would silently reclassify against a different taxonomy.
 
 ```bash
-bash comparison/fetch_kraken2_db.sh                    # ~5.5 GiB, verified
-bash comparison/run_kraken2_reanalysis.sh \
+bash bin/comparison/fetch_kraken2_db.sh                    # ~5.5 GiB, verified
+bash bin/comparison/run_kraken2_reanalysis.sh \
      --fastq data/raghavendra_2023 --out results_kraken2 --min-qual 10
 ```
 
@@ -463,7 +463,7 @@ would matter most.
 
 | File | Contents |
 |---|---|
-| `comparison/fetch_raghavendra.sh` | Downloads `MinION low detectability.zip` from <https://zenodo.org/records/8208597>, verifies size and MD5, extracts the 10 `fastq_pass` files and stages them as `data/raghavendra_2023/<alias>.fastq.gz`. |
+| `bin/comparison/fetch_raghavendra.sh` | Downloads `MinION low detectability.zip` from <https://zenodo.org/records/8208597>, verifies size and MD5, extracts the 10 `fastq_pass` files and stages them as `data/raghavendra_2023/<alias>.fastq.gz`. |
 | `assets/samplesheets/raghavendra_2023.csv` | 10 rows, `include_in_headline=0` throughout. |
 | `assets/references/raghavendra_2023_ecoli.tsv` | *E. coli* only, fraction 1.0 (Ec_R1-R3). |
 | `assets/references/raghavendra_2023_scerevisiae.tsv` | *S. cerevisiae* only, fraction 1.0 (YSC_R1-R3). |
@@ -488,7 +488,7 @@ sensitivity is limited to 10 pg/µl", so nothing at this level was quantified.
 ### How to run
 
 ```bash
-bash comparison/fetch_raghavendra.sh
+bash bin/comparison/fetch_raghavendra.sh
 ./run.sh -profile docker --samplesheet assets/samplesheets/raghavendra_2023.csv
 ```
 

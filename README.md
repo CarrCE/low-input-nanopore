@@ -128,7 +128,9 @@ These mirror the conventions used across the lab's analysis repositories.
 | `docs/ecoli-partitioning.md` | Why the community's *E. coli* must not be subtracted with the contaminant, and how competitive assignment handles it |
 | `docs/TODO.md` | Honest list of known gaps |
 | `modules/local/` | Reserved for extracted process modules |
-| `comparison/` | Reserved for the prior-study reanalysis (see `docs/TODO.md`) |
+| `bin/comparison/` | The prior-work comparison: figure generator, the loader, the Kraken2/Raghavendra fetch and reanalysis scripts, and `seed_this_study.py` |
+| `assets/comparison/` | Its inputs: `prior_studies.tsv` (one row per prior-study sample per classifier variant, each citing its published source), `this_study.tsv` (a committed snapshot of pipeline output), `kraken2_db.manifest.tsv` (the pinned database) |
+| `docs/comparison.md` | How that comparison is built, and the four data defects it repairs |
 | `data/`, `refs/`, `results/`, `work/` | **Gitignored.** Input reads, fetched genomes, outputs, Nextflow scratch |
 
 ---
