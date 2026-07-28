@@ -53,6 +53,14 @@ def parse_args():
                    help="*.coverage_summary.tsv")
     p.add_argument("--profiles", nargs="+", required=True,
                    help="*.coverage_profile.tsv")
+    p.add_argument("--attribution", default=None,
+                   help="coverage_attribution.tsv; marks panels whose alignment "
+                        "depth is largely not attributable to awarded reads")
+    p.add_argument("--exclude", nargs="*", default=["test_s2"],
+                   help="sample_ids that are not experiments. The smoke test is a "
+                        "40,000-read synthetic subsample; the input globs match it, "
+                        "and counting it inflates every 'N of M pairs' statement "
+                        "made from this figure (default: %(default)s)")
     p.add_argument("--outdir", required=True)
     p.add_argument("--basename", default="coverage")
     return p.parse_args()
@@ -73,6 +81,20 @@ def main():
                      ignore_index=True)
     prof = pd.concat([pd.read_csv(f, sep="\t") for f in args.profiles],
                      ignore_index=True)
+
+    if args.exclude:
+        summ = summ[~summ["sample_id"].isin(args.exclude)]
+        prof = prof[~prof["sample_id"].isin(args.exclude)]
+
+    # Attributable depth decides what may be *interpreted*; alignment depth still
+    # decides what is *drawn*, because the panel that is mostly another
+    # organism's reads is the one Section S4 exists to explain. Drawn and marked
+    # beats quietly dropped.
+    attribution = {}
+    if args.attribution:
+        att = pd.read_csv(args.attribution, sep="\t")
+        attribution = {(r["sample_id"], r["organism"]): float(r["attributable_fraction"])
+                       for _, r in att.iterrows()}
 
     summ = summ.sort_values(["organism", "sample_id"])
     summ.to_csv(outdir / f"{args.basename}_summary.csv", index=False)
@@ -122,8 +144,16 @@ def main():
         axp.axhline(1.0, color="0.4", lw=0.8, ls=(0, (4, 3)), zorder=4)
         axp.set_ylim(0, 2.5)
         axp.set_xlim(0, x.max() if len(x) else 1)
-        axp.set_title(f"{italicize(org)}\n{sid}, {mean_depth:.1f}$\\times$",
-                      fontsize=8, loc="left")
+        frac = attribution.get((sid, org))
+        weak = frac is not None and frac < 0.9
+        title = f"{italicize(org)}\n{sid}, {mean_depth:.1f}$\\times$"
+        if weak:
+            title += f" ({mean_depth * frac:.2f}$\\times$ attributable)"
+        axp.set_title(title, fontsize=8, loc="left",
+                      color="#8a3800" if weak else "black")
+        if weak:
+            for s in axp.spines.values():
+                s.set_color("#8a3800"); s.set_linewidth(1.1); s.set_linestyle((0, (3, 2)))
         axp.tick_params(labelsize=7.5)
         axp.grid(True, color="0.93", lw=0.5, zorder=0)
         if i % ncol == 0:
@@ -183,8 +213,18 @@ def main():
 
     pd.DataFrame(plotted_rows).to_csv(outdir / f"{args.basename}.csv", index=False)
 
-    interpretable = deep[["sample_id", "organism", "mean_depth", "breadth_1x",
-                          "cv", "gini"]].to_dict("records")
+    # "Interpretable" is now attributable-depth based. An organism-replicate pair
+    # whose awarded reads cover less than 1x has not been sequenced deeply enough
+    # to characterise, whatever its alignment depth says.
+    if attribution:
+        att_depth = deep.apply(
+            lambda r: r["mean_depth"] * attribution.get((r["sample_id"], r["organism"]), 1.0),
+            axis=1)
+        interp_rows = deep[att_depth >= MIN_DEPTH_INTERPRETABLE]
+    else:
+        interp_rows = deep
+    interpretable = interp_rows[["sample_id", "organism", "mean_depth", "breadth_1x",
+                                 "cv", "gini"]].to_dict("records")
     payload = {
         "id": args.basename,
         "title": "Coverage uniformity across community members",
@@ -192,13 +232,17 @@ def main():
             "(A) Depth in 1 kb bins along each reference genome, normalised to that "
             "organism's own mean depth, for organisms whose mean depth reached 1x; the "
             "deepest replicate is shown, with a 25-bin rolling median over the raw bins. "
-            "A uniformly covered genome sits at 1.0. Note that the Escherichia coli "
-            "panel does NOT show a biological coverage artifact: it shows competitive "
-            "assignment working. Reads are awarded to the community's E. coli B-1109 "
-            "only where that strain is distinguishable from the carrier-derived K-12 "
-            "contaminant, so depth concentrates in the strain-specific accessory region "
-            "and falls to near zero across the shared core genome, where reads are "
-            "reported as ambiguous instead. Listeria monocytogenes, by contrast, is flat "
+            "A uniformly covered genome sits at 1.0. Depth is over primary alignments "
+            "and is not restricted to reads competitive assignment awarded to the "
+            "organism; panels outlined in dashed rule are those where the two differ, "
+            "and carry the attributable depth in the panel title. The Escherichia coli "
+            "panel is the extreme case at 1.3% attributable, and does NOT show a "
+            "biological coverage artifact: its depth is concentrated at sequence "
+            "B-1109 shares with the lambda carrier and with the K-12 contaminant, so it "
+            "is a picture of the reference set rather than of the sample. It is drawn "
+            "rather than dropped because it is the cautionary example the accompanying "
+            "text explains, but it is excluded from the characterisable pairs on "
+            "attributable depth. Listeria monocytogenes, by contrast, is flat "
             "at 162x apart from two discrete dropouts, which are genuine artifacts. "
             "(B) Gini "
             "coefficient of per-base depth against mean depth for every organism and "
@@ -214,15 +258,21 @@ def main():
         "metrics": {
             "n_plotted_points": int(len(plotted_rows)),
             "n_organism_replicate_pairs": int(len(summ)),
-            "n_above_1x": int(len(deep)),
-            "organisms_above_1x": organisms,
+            "excluded_samples": list(args.exclude),
+            "n_above_1x_alignment_depth": int(len(deep)),
+            "n_above_1x_attributable_depth": int(len(interp_rows)),
+            "organisms_above_1x_alignment": organisms,
+            "organisms_characterisable": sorted(interp_rows["organism"].unique()),
             "interpretable_rows": interpretable,
         },
     }
     (outdir / f"{args.basename}.json").write_text(json.dumps(payload, indent=2))
 
-    print(f"[coverage] {len(summ)} organism-replicate pairs, "
-          f"{len(deep)} above {MIN_DEPTH_INTERPRETABLE:g}x")
+    print(f"[coverage] {len(summ)} organism-replicate pairs "
+          f"(excluded: {', '.join(args.exclude) or 'nothing'}); "
+          f"{len(deep)} above {MIN_DEPTH_INTERPRETABLE:g}x alignment depth, "
+          f"{len(interp_rows)} above {MIN_DEPTH_INTERPRETABLE:g}x attributable depth "
+          f"({interp_rows['organism'].nunique()} organisms)")
     if organisms:
         print(f"[coverage] interpretable: {', '.join(organisms)}")
     print(f"[coverage] wrote {args.basename}.pdf/.png/.csv/.json in {outdir}")
