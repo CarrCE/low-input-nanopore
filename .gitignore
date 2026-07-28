@@ -34,3 +34,7 @@ manuscript/
 __pycache__/
 *.pyc
 .venv/
+
+# Editor / language scratch
+.Rhistory
+.Rproj.user/

@@ -5,22 +5,22 @@
   "source_files": [
     {
       "path": "comparison/prior_studies.tsv",
-      "sha256": "3e1346a44abde2cb115cd3ed17fad3b81497366704a1b8017436dfb00c67f02f",
+      "sha256": "9556ff0daf8225dcc3595987ffaed43339a1b305eb7c4ddff8ab2fa40c7ae742",
       "role": "prior-study data"
     },
     {
       "path": "comparison/this_study.tsv",
-      "sha256": "0e3f49c27630a94c0c9dc2679aefb171cc1daba6de709894451f4c5784180fe8",
+      "sha256": "0cf4a3f7374271e3eb4dd8de552df7d81b256c63af070587599091cce4be5402",
       "role": "this-study data"
     },
     {
       "path": "comparison/plot_comparison.py",
-      "sha256": "df614d48ab8eaf2ebd1a888c9b1475c1db5485237af65c838f79d8ebca8c1aa6",
+      "sha256": "89bd45f0c1423cc1b1ff01dcac20b07e5ef197eba27c42673fe9d164cb3cefe5",
       "role": "figure script"
     },
     {
       "path": "comparison/comparison_data.py",
-      "sha256": "104f15910d9fc6dc2276c5325682f138236bdefe756696bb4ef8244a18e3c5e4",
+      "sha256": "7bbd8e0b44bb71432db52a21a023a82bde38a06a938bb1a417c768b25064b4b4",
       "role": "loader"
     },
     {
@@ -30,7 +30,7 @@
     }
   ],
   "software": {
-    "generated_utc": "2026-07-28T21:33:34+00:00",
+    "generated_utc": "2026-07-28T22:39:48+00:00",
     "python": "3.12.13",
     "platform": "Linux-6.12.76-linuxkit-aarch64-with-glibc2.36",
     "numpy": "2.1.3",
