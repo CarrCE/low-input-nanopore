@@ -188,6 +188,25 @@ def main():
                       & (per_org["theoretical_dna_fraction"] > 0)].copy()
     samples = samples[samples["measured_base_fraction"].notna()]
 
+    # With --mode both, per_org holds one row per (sample, mode, organism), so
+    # averaging without first selecting a mode silently mixes the two
+    # assignment rules: the "mean across replicates" becomes the mean of the
+    # competitive and the sequential value, and the error bar becomes
+    # between-mode variance rather than between-replicate. The panel title
+    # counts distinct sample_ids and so would still read n=3 while the
+    # statistic behind it was over 6 rows. Pick one mode -- competitive, which
+    # every headline number uses -- and fall back to whichever single mode is
+    # present when only one was run. MAKE_READLENGTHS applies the same
+    # deduplication upstream (main.nf) for the same reason.
+    modes = sorted(samples["mode"].unique())
+    abundance_mode = "competitive" if "competitive" in modes else (
+        modes[0] if modes else None)
+    if abundance_mode is not None:
+        samples = samples[samples["mode"] == abundance_mode].copy()
+        if len(modes) > 1:
+            print(f"[aggregate] abundance figure uses mode={abundance_mode} "
+                  f"(available: {', '.join(modes)})")
+
     if len(samples):
         experiments = sorted(samples["experiment"].unique())
         fig, axes = plt.subplots(1, len(experiments),
@@ -237,7 +256,7 @@ def main():
         fig.savefig(outdir / "abundance.png", bbox_inches="tight", dpi=600)
         plt.close(fig)
 
-        grp_all = (samples.groupby(["experiment", "organism"])
+        grp_all = (samples.groupby(["experiment", "mode", "organism"])
                    .agg(theoretical=("theoretical_dna_fraction", "first"),
                         measured_mean=("measured_base_fraction", "mean"),
                         measured_sd=("measured_base_fraction", "std"),
@@ -256,7 +275,11 @@ def main():
             "standard deviation. The dashed line is 1:1.",
             [Path(f).name for f in args.metrics],
             {"n_organisms": int(len(grp_all)),
-             "n_plotted_points": int(len(grp_all))})
+             "n_plotted_points": int(len(grp_all)),
+             "assignment_mode": abundance_mode,
+             "n_replicates_by_experiment": {
+                 e: int(g["sample_id"].nunique())
+                 for e, g in samples.groupby("experiment")}})
         print(f"[aggregate] wrote abundance.pdf/.png/.csv/.json")
 
     # ---- Figure: read length by role (the ejection signature) -------------
