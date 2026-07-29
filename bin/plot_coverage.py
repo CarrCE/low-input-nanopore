@@ -23,6 +23,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import sys
 from pathlib import Path
 
 import matplotlib
@@ -217,8 +218,20 @@ def main():
     # whose awarded reads cover less than 1x has not been sequenced deeply enough
     # to characterise, whatever its alignment depth says.
     if attribution:
+        # No .get() default. A default of 1.0 means "fully attributable", so a
+        # pair missing from coverage_attribution.tsv would be counted as
+        # characterisable and inflate n_above_1x_attributable_depth -- the
+        # figure and the attribution table select their rows by different
+        # mechanisms, so they can diverge without any other signal.
+        missing = [(r["sample_id"], r["organism"]) for _, r in deep.iterrows()
+                   if (r["sample_id"], r["organism"]) not in attribution]
+        if missing:
+            sys.exit("error: --attribution given but these organism-replicate "
+                     "pairs are absent from it, and defaulting them to fully "
+                     "attributable would overstate what can be characterised: "
+                     + ", ".join(f"{s}/{o}" for s, o in sorted(missing)))
         att_depth = deep.apply(
-            lambda r: r["mean_depth"] * attribution.get((r["sample_id"], r["organism"]), 1.0),
+            lambda r: r["mean_depth"] * attribution[(r["sample_id"], r["organism"])],
             axis=1)
         interp_rows = deep[att_depth >= MIN_DEPTH_INTERPRETABLE]
     else:

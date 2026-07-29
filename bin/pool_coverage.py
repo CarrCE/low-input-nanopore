@@ -130,7 +130,15 @@ def assigned_bases(results, sid, mode):
     """
     f = Path(results) / sid / mode / f"{sid}.counts.tsv"
     if not f.is_file():
-        return {}
+        # Returning {} here would contribute zero awarded bases for this
+        # replicate and silently deflate the pooled assigned_depth and
+        # attributable columns for the whole experiment -- the two columns
+        # Figure S3's filled-vs-hollow markers and the "N above 1x" count rest
+        # on. A replicate that has a depth file but no counts file is an
+        # inconsistency, not a zero.
+        sys.exit(f"error: {f} not found, but {sid} has a depth file. Pooling "
+                 f"would silently under-report attributable depth for every "
+                 f"member of this experiment.")
     c = pd.read_csv(f, sep="\t")
     c = c[c["role"] == "sample"]
     return dict(zip(c["organism"], c["aligned_bases"]))

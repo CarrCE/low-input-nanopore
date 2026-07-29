@@ -58,8 +58,13 @@ def read_reference_tsv(path):
     frac = sum(float(r.get("theoretical_dna_fraction") or 0)
                for r in rows if r["role"] == "sample")
     if abs(frac - 1.0) > 0.01:
-        print(f"warning: sample theoretical_dna_fraction sums to {frac:.6f}, not 1.0",
-              file=sys.stderr)
+        # Not a warning. This is the denominator of every per-organism
+        # reads_per_fg and bases_per_fg, and a warning on stderr is buried in
+        # .command.err where nobody reads it.
+        sys.exit(f"error: {path}: sample theoretical_dna_fraction sums to "
+                 f"{frac:.6f}, not 1.0. Every per-femtogram value is computed "
+                 f"against these fractions, so a reference set that is not a "
+                 f"distribution produces wrong numbers with no other symptom.")
     return rows
 
 
