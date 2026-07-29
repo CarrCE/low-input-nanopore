@@ -126,9 +126,13 @@ PY
     log "${rep}: pulling reads and contaminant reference"
     docker run --rm -v "${REPO}":/repo -v "${OUTDIR}":/out -w /repo "${TOOLS_IMAGE}" bash -c "
         set -e
-        fq=\$(awk -F, -v r='${rep}' '\$1 == r {print \$2}' /repo/assets/samplesheets/*.csv 2>/dev/null | head -1)
-        [ -n \"\$fq\" ] || fq=data/${rep}.fastq
-        [ -f \"\$fq\" ] || { echo 'error: FASTQ not found for ${rep}' >&2; exit 1; }
+        # Column 4 is fastq; column 2 is experiment. Reading \$2 here made the
+        # test below compare a non-empty experiment name against a file that
+        # cannot exist, so the data/<rep>.fastq fallback never fired and this
+        # script could not find any FASTQ at all.
+        fq=\$(awk -F, -v r='${rep}' '\$1 == r {print \$4}' /repo/assets/samplesheets/*.csv | head -1)
+        [ -n \"\$fq\" ] || { echo 'error: ${rep} not found in any samplesheet' >&2; exit 1; }
+        [ -f \"\$fq\" ] || { echo \"error: FASTQ not found for ${rep}: \$fq\" >&2; exit 1; }
         seqkit grep -f /out/${rep}/ids.txt \"\$fq\" > /out/${rep}/contam.fastq 2>/dev/null
         awk -F'\t' 'NR>1 && \$3==\"contaminant\" {print \$1}' \
             '${contig_map#${REPO}/}' > /out/${rep}/ctgs.txt

@@ -23,6 +23,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import sys
 from collections import defaultdict
 from pathlib import Path
 
@@ -89,8 +90,22 @@ def read_headline_flags(path, delimiter="\t"):
     import csv
     import io
     rows = list(csv.DictReader(io.StringIO("\n".join(lines)), delimiter=delimiter))
-    return {r["sample_id"]: (str(r.get("include_in_headline", "1")).strip() == "1")
-            for r in rows if r.get("sample_id")}
+    flags = {}
+    for r in rows:
+        sid = r.get("sample_id")
+        if not sid:
+            continue
+        # `== "1"` was the old test, which excluded a replicate whose flag was
+        # blank -- the opposite of the rule stated above, and the opposite of
+        # what comparison_data.py does with the same column, so the two could
+        # select different replicate sets from one file. A blank means "not
+        # stated", which is an inclusion; only an explicit 0 excludes.
+        raw = str(r.get("include_in_headline") or "").strip()
+        if raw not in ("", "0", "1"):
+            sys.exit(f"error: {path}: {sid} has include_in_headline={raw!r}; "
+                     f"expected 0, 1, or blank.")
+        flags[sid] = raw != "0"
+    return flags
 
 
 def italicize(name):
@@ -261,6 +276,23 @@ def main():
 
     # ---- Figure: read length by role (the ejection signature) -------------
     if args.readlengths:
+        # Every mode writes <sample_id>.readlengths.tsv.gz, so a --mode both run
+        # offers two files per sample holding the same reads under different
+        # labels. Summing both double-counts every read: doing exactly that by
+        # hand put carrier n at 105,559,752 instead of 50,513,219. main.nf
+        # filters to one mode before staging, but nothing stopped a direct
+        # invocation, and the guard belongs with the code that can be misused.
+        by_name = defaultdict(list)
+        for f in args.readlengths:
+            by_name[Path(f).name].append(f)
+        dupes = {k: v for k, v in by_name.items() if len(v) > 1}
+        if dupes:
+            raise SystemExit(
+                "error: read lengths supplied more than once for the same "
+                "sample, which double-counts every read: "
+                + "; ".join(f"{k} x{len(v)}" for k, v in sorted(dupes.items()))
+                + ". Pass a single assignment mode.")
+
         # These files hold one row per read -- ~120 million rows across this
         # study's replicates. Concatenating them into a single DataFrame needs
         # well over 10 GB and gets the process OOM-killed, so accumulate

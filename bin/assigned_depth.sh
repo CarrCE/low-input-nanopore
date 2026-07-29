@@ -129,6 +129,19 @@ PY
     docker run --rm -v "${REPO}":/repo -v "${work}":/work -w /repo "${TOOLS_IMAGE}" \
         bash -lc "seqkit grep -f /work/ids.txt '${fastq}' > /work/reads.fastq"
 
+    # seqkit grep exits 0 when it matches nothing. If the samplesheet resolves
+    # to the wrong replicate, or the reads were re-basecalled since assignment,
+    # the profile below is silently shallow and feeds pooled attributable depth,
+    # Figure S3 and Table S5 with no other symptom.
+    n_ids=$(wc -l < "${work}/ids.txt")
+    got=$(( $(wc -l < "${work}/reads.fastq") / 4 ))
+    if [ "${got}" -ne "${n_ids}" ]; then
+        echo "error: ${rep}: asked seqkit for ${n_ids} reads, recovered ${got}." \
+             "The FASTQ and the assignment table disagree; refusing to write a" \
+             "depth profile from an incomplete extraction." >&2
+        exit 1
+    fi
+
     log "${rep}: mapping against ${set_name} and filtering to the awarded organism"
     docker run --rm -v "${REPO}":/repo -v "${work}":/work -w /repo "${TOOLS_IMAGE}" \
         bash -lc "
