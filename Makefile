@@ -32,7 +32,7 @@ DEMO_READS  ?= 40000
 
 .DEFAULT_GOAL := help
 
-.PHONY: help images test check measurements seqsummary versions runmeta poolcov attribution comparison assigneddepth s1 s2 demo-data clean
+.PHONY: help images test check verify measurements seqsummary versions runmeta poolcov attribution comparison coverage modedelta estcontrol assigneddepth s1 s2 all raghavendra q10 demo-data clean
 
 help: ## Show this help
 	@printf 'low-input-nanopore -- make targets\n\n'
@@ -58,6 +58,26 @@ s1: ## Run lowinput_s1 (D6311 log-distributed DNA, 3 replicates)
 s2: ## Run lowinput_s2 (D6321 low-microbial-load cells, r0-r3)
 	@"$(ROOT)/run.sh" -profile $(PROFILE) \
 	    --samplesheet assets/samplesheets/lowinput_s2.csv $(NF_ARGS)
+
+# THIS is the invocation behind the published display items, and `make s1` /
+# `make s2` are not: AGGREGATE only ever sees the samples of the run that
+# invokes it, and every target here writes to the same default results/summary.
+# Running s2 then s1 therefore leaves results/summary describing lowinput_s1
+# alone, and `make test` leaves it describing 40,000 smoke-test reads. --mode
+# both is required for Figure S1, which compares the two assignment rules.
+all: ## Run both experiments in both modes -- the published analysis
+	@"$(ROOT)/run.sh" -profile $(PROFILE) \
+	    --samplesheet assets/samplesheets/all.csv --mode both $(NF_ARGS)
+
+raghavendra: ## Reanalyse the Basapathi Raghavendra 2023 reads (own outdir; needs fetch_raghavendra.sh)
+	@"$(ROOT)/run.sh" -profile $(PROFILE) \
+	    --samplesheet assets/samplesheets/raghavendra_2023.csv \
+	    --outdir results_raghavendra $(NF_ARGS)
+
+q10: ## Quality-matched rerun of the published analysis at Q10 (own outdir)
+	@"$(ROOT)/run.sh" -profile $(PROFILE) \
+	    --samplesheet assets/samplesheets/all.csv --mode both \
+	    --min_qscore 10 --outdir results_q10 $(NF_ARGS)
 
 # Whole 4-line records only: a plain `head -n` is fine at 40000 but silently
 # truncates a record the moment DEMO_READS is set to a value that is not a
@@ -104,8 +124,38 @@ check: ## Assert consensus subtraction preserves read accounting (needs `make te
 	    python3 tests/consensus_accounting.py \
 	        --bam "$(TEST_BAM)" --contig-map "$(TEST_CONTIG_MAP)"
 
+# Exit 2 means "pendings, no errors" and is tolerated; exit 1 (a real
+# inconsistency) still fails the target.
 measurements: ## Check assets/measurements.tsv for gaps and inconsistencies
-	@python3 "$(ROOT)/bin/check_measurements.py" || test $$? -eq 2
+	@docker run --rm -u "$$(id -u):$$(id -g)" \
+	    -v "$(ROOT)":/repo -w /repo "$(ANALYSIS_IMAGE)" \
+	    python3 bin/check_measurements.py || test $$? -eq 2
+
+verify: ## Assert every display item satisfies docs/display-items.md
+	@docker run --rm -u "$$(id -u):$$(id -g)" \
+	    -v "$(ROOT)":/repo -w /repo "$(ANALYSIS_IMAGE)" \
+	    python3 bin/verify_display_items.py
+
+coverage: ## Per-replicate coverage figure (Fig. S2)
+	@docker run --rm -u "$$(id -u):$$(id -g)" -e MPLCONFIGDIR=/tmp/mpl \
+	    -v "$(ROOT)":/repo -w /repo "$(ANALYSIS_IMAGE)" \
+	    python3 bin/plot_coverage.py \
+	        --summaries results/*/coverage/*.coverage_summary.tsv \
+	        --profiles  results/*/coverage/*.coverage_profile.tsv \
+	        --attribution results/summary/coverage_attribution.tsv \
+	        --outdir results/summary
+
+modedelta: ## Competitive vs sequential assignment figure (Fig. S1)
+	@docker run --rm -u "$$(id -u):$$(id -g)" -e MPLCONFIGDIR=/tmp/mpl \
+	    -v "$(ROOT)":/repo -w /repo "$(ANALYSIS_IMAGE)" \
+	    python3 bin/plot_mode_delta.py \
+	        --per-organism results/summary/per_organism.tsv \
+	        --outdir results/summary
+
+estcontrol: ## Estimated no-adaptive-sampling control from Mojarro et al. 2019
+	@docker run --rm -u "$$(id -u):$$(id -g)" \
+	    -v "$(ROOT)":/repo -w /repo "$(ANALYSIS_IMAGE)" \
+	    python3 bin/comparison/estimated_control.py --outdir results/comparison
 
 seqsummary: ## Per-replicate yield, read length and read quality (needs finished runs + FASTQs)
 	@docker run --rm -u "$$(id -u):$$(id -g)" -v "$(ROOT)":/repo -w /repo "$(ANALYSIS_IMAGE)" \

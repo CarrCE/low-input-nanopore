@@ -24,10 +24,14 @@ Outputs (per the repo's display-item convention), written to --outdir:
     <basename>.csv      every plotted point, with provenance
     <basename>.json     sidecar: id / title / caption / source_files / software / metrics
 
-Known data defects handled here (full discussion in README.md):
-  (a) Zorzano et al. 2025 axis inconsistency -> --zorzano-classifier
-  (b) Mojarro et al. 2019 unsourced counts   -> loud warning when plotted
-  (c) Raghavendra published vs reanalysed    -> --raghavendra-classifier
+Cross-study comparability problems handled here (full discussion in
+docs/comparison.md):
+  Zorzano et al. 2025 reported reads and bases from different classifiers
+                                             -> --zorzano-classifier
+  Raghavendra et al. 2023 mapping vs k-mer classification is not like-for-like
+                                             -> --raghavendra-classifier
+Any row with verified=FALSE draws a banner on stderr and can be dropped with
+--drop-unverified; no row in the shipped table is currently unverified.
 """
 from __future__ import annotations
 

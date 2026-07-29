@@ -35,9 +35,20 @@ REQUIRED_JSON_KEYS = ("id", "title", "caption", "source_files", "software")
 def parse_args():
     p = argparse.ArgumentParser(description=__doc__,
                                 formatter_class=argparse.RawDescriptionHelpFormatter)
-    p.add_argument("--dirs", nargs="+", default=["results/summary", "comparison/figures"],
+    # "comparison/figures" was the pre-move path. It has not existed since the
+    # comparison module was split into bin/ and assets/, so this scan printed
+    # "[skip] comparison/figures does not exist" and still reported conformance
+    # -- main-text Figure 3 was never checked by the gate written to check it.
+    p.add_argument("--dirs", nargs="+", default=["results/summary", "results/comparison"],
                    help="directories to scan for display items")
-    p.add_argument("--require-pdf", action="store_true", default=True)
+    # A directory named explicitly is one the caller expects to exist; skipping
+    # it silently is how the above went unnoticed.
+    p.add_argument("--allow-missing-dirs", action="store_true",
+                   help="treat a named directory that does not exist as empty "
+                        "rather than as an error")
+    p.add_argument("--no-require-pdf", dest="require_pdf", action="store_false",
+                   help="do not require a vector PDF for plotted items")
+    p.set_defaults(require_pdf=True)
     return p.parse_args()
 
 
@@ -53,7 +64,12 @@ def main():
     for d in args.dirs:
         base = Path(d)
         if not base.is_dir():
-            print(f"[skip] {d} does not exist")
+            if args.allow_missing_dirs:
+                print(f"[skip] {d} does not exist")
+                continue
+            failures.append((d, ["directory does not exist; nothing in it was "
+                                 "checked. Generate it, or pass "
+                                 "--allow-missing-dirs."]))
             continue
         for js in sorted(base.glob("*.json")):
             item = js.stem
@@ -79,9 +95,14 @@ def main():
                     problems.append("no vector PDF")
 
             if meta.get("display_type") == "calculation":
-                print(f"[ok]   {item:<24} {'':>7}  calculation (no figure); JSON+CSV present")
-                if not csv_path.exists():
-                    failures.append((item, ["no CSV"]))
+                # `problems` accumulated above (missing title/caption/software)
+                # used to be discarded here, so a calculation item passed with
+                # any metadata defect as long as its CSV existed.
+                if problems:
+                    failures.append((item, problems))
+                    print(f"[FAIL] {item:<24} {'':>7}  " + "; ".join(problems))
+                else:
+                    print(f"[ok]   {item:<24} {'':>7}  calculation (no figure); JSON+CSV present")
                 continue
 
             declared = (meta.get("metrics") or {}).get("n_plotted_points")

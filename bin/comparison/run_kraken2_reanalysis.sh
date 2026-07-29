@@ -23,7 +23,7 @@
 # upstream build cannot change the result without the fetch step failing.
 #
 # Usage:
-#     bash comparison/run_kraken2_reanalysis.sh --fastq DIR --out DIR [options]
+#     bash bin/comparison/run_kraken2_reanalysis.sh --fastq DIR --out DIR [options]
 #
 #     --fastq DIR       directory of FASTQ files, one sample per subdirectory or
 #                       a flat directory of files (wf-metagenomics conventions)
@@ -37,11 +37,11 @@
 # Note on --min-qual: wf-metagenomics `--min_read_qual` filters on the mean
 # **Phred** of the read, whereas this repository's own filter uses the ONT
 # convention of averaging in error-probability space. The two are not the same
-# threshold; see docs/ and comparison/README.md. The value is passed through
+# threshold; see docs/ and docs/comparison.md. The value is passed through
 # unchanged so it matches what the prior-study rows were generated with.
 #
 # Requirements: bash, nextflow, docker, git; the databases fetched by
-# comparison/fetch_kraken2_db.sh.
+# bin/comparison/fetch_kraken2_db.sh.
 
 set -euo pipefail
 
@@ -94,13 +94,13 @@ command -v nextflow >/dev/null 2>&1 || die "'nextflow' is required but not on PA
 # ---------------------------------------------------------------------------
 [ -d "${DB}" ] \
     || die "database directory not found: ${DB}
-       Run: bash comparison/fetch_kraken2_db.sh"
+       Run: bash bin/comparison/fetch_kraken2_db.sh"
 [ -s "${DB}/hash.k2d" ] || die "not a Kraken2 database (no hash.k2d): ${DB}"
 ls "${DB}"/database*mers.kmer_distrib >/dev/null 2>&1 \
     || die "database has no bracken distribution (database*mers.kmer_distrib) in ${DB}"
 [ -s "${TAXONOMY}" ] \
     || die "taxonomy not found: ${TAXONOMY}
-       Run: bash comparison/fetch_kraken2_db.sh"
+       Run: bash bin/comparison/fetch_kraken2_db.sh"
 
 # ---------------------------------------------------------------------------
 # Pin the workflow revision, then confirm it. `nextflow pull -r <tag>` follows a
@@ -158,7 +158,7 @@ database        ${DB}
 taxonomy        ${TAXONOMY}
 min_read_qual   ${MIN_QUAL}
 fastq           ${FASTQ}
-manifest        comparison/kraken2_db.manifest.tsv
+manifest        assets/comparison/kraken2_db.manifest.tsv
 EOF
 
 log "done. Provenance written to ${OUT}/reanalysis_provenance.txt"

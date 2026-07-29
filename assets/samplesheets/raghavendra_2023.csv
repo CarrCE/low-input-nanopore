@@ -11,16 +11,16 @@
 # Reads are the authors' own deposited fastq_pass files from
 # https://zenodo.org/records/8208597 ("MinION low detectability.zip").
 # Populate data/raghavendra_2023/ first:
-#     bash comparison/fetch_raghavendra.sh
+#     bash bin/comparison/fetch_raghavendra.sh
 #
 # WHY THIS SAMPLESHEET EXISTS
-# comparison/prior_studies.tsv currently compares this study to ours across a
+# assets/comparison/prior_studies.tsv currently compares this study to ours across a
 # methodological gap: their reads were classified with Kraken2 against PlusPF-8,
 # ours are assigned by competitive minimap2 alignment to a known reference.
 # Direct alignment to the exact organisms present is strictly more sensitive
 # than classification against a broad database, so that comparison inflates our
 # apparent advantage. Running their reads through THIS pipeline removes the gap.
-# See comparison/README.md, "Mapping-based re-analysis of Raghavendra et al.".
+# See docs/comparison.md, "Mapping-based re-analysis of Raghavendra et al.".
 #
 # Columns are as documented in lowinput_s1.csv, with these study-specific values:
 #   library_dna_ng   TOTAL sample DNA mass into library prep, ng. Stated by the
@@ -57,7 +57,7 @@
 # the paper's own analysis ("The passed Fastq files were analysed using EPI2ME").
 # One consequence is worth flagging: APN068 has exactly 263 reads in fastq_pass,
 # and 263 is the value Table 3 reports as its S. cerevisiae pass-read count. That
-# confirms the transcription error already suspected in comparison/prior_studies.tsv.
+# confirms the transcription error already suspected in assets/comparison/prior_studies.tsv.
 sample_id,experiment,replicate,fastq,sra_accession,reference_set,library_dna_ng,carrier_dna_ng,dna_into_extraction_ng,cells_into_extraction,include_in_headline,notes
 raghavendra_2023_ec_r1,raghavendra_2023_ec,1,data/raghavendra_2023/Ec_R1.fastq.gz,,assets/references/raghavendra_2023_ecoli.tsv,0.010,0,,,0,Table 2 R1; ANP471; MinKNOW total pass+fail 224 reads; deposited fastq_pass 8 reads
 raghavendra_2023_ec_r2,raghavendra_2023_ec,2,data/raghavendra_2023/Ec_R2.fastq.gz,,assets/references/raghavendra_2023_ecoli.tsv,0.010,0,,,0,Table 2 R2; ANP315; MinKNOW total pass+fail 73 reads; deposited fastq_pass 4 reads

@@ -129,18 +129,21 @@ first-principles estimate — 10,000 *B. spizizenii* cells x 4.4276 fg DNA/cell 
 5% simulated extraction efficiency = 2.214 pg — corroborates the **mass**, but
 nothing anywhere in the file supports the read or base counts.
 
-Handling:
+**Resolved.** Both counts were traced to the paper itself: Table 1, "Low-Input
+Carrier Sequencing Metrics", row *B. subtilis reads* — 5 reads, 5,270 total
+bases (min 848 bp, max 1,559 bp, median 967 bp); the 2 pg input mass is from the
+abstract. The row now carries `verified=TRUE`, `source=published_table1`,
+`classifier=published_table1`, and the full citation in `source_detail`, so it
+no longer rests on the workbook at all.
 
-* The row is in `prior_studies.tsv` with `verified=FALSE`,
-  `source=unsourced_literal`, `classifier=published_unverified`, and a
-  `provenance_note` flagging it as UNVERIFIED / citation needed.
-* `plot_comparison.py` prints a loud banner to stderr whenever an unverified
-  row is plotted, naming the row and echoing the note.
-* `--drop-unverified` removes it from the figure entirely.
+Note the organism name: Mojarro et al.\ report *B. subtilis*, which is the name
+used here whenever their number is quoted. `prior_studies.tsv` records the
+current designation, *Bacillus spizizenii*, for the same material.
 
-**This must be resolved before submission**: either trace 5 reads / 5,270 bases
-to a specific table or figure in Mojarro et al. 2019 and update
-`source_detail`/`verified`, or drop the point.
+The machinery built for the unverified case is still present and still correct —
+`plot_comparison.py` prints a banner to stderr whenever a row with
+`verified=FALSE` is plotted, and `--drop-unverified` removes such rows — but no
+row in the table triggers either today.
 
 ### (c) Basapathi Raghavendra et al. 2023 — reanalysis disagrees with the paper
 
@@ -231,8 +234,10 @@ Both TSVs share these columns:
 ## Regenerating the figure
 
 ```bash
-cd comparison
-python3 plot_comparison.py
+make comparison        # or, equivalently:
+docker run --rm -u $(id -u):$(id -g) -e MPLCONFIGDIR=/tmp/mpl \\
+  -v "$PWD":/repo -w /repo low-input-nanopore/analysis:0.1.0 \\
+  python3 bin/comparison/plot_comparison.py --results-dir results
 ```
 
 Writes to `results/comparison/`:

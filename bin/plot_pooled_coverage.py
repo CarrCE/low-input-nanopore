@@ -276,6 +276,10 @@ def main():
         "software": ["python 3.12", f"pandas {pd.__version__}",
                      f"numpy {np.__version__}", f"matplotlib {matplotlib.__version__}"],
         "metrics": {
+            # The display-item contract's one substantive check: the CSV must
+            # hold exactly the points the figure drew. Without this key
+            # verify_display_items.py cannot compare them and fails the item.
+            "n_plotted_points": int(len(plotted)),
             "n_members": int(len(summ)),
             "n_above_1x_alignment_depth": int((summ["mean_depth"] >= 1).sum()),
             "n_above_1x_attributable_depth": int((summ["assigned_depth"] >= 1).sum()),

@@ -88,10 +88,13 @@ docker run --rm -u $(id -u):$(id -g) -v "$PWD":/w -w /w -e MPLCONFIGDIR=/tmp/mpl
 docker run --rm -u $(id -u):$(id -g) -v "$PWD":/w -w /w -e MPLCONFIGDIR=/tmp/mpl \
   low-input-nanopore/analysis:0.1.0 \
   python3 bin/comparison/plot_comparison.py --results-dir results \
-    --raghavendra-classifier minimap2_competitive --outdir results/comparison
+    --outdir results/comparison
+# minimap2_competitive is the DEFAULT. Do not pass --raghavendra-classifier
+# here: the manuscript describes the mapping-based variant, so the default is
+# what must reproduce the published figure.
 
 # copy vector figures into the manuscript repository
-cp results/summary/{abundance,readlengths,coverage,mode_delta}.pdf \
+cp results/summary/{abundance,readlengths,coverage,mode_delta,pooled_coverage}.pdf \
    ../low-input-nanopore-manuscript/figures/
 cp results/comparison/low_input_comparison.pdf \
    ../low-input-nanopore-manuscript/figures/
