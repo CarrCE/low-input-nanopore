@@ -63,11 +63,23 @@ def parse_args():
     p.add_argument("--samplesheets", default="assets/samplesheets")
     p.add_argument("--mode", default="competitive")
     p.add_argument("--window", type=int, default=1000)
-    p.add_argument("--exclude", nargs="*", default=[],
-                   help="sample_ids to leave out of the pool")
+    p.add_argument("--exclude", nargs="*", default=["test_s2"],
+                   help="sample_ids that are not experiments (default: %(default)s)")
+    p.add_argument("--depth-kind", choices=("assigned", "alignment"), default="assigned",
+                   help="which per-base depth to pool. 'assigned' uses "
+                        "<rep>.assigned_depth.tsv.gz, the depth of reads competitive "
+                        "assignment awarded to each organism (bin/assigned_depth.sh); "
+                        "'alignment' uses <rep>.depth.tsv.gz, every primary alignment "
+                        "to a community contig, which for a member sharing sequence "
+                        "with an abundant relative is largely that relative's reads. "
+                        "(default: %(default)s)")
     p.add_argument("--out-summary", required=True)
     p.add_argument("--out-profile", required=True)
     return p.parse_args()
+
+
+def depth_file(sid, kind):
+    return f"{sid}.assigned_depth.tsv.gz" if kind == "assigned" else f"{sid}.depth.tsv.gz"
 
 
 def gini(d: np.ndarray) -> float:
@@ -135,10 +147,12 @@ def main():
         if sid in args.exclude:
             print(f"[pool] excluding {sid}", file=sys.stderr)
             continue
-        if (results / sid / "coverage" / f"{sid}.depth.tsv.gz").is_file():
+        if (results / sid / "coverage" / depth_file(sid, args.depth_kind)).is_file():
             by_experiment[exp].append((sid, refset))
     if not by_experiment:
-        sys.exit("error: no replicate has a depth file; run the pipeline first")
+        sys.exit(f"error: no replicate has a {args.depth_kind} depth file. For "
+                 f"'assigned', run bin/assigned_depth.sh first.")
+    print(f"[pool] pooling {args.depth_kind} depth", file=sys.stderr)
 
     summary_rows, profile_rows = [], []
 
@@ -157,7 +171,7 @@ def main():
             for org, b in assigned_bases(results, sid, args.mode).items():
                 assigned[org] += b
 
-            path = results / sid / "coverage" / f"{sid}.depth.tsv.gz"
+            path = results / sid / "coverage" / depth_file(sid, args.depth_kind)
             print(f"[pool]   reading {path.name}", file=sys.stderr)
             reader = pd.read_csv(path, sep="\t", header=None,
                                  names=["contig", "pos", "depth"],
@@ -193,6 +207,7 @@ def main():
             adep = assigned.get(org, 0.0) / n if n else float("nan")
             summary_rows.append({
                 "experiment": exp, "n_replicates": len(members), "organism": org,
+                "depth_kind": args.depth_kind,
                 "positions": n, "mean_depth": f"{mean:.6g}",
                 "median_depth": f"{float(np.median(d)):.6g}",
                 "assigned_depth": f"{adep:.6g}",

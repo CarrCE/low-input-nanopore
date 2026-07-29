@@ -95,13 +95,25 @@ The same script fixed a second error: the coverage globs match `test_s2`, the
 40,000-read smoke-test subsample, so the denominator had been 45 pairs rather
 than 42. `--exclude` now drops it in both the table and the figure.
 
-**What is left.** Only *E. coli* B-1109 in the pooled figure, where attributable
-depth is 2.08× and so above threshold, but the profile drawn is still alignment
-depth. Showing its true pooled profile needs the BAM filtered by assignment
-before `samtools depth`, which needs a full re-map — the qname BAMs are not
-retained (only `test_s2.qname.bam`) and `assignments.tsv.gz` carries no alignment
-coordinates. At 2.08× pooled, roughly 0.7× per replicate, that is marginal
-territory where uniformity statistics are weak anyway. Deferred, not blocking.
+**Closed.** `bin/assigned_depth.sh` (`make assigneddepth`) now recovers the
+profile on the correct basis without re-running the pipeline. It pulls the read
+IDs competitive assignment awarded from `assignments.tsv.gz`, extracts those
+reads with `seqkit grep`, re-maps them with the same minimap2 invocation against
+the same combined reference, and keeps a primary alignment only where the
+contig's organism is the organism the read was awarded to. About 712,000 reads
+across all seven replicates, against roughly 60 million sequenced, so it runs in
+minutes rather than the hours a re-map would take.
+
+`bin/pool_coverage.py --depth-kind assigned|alignment` selects which per-base
+depth to pool, and Figure S3 now draws profiles from the assignment-filtered
+depth while still showing the raw alignment depth as a hollow marker, so the gap
+is visible rather than merely described.
+
+Validated against an independent route -- awarded aligned bases from
+`counts.tsv` divided by genome size -- which agrees to within 2% for eight of
+the ten `lowinput_s1` organisms. The two that differ are *E. coli* (0.86, the
+route via `counts.tsv` counts aligned span including bases placed on other
+contigs) and *C. neoformans* (87 reads pooled, so counting noise).
 
 ## 4. Declared parameters that nothing reads
 

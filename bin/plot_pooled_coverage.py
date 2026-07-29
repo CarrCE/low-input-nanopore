@@ -72,7 +72,13 @@ NCOL = 5
 def parse_args():
     p = argparse.ArgumentParser(description=__doc__,
                                 formatter_class=argparse.RawDescriptionHelpFormatter)
-    p.add_argument("--summary", required=True)
+    p.add_argument("--summary", required=True,
+                   help="pooled summary; normally the assignment-filtered one")
+    p.add_argument("--alignment-summary", default=None,
+                   help="the same pooling over raw alignment depth. When given, each "
+                        "point also shows where it would have sat had depth not been "
+                        "filtered to awarded reads -- which for three of the thirteen "
+                        "members is a different number by orders of magnitude")
     p.add_argument("--profile", required=True)
     p.add_argument("--outdir", required=True)
     p.add_argument("--basename", default="pooled_coverage")
@@ -96,6 +102,18 @@ def main():
 
     summ = pd.read_csv(args.summary, sep="\t")
     prof = pd.read_csv(args.profile, sep="\t")
+
+    # `attributable` inside the summary compares two routes to the same quantity
+    # once depth is already assignment-filtered, so it is ~1 by construction and
+    # says nothing. What a reader needs is how far the filtering moved each
+    # point, which is this pooling against the alignment-depth pooling.
+    if args.alignment_summary:
+        al = pd.read_csv(args.alignment_summary, sep="\t")
+        amap = dict(zip(al["organism"], al["mean_depth"]))
+        summ["alignment_depth"] = summ["organism"].map(amap)
+    else:
+        summ["alignment_depth"] = summ["mean_depth"]
+    summ["attributable"] = summ["mean_depth"] / summ["alignment_depth"]
 
     # Ordered by depth so the grid reads as a depth series, not an alphabet.
     summ = summ.sort_values("mean_depth", ascending=False).reset_index(drop=True)
@@ -141,7 +159,7 @@ def main():
         # it goes in the title next to the name.
         note = f"{mean:,.2f}$\\times$" if mean < 10 else f"{mean:,.0f}$\\times$"
         if weak:
-            note += f" (only {row['assigned_depth']:.3g}$\\times$ attributable)"
+            note += (f" of {row['alignment_depth']:,.0f}$\\times$ aligned")
         ax.set_title(f"{italic(org)}\n{note}", fontsize=7.4, loc="left",
                      color="0.25" if not weak else "#8a3800")
         if weak:
@@ -169,7 +187,7 @@ def main():
 
     # ---- Panel B: Gini vs depth -------------------------------------------
     axB = fig.add_subplot(gs[nrow, :])
-    lo = float(summ[["assigned_depth", "mean_depth"]].values.min()) * 0.4
+    lo = float(summ[["mean_depth", "alignment_depth"]].values.min()) * 0.4
     axB.axvspan(lo, MIN_DEPTH_INTERPRETABLE, color="0.90", zorder=0)
     axB.axvline(MIN_DEPTH_INTERPRETABLE, color="0.4", lw=0.8, ls=(0, (4, 3)), zorder=2)
 
@@ -179,13 +197,13 @@ def main():
         weak = r["attributable"] < MIN_ATTRIBUTABLE
         if weak:
             # The gap between what aligns and what is attributable, drawn.
-            axB.plot([r["assigned_depth"], r["mean_depth"]], [r["gini"]] * 2,
+            axB.plot([r["mean_depth"], r["alignment_depth"]], [r["gini"]] * 2,
                      color=c, lw=1.0, ls=":", zorder=3, alpha=0.85)
-            axB.scatter(r["mean_depth"], r["gini"], s=44, facecolors="none",
+            axB.scatter(r["alignment_depth"], r["gini"], s=44, facecolors="none",
                         edgecolors=c, linewidths=1.2, zorder=4)
-        axB.scatter(r["assigned_depth"] if weak else r["mean_depth"], r["gini"],
+        axB.scatter(r["mean_depth"], r["gini"],
                     s=40, color=c, edgecolors="black", linewidths=0.4, zorder=5)
-        labels.append((r["assigned_depth"] if weak else r["mean_depth"],
+        labels.append((r["mean_depth"],
                        float(r["gini"]), abbrev(r["organism"])))
         plotted.append({"panel": "B", "experiment": r["experiment"],
                         "organism": r["organism"], "position_mb": "",
@@ -194,7 +212,7 @@ def main():
                         "attributable": r["attributable"], "gini": r["gini"]})
 
     axB.set_xscale("log")
-    axB.set_xlim(lo, float(summ["mean_depth"].max()) * 2.6)
+    axB.set_xlim(lo, float(summ["alignment_depth"].max()) * 2.6)
     axB.set_ylim(-0.03, 1.16)
 
     # Six of the thirteen sit within 0.03 Gini of each other along the top of the
@@ -222,7 +240,7 @@ def main():
                       label="lowinput_s2 (D6321, 4 replicates)"),
                Line2D([], [], marker="o", ls=":", color="0.35", markerfacecolor="none",
                       markeredgecolor="0.35", markersize=7,
-                      label="hollow: raw alignment depth\nfilled: attributable depth")]
+                      label="filled: depth of awarded reads\nhollow: raw alignment depth")]
     # Parked mid-right: the only region of this panel with no marks in it, and
     # clear of the shaded-region note at lower left.
     axB.legend(handles=handles, fontsize=6.8, frameon=True, framealpha=0.95,

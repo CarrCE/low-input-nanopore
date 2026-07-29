@@ -32,7 +32,7 @@ DEMO_READS  ?= 40000
 
 .DEFAULT_GOAL := help
 
-.PHONY: help images test check measurements seqsummary versions runmeta poolcov attribution comparison s1 s2 demo-data clean
+.PHONY: help images test check measurements seqsummary versions runmeta poolcov attribution comparison assigneddepth s1 s2 demo-data clean
 
 help: ## Show this help
 	@printf 'low-input-nanopore -- make targets\n\n'
@@ -115,17 +115,26 @@ runmeta: ## Per-run acquisition id, model and dates, read from the FASTQs (slow:
 	@docker run --rm -u "$$(id -u):$$(id -g)" -v "$(ROOT)":/repo -w /repo "$(ANALYSIS_IMAGE)" \
 	    python3 bin/run_metadata.py --out results/summary/run_metadata.tsv
 
-poolcov: ## Pooled-across-replicates coverage summary and Figure S3 (slow: full pass over the depth files)
+assigneddepth: ## Per-base depth of the reads assignment AWARDED to each organism (slow: one FASTQ pass per replicate)
+	@bash "$(ROOT)/bin/assigned_depth.sh"
+
+poolcov: ## Pooled-across-replicates coverage summary and Figure S3 (needs `make assigneddepth` first)
 	@docker run --rm -u "$$(id -u):$$(id -g)" -e MPLCONFIGDIR=/tmp/mpl \
 	    -v "$(ROOT)":/repo -w /repo "$(ANALYSIS_IMAGE)" \
-	    python3 bin/pool_coverage.py \
+	    python3 bin/pool_coverage.py --depth-kind assigned \
 	        --out-summary results/summary/pooled_coverage_summary.tsv \
 	        --out-profile results/summary/pooled_coverage_profile.tsv
+	@docker run --rm -u "$$(id -u):$$(id -g)" -e MPLCONFIGDIR=/tmp/mpl \
+	    -v "$(ROOT)":/repo -w /repo "$(ANALYSIS_IMAGE)" \
+	    python3 bin/pool_coverage.py --depth-kind alignment \
+	        --out-summary results/summary/pooled_alignment_summary.tsv \
+	        --out-profile results/summary/pooled_alignment_profile.tsv
 	@docker run --rm -u "$$(id -u):$$(id -g)" -e MPLCONFIGDIR=/tmp/mpl \
 	    -v "$(ROOT)":/repo -w /repo "$(ANALYSIS_IMAGE)" \
 	    python3 bin/plot_pooled_coverage.py \
 	        --summary results/summary/pooled_coverage_summary.tsv \
 	        --profile results/summary/pooled_coverage_profile.tsv \
+	        --alignment-summary results/summary/pooled_alignment_summary.tsv \
 	        --outdir  results/summary
 
 attribution: ## Per-replicate alignment vs attributable depth, and the 1x threshold
