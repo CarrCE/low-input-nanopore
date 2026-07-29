@@ -2,7 +2,7 @@
 #
 # Download and verify the pinned classification databases used by the
 # prior-study Kraken2 reanalysis, as recorded in
-# comparison/kraken2_db.manifest.tsv.
+# assets/comparison/kraken2_db.manifest.tsv.
 #
 #   Kraken2 PlusPF-8, 2024-12-28 build   ~5.5 GiB compressed, ~7.5 GiB unpacked
 #   NCBI new_taxdump, 2025-01-01          ~133 MiB
@@ -13,9 +13,9 @@
 # the classification cannot silently drift onto a different database build.
 #
 # Usage:
-#     bash comparison/fetch_kraken2_db.sh              # download if needed, verify, unpack
-#     DEST=/path/to/dbs bash comparison/fetch_kraken2_db.sh
-#     KEEP_ARCHIVE=1 bash comparison/fetch_kraken2_db.sh    # keep the 5.5 GiB tarball
+#     bash bin/comparison/fetch_kraken2_db.sh              # download if needed, verify, unpack
+#     DEST=/path/to/dbs bash bin/comparison/fetch_kraken2_db.sh
+#     KEEP_ARCHIVE=1 bash bin/comparison/fetch_kraken2_db.sh    # keep the 5.5 GiB tarball
 #
 # The default destination is data/kraken2_db/, matching where the read data and
 # fetch_raghavendra.sh already put their downloads. That is ~7.5 GiB unpacked;
@@ -153,7 +153,7 @@ cat <<EOF
 
 Pass these to the workflow with:
 
-  bash comparison/run_kraken2_reanalysis.sh --fastq <dir> --out <dir> --min-qual 10
+  bash bin/comparison/run_kraken2_reanalysis.sh --fastq <dir> --out <dir> --min-qual 10
 
 which reads the same manifest and refuses to run against anything else.
 EOF

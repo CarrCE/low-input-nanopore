@@ -113,7 +113,7 @@ def main():
         # bin/verify_display_items.py does not demand a PDF or a plotted-point
         # count from it.
         "display_type": "calculation",
-        "source_files": ["comparison/estimated_control.py (constants from the "
+        "source_files": ["bin/comparison/estimated_control.py (constants from the "
                          "cited Table 1 and Methods; no input file is read)"],
         "software": ["python 3.12", "scipy (Garwood exact Poisson interval)"],
         "title": "Estimated no-adaptive-sampling control from Mojarro et al. 2019",

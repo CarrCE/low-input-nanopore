@@ -2,8 +2,8 @@
 #
 # This file is the single authoritative record of what the `kraken2_q1` and
 # `kraken2_q10` rows in prior_studies.tsv were classified against. It is read by
-# comparison/fetch_kraken2_db.sh, which downloads and verifies every entry, and
-# by comparison/run_kraken2_reanalysis.sh, which points the workflow at the
+# bin/comparison/fetch_kraken2_db.sh, which downloads and verifies every entry, and
+# by bin/comparison/run_kraken2_reanalysis.sh, which points the workflow at the
 # verified local copies rather than letting it resolve the URLs itself.
 #
 # Why these exact URLs: epi2me-labs/wf-metagenomics v2.14.1 hard-codes them in

@@ -27,7 +27,7 @@ them out. The two paths cannot disagree, because they are the same code. Re-run
 it whenever the pipeline output changes, and commit the result.
 
 Usage:
-    python3 comparison/seed_this_study.py --results-dir results
+    python3 bin/comparison/seed_this_study.py --results-dir results
 """
 from __future__ import annotations
 
@@ -74,7 +74,7 @@ def main():
         lambda s: f"results/{s}/{args.mode}/{s}.metrics.tsv, "
                   f"'{cd.HEADLINE_ORGANISM}' row")
     live["provenance_note"] = (
-        "Snapshot of pipeline output, written by comparison/seed_this_study.py "
+        "Snapshot of pipeline output, written by bin/comparison/seed_this_study.py "
         "so the figure can be redrawn without the reads. Identical to what "
         "--results-dir produces; input masses come from assets/measurements.tsv "
         "via the pipeline, not from this file.")

@@ -68,7 +68,7 @@
 #
 #   carrier_catalogue, carrier_lot
 #       Lambda source. Same catalogue number across both sessions; the lots are
-#       14 months apart and may differ. docs/TODO.md section 5 reports a
+#       14 months apart and may differ. docs/TODO.md §6 reports a
 #       reproducible difference in the carrier-derived E. coli between sessions
 #       that a lot difference is one candidate explanation for.
 #

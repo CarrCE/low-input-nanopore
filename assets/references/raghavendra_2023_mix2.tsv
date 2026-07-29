@@ -5,7 +5,7 @@
 #   Sci Rep 13:15277 (2023). doi:10.1038/s41598-023-42170-6
 #   Author Correction: Sci Rep 15:14107 (2025). doi:10.1038/s41598-025-98000-4
 # Reads: https://zenodo.org/records/8208597 ("MinION low detectability.zip"),
-# fetched by comparison/fetch_raghavendra.sh.
+# fetched by bin/comparison/fetch_raghavendra.sh.
 #
 # Covers Mix2_R1 / Mix2_R2, the paper's Table 3 row
 # "10 pg of S. cerevisiae + 2 pg of E. coli".
@@ -18,7 +18,7 @@
 # A re-analysis of a prior study's deposited reads under THIS pipeline's
 # competitive-mapping assignment, so the prior study can be compared
 # like-for-like against our numbers rather than Kraken2-against-PlusPF-8 versus
-# minimap2-against-a-known-reference. See comparison/README.md.
+# minimap2-against-a-known-reference. See docs/comparison.md.
 #
 # NO CARRIER
 # Raghavendra et al. used no genomic carrier. Methods, "Library preparation":

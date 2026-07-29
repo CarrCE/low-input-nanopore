@@ -14,9 +14,9 @@
 # extracted; the rest of the archive is left alone.
 #
 # Usage:
-#     bash comparison/fetch_raghavendra.sh            # download if needed, extract
-#     KEEP_ARCHIVE=1 bash comparison/fetch_raghavendra.sh   # keep the zip afterwards
-#     ZIP=/path/to/local.zip bash comparison/fetch_raghavendra.sh  # use a local copy
+#     bash bin/comparison/fetch_raghavendra.sh            # download if needed, extract
+#     KEEP_ARCHIVE=1 bash bin/comparison/fetch_raghavendra.sh   # keep the zip afterwards
+#     ZIP=/path/to/local.zip bash bin/comparison/fetch_raghavendra.sh  # use a local copy
 #
 # Idempotent: re-running when all 10 FASTQs are already present and valid is a
 # no-op and does not touch the network.

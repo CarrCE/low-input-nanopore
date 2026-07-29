@@ -21,19 +21,47 @@ cells; 4 replicates, r0–r3).
 Requirements on the host: **Nextflow (>=23.10.0)** and **Docker**. Nothing else —
 every tool the pipeline calls lives in a pinned container.
 
+Hardware, for the shipped defaults: **48 GB of memory available to Docker and 14
+cores**, because `MAP_COMPETITIVE` asks for them (`conf/base.config`). On a
+smaller machine pass `--max_memory 16.GB --max_cpus 8`; the mapping is slower
+but nothing else changes. Budget **~110 GB** for the seven FASTQs and a further
+**~230 GB** for Nextflow's `work/` if you keep it. A full `make all` takes
+roughly 4–5 h on 14 cores; see `docs/benchmarks.md`.
+
+> **Read this before step 2.** The sequencing reads are **not yet deposited**,
+> and the smoke-test FASTQ is derived from them, so *steps 2 and 3 cannot be run
+> from a fresh clone today*. See [Data availability](#data-availability). What
+> **is** reproducible from the repository alone is main-text Figure 3, which is
+> built from committed tables: `make images && make comparison`.
+
 ```bash
 # 1. Build the two local images (minimap2/samtools/seqkit/datasets, and python)
 make images
 
 # 2. Smoke test: 40,000 reads through the whole pipeline, a couple of minutes
+#    (needs data/test/test_s2.fastq -- see `make demo-data`)
 ./run.sh -profile docker,test
 
-# 3. The real runs
-./run.sh -profile docker --samplesheet assets/samplesheets/lowinput_s2.csv
-./run.sh -profile docker --samplesheet assets/samplesheets/lowinput_s1.csv
+# 3. The published analysis: both experiments, both assignment modes
+./run.sh -profile docker --samplesheet assets/samplesheets/all.csv --mode both
+
+# 4. Check every display item still satisfies docs/display-items.md
+make verify
 ```
 
-`make test`, `make s1` and `make s2` are shorthands for the same three commands.
+`make test`, `make all` and `make verify` are shorthands for those.
+
+**Use `make all`, not `make s1` plus `make s2`.** `AGGREGATE` only sees the
+samples of the run that invokes it, and every target writes to the same
+`results/summary/`. Running one experiment after the other therefore leaves the
+study-level tables and Figures 1, 2 and S1 describing whichever ran last — and
+`make test` leaves them describing 40,000 smoke-test reads. `--mode both` is
+required for Figure S1, which compares the two assignment rules. `make s1` and
+`make s2` remain available for working on one dataset, with that caveat.
+
+Runs that must not overwrite `results/` have their own targets: `make
+raghavendra` (prior-study reanalysis → `results_raghavendra/`) and `make q10`
+(quality-matched rerun → `results_q10/`).
 
 ### Why `./run.sh` instead of `nextflow run`
 
@@ -106,7 +134,7 @@ These mirror the conventions used across the lab's analysis repositories.
 | `nextflow.config` | Manifest, all `params` defaults, `docker`/`singularity`/`test` profiles, provenance reporting |
 | `conf/base.config` | Container pinning, per-label CPU/memory/time, `check_max` clamping |
 | `run.sh` | Launcher that works around Nextflow's inability to handle spaces in the project path |
-| `Makefile` | `images`, `test`, `check`, `measurements`, `seqsummary`, `versions`, `runmeta`, `assigneddepth`, `poolcov`, `attribution`, `s1`, `s2`, `demo-data`, `clean`, `help` |
+| `Makefile` | Runs: `all` (the published analysis), `s1`, `s2`, `raghavendra`, `q10`, `test`. Display items: `comparison`, `coverage`, `modedelta`, `poolcov`, `estcontrol`. Checks: `verify`, `check`, `measurements`. Records: `versions`, `runmeta`, `seqsummary`, `attribution`, `assigneddepth`. Plus `images`, `demo-data`, `clean`, `help` |
 | `bin/build_reference_set.py` | Concatenates fetched genomes into one FASTA + contig→organism→role map + genome sizes + provenance |
 | `bin/assign_reads.py` | Competitive per-read assignment from a qname-grouped BAM; emits counts, per-read calls, read lengths |
 | `bin/compute_metrics.py` | Enrichment and per-femtogram metrics; enforces the read-accounting reconciliation |
@@ -128,7 +156,6 @@ These mirror the conventions used across the lab's analysis repositories.
 | `docs/benchmarks.md` | Native arm64 vs emulated amd64 timing, projected run cost, `breseq` notes |
 | `docs/ecoli-partitioning.md` | Why the community's *E. coli* must not be subtracted with the contaminant, and how competitive assignment handles it |
 | `docs/TODO.md` | Honest list of known gaps |
-| `modules/local/` | Reserved for extracted process modules |
 | `bin/comparison/` | The prior-work comparison: figure generator, the loader, the Kraken2/Raghavendra fetch and reanalysis scripts, and `seed_this_study.py` |
 | `assets/comparison/` | Its inputs: `prior_studies.tsv` (one row per prior-study sample per classifier variant, each citing its published source), `this_study.tsv` (a committed snapshot of pipeline output), `kraken2_db.manifest.tsv` (the pinned database) |
 | `docs/comparison.md` | How that comparison is built, and the four data defects it repairs |
@@ -173,7 +200,7 @@ contaminant actually is from the stock reference, using a finished run's
 assignments rather than re-mapping. Across all seven replicates 86-92% of
 contaminant reads map to stock MG1655, with no structural variants and at
 worst ~100 SNPs in 4.64 Mb, so the stock reference is adequate and the
-consensus below is not needed for these data. See `docs/TODO.md` item 2.
+consensus below is not needed for these data. See `docs/TODO.md` §6.
 
 `--breseq_consensus` (sequential and both only) subtracts against a
 reference-guided consensus of the contaminant actually present in the carrier
@@ -182,8 +209,9 @@ the original `lowinput_s1` analysis did, so the flag exists to reproduce it
 faithfully. It needs real depth: below `--breseq_min_depth` (default 10×) breseq
 predicts missing coverage across the whole reference and returns a deleted
 genome rather than a consensus, so the bundled test profile — ~0.3× contaminant
-depth — cannot exercise it. The accounting is covered by `make check`; **no full
-replicate has been run through it yet**, see `docs/TODO.md` item 2.
+depth — cannot exercise it. The accounting is covered by `make check`. All seven
+replicates have since been run through it, and the consensus route did not
+change the conclusion; see `docs/TODO.md` §6.
 
 ### The read-accounting guarantee
 
@@ -229,10 +257,11 @@ unmapped. Counts come from the assignment step, which accounts for every read
 exactly once, so this denominator is exact.
 
 **`enrichment`**
-`output_sample_fraction / input_sample_fraction`. This is the quantity reported
-as ">100x enrichment": how much depletion-mode adaptive sampling raised the
-sample's share of the output above its share of the input. Reported both
-base-weighted and read-weighted.
+`output_sample_fraction / input_sample_fraction`: how much the sample's share of
+the output exceeds its share of the input. Reported both base-weighted and
+read-weighted. An earlier preliminary analysis of `lowinput_s1` reported this as
+">100x"; correcting the carrier mass and removing carrier-derived *E. coli* from
+the community lowers it to **70.7x** (manuscript, Supplementary Section S2).
 
 **`reads_per_fg` / `bases_per_fg`**
 reads (or bases) assigned to an organism, divided by the femtograms of that
@@ -298,7 +327,7 @@ Pinned in `conf/base.config`. Nothing runs on host-installed software.
 |---|---|---|---|
 | `tools` | `low-input-nanopore/tools:0.1.0` | `docker/tools/Dockerfile` — built locally by `make images`; minimap2 2.28, htslib 1.21, samtools 1.21, seqkit 2.8.2, NCBI `datasets` v2, on `debian:bookworm-20241111-slim` | `FETCH_GENOMES`, `MAP_COMPETITIVE`, `COVERAGE_PROFILE` |
 | `analysis` | `low-input-nanopore/analysis:0.1.0` | `docker/analysis/Dockerfile` — built locally by `make images`; `python:3.12-slim-bookworm` + pinned `requirements.txt` (numpy 2.1.3, pandas 2.2.3, matplotlib 3.9.2, openpyxl 3.1.5, pysam 0.22.1, scipy 1.14.1) | `BUILD_REFERENCE`, `ASSIGN_READS`, `COMPUTE_METRICS` |
-| `breseq` | `quay.io/biocontainers/breseq:0.40.1--h3be2455_0` | Upstream biocontainer, forced to `--platform linux/amd64`, run as root with `-e HOME=/tmp` | The optional sequential/`--breseq_consensus` path (not yet wired) |
+| `breseq` | `quay.io/biocontainers/breseq:0.40.1--h3be2455_0` | Upstream biocontainer, forced to `--platform linux/amd64`, run as root with `-e HOME=/tmp` | The optional sequential/`--breseq_consensus` path |
 
 The two local images are built from pinned source rather than pulled from
 bioconda because bioconda publishes **linux/amd64 only**, while this study's
