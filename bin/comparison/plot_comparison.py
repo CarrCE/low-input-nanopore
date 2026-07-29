@@ -307,8 +307,34 @@ def label_iso_contour(ax, placer, cx, cy, log_radius, label, color="0.4"):
             zorder=2)
 
 
+def summarise_smallest(prior: pd.DataFrame, ref: dict) -> list[dict]:
+    """Per study, the condition this study improves on by the least.
+
+    The mirror of pick_callouts: the sample NEAREST the reference point in
+    log-log space, i.e. each prior study's strongest condition. A fold factor
+    below 1 means this study does not beat that condition on that axis, which
+    is a thing the manuscript has to be able to say.
+    """
+    out = []
+    for study, grp in prior.groupby("study"):
+        d = np.sqrt((np.log10(ref["reads"]) - np.log10(grp["reads_per_fg"])) ** 2 +
+                    (np.log10(ref["bases"]) - np.log10(grp["bases_per_fg"])) ** 2)
+        r = grp.loc[d.idxmin()]
+        out.append({"study": str(r["study"]),
+                    "condition": str(r["condition"]),
+                    "fold_reads": float(ref["reads"] / r["reads_per_fg"]),
+                    "fold_bases": float(ref["bases"] / r["bases_per_fg"])})
+    return out
+
+
 def pick_callouts(prior: pd.DataFrame, ref: dict) -> list[dict]:
-    """Per study, the sample furthest below the reference point in log-log space."""
+    """Per study, the sample furthest below the reference point in log-log space.
+
+    That is the study's WEAKEST condition, so the fold factor a callout carries
+    is the largest improvement over that study, not a typical or a conservative
+    one. Anything quoting these numbers must say so; `summarise_improvements`
+    emits the opposite end of the range alongside them for that reason.
+    """
     callouts = []
     for study, grp in prior.groupby("study"):
         d = np.sqrt((np.log10(ref["reads"]) - np.log10(grp["reads_per_fg"])) ** 2 +
@@ -449,6 +475,9 @@ def build_figure(prior: pd.DataFrame, rounds: dict, title: str | None):
 
     # ---- per-study callouts ------------------------------------------------
     callouts = pick_callouts(prior, ref)
+    # Computed here, where `ref` still holds the plotted reference point; it is
+    # rebound to the round record further down.
+    smallest = summarise_smallest(prior, ref)
     for c in callouts:
         tx, ty = placer.place((c["x"], c["y"]), c["text"], 7.5)
         placed_artists.append((ax.annotate(
@@ -500,7 +529,7 @@ def build_figure(prior: pd.DataFrame, rounds: dict, title: str | None):
     else:
         print(f"[layout] {len(placed_artists)} labels placed, none covering a data point")
 
-    return fig, callouts, bpr_median, ref_name
+    return fig, callouts, smallest, bpr_median, ref_name
 
 
 # ---------------------------------------------------------------------------
@@ -546,7 +575,8 @@ def build_caption(prior, rounds, ref_name, args, callouts) -> str:
         + f". Dashed contours are iso-improvement circles around the {ref_name} mean "
         f"({fmt_rate(ref['reads_mean'])} reads/fg, {fmt_rate(ref['bases_mean'])} "
         "bases/fg) at 10x, 100x and 1000x geometric-mean fold improvement in "
-        "log10-log10 space. Callouts give the largest per-study improvement: "
+        "log10-log10 space. Callouts mark each prior study's weakest condition, "
+        "which is where the improvement is largest: "
         f"{folds}. Zorzano et al. 2025 counts use the '{args.zorzano_classifier}' "
         f"variant and Basapathi Raghavendra et al. 2023 the "
         f"'{args.raghavendra_classifier}' variant; see prior_studies.tsv for the "
@@ -571,15 +601,24 @@ def parse_args(argv=None):
                     help="output file stem (default: %(default)s)")
     ap.add_argument("--zorzano-classifier", choices=cd.ZORZANO_CHOICES,
                     default="kraken2_q1",
-                    help="DEFECT (a): which Zorzano et al. 2025 read/base assignment "
-                         "to plot. 'kraken2_q1' (default) is internally consistent on "
-                         "both axes; 'published_squeezemeta' uses the paper's own hits "
-                         "on both axes (bases are a derived estimate)")
+                    help="which Zorzano et al. 2025 read/base assignment to plot. "
+                         "'kraken2_q1' (default) is internally consistent on both "
+                         "axes; 'published_squeezemeta' uses the paper's own hits on "
+                         "both axes (bases are a derived estimate)")
+    # Default is the mapping-based reanalysis, not the classifier-based one:
+    # comparing this study's alignment-based assignment against a k-mer
+    # classifier is not like-for-like, and the discount runs against us (their
+    # reads through this pipeline recover 2.75x what Kraken2 does). The
+    # manuscript states this choice, so it must be what the DEFAULT invocation
+    # draws -- a flag the reader has to know to pass is a figure nobody
+    # reproduces.
     ap.add_argument("--raghavendra-classifier", choices=cd.RAGHAVENDRA_CHOICES,
-                    default="kraken2_q10",
-                    help="DEFECT (c): 'kraken2_q10' (default) is our reanalysis of the "
-                         "deposited reads; 'published' uses the paper's pass reads, "
-                         "which have no base counts and so cannot be plotted")
+                    default="minimap2_competitive",
+                    help="'minimap2_competitive' (default) re-maps the deposited "
+                         "reads through this pipeline, which is like-for-like with "
+                         "this study; 'kraken2_q10' is our Kraken2 reanalysis of the "
+                         "same reads; 'published' uses the paper's pass reads, which "
+                         "have no base counts and so cannot be plotted")
     # The figure carries no drawn title: in the manuscript it sits above a
     # caption that says the same thing, and a title there is redundant and eats
     # plot area. The string is still the display item's title in the JSON
@@ -653,7 +692,7 @@ def main(argv=None):
               f"{info['bases_mean']:.6g} bases/fg, source(s)={','.join(info['sources'])}")
 
     # ---- figure ------------------------------------------------------------
-    fig, callouts, bpr_median, ref_name = build_figure(
+    fig, callouts, smallest, bpr_median, ref_name = build_figure(
         prior, rounds, args.title if args.draw_title else None)
 
     outdir = args.outdir
@@ -746,6 +785,11 @@ def main(argv=None):
                 {"study": c["study"], "condition": c["condition"],
                  "fold_reads": c["fold_reads"], "fold_bases": c["fold_bases"]}
                 for c in callouts],
+            # The other end of the range. The callouts above are each study's
+            # WEAKEST condition; quoting only those overstates the comparison,
+            # so the strongest condition of each study is recorded here and the
+            # manuscript reports both.
+            "smallest_improvement_per_study": smallest,
             "unverified_points_plotted": [
                 {"study": r["study"], "condition": r["condition"],
                  "classifier": r["classifier"], "reads_per_fg": float(r["reads_per_fg"]),
