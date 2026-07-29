@@ -72,6 +72,21 @@
 #       reproducible difference in the carrier-derived E. coli between sessions
 #       that a lot difference is one candidate explanation for.
 #
+#   flow_cell_id, minknow_version
+#       Transcribed from the run records, NOT derived from the reads. Every
+#       other run-level fact in Supplementary Table S9 -- acquisition id,
+#       basecalling model, start and end times -- is read out of the FASTQ
+#       headers by bin/run_metadata.py. These two appear nowhere in the read
+#       headers, so they are the only entries in that table a reader cannot
+#       recompute, and they are recorded here so that the table has a
+#       machine-readable source in the repository rather than existing only in
+#       the PDF.
+#
+#       MinKNOW was updated once during the fourteen-month acquisition window:
+#       24.11.10 for lowinput_s1_r1-r3 and lowinput_s2_r0, 26.01.15 for
+#       lowinput_s2_r1-r3. The update therefore falls inside lowinput_s2 rather
+#       than between the two experiments.
+#
 #   include_in_headline, include_reason
 #       Whether the library contributes to the headline per-femtogram and
 #       enrichment statistics, and why not when it does not. The reason is here
@@ -108,11 +123,11 @@
 # not something the run records establish. Whether the carrier was adjusted in
 # the same way is unconfirmed. If it was, 1272 ng is itself an upper estimate.
 #
-sample_id	experiment	replicate	legacy_label	standard	standard_catalogue	standard_lot	input_format	preps_per_extraction	polyA_ug	sample_dna_ng	sample_dna_basis	carrier_dna_ng	carrier_dna_basis	carrier_catalogue	carrier_lot	include_in_headline	include_reason	notes
-lowinput_s1_r1	lowinput_s1	1	r1	ZymoBIOMICS Microbial Community DNA Standard II (Log Distribution)	D6311	252976	extracted_dna	n/a	n/a	1.21	qubit_hs_measured	1272	dilution_series	NEB N3011	PENDING	1		Sample mass inferred from a Qubit HS reading. Carrier mass computed from the dilution scheme in the header, not read off a nominal target.
-lowinput_s1_r2	lowinput_s1	2	r2	ZymoBIOMICS Microbial Community DNA Standard II (Log Distribution)	D6311	252976	extracted_dna	n/a	n/a	1.21	qubit_hs_shared_tube	1272	dilution_series	NEB N3011	PENDING	1		Same source tube as lowinput_s1_r1, so that tube's Qubit reading applies to both. The mass is measured, but once, not independently per library.
-lowinput_s1_r3	lowinput_s1	3	r3	ZymoBIOMICS Microbial Community DNA Standard II (Log Distribution)	D6311	252976	extracted_dna	n/a	n/a	1.34	qubit_hs_measured	1272	dilution_series	NEB N3011	PENDING	1		Sample mass inferred from a Qubit HS reading.
-lowinput_s2_r0	lowinput_s2	0	r1	ZymoBIOMICS Spike-in Control II (Low Microbial Load)	D6321	PENDING	intact_cells	3	1	0.223	raw_fluorescence_extrapolated	1000	direct_addition	NEB N3011	PENDING	0	Sample mass is an extrapolation below the Qubit HS reporting range, not a reading within it	Extracted from 3 preps (60 uL); 8 uL of extract went forward with 1 ug lambda. Fewer preps than r1-r3 and correspondingly less DNA.
-lowinput_s2_r1	lowinput_s2	1	r2	ZymoBIOMICS Spike-in Control II (Low Microbial Load)	D6321-10	PENDING	intact_cells	25	0	0.26	qubit_hs_measured	1000	direct_addition	NEB N3011	PENDING	1		
-lowinput_s2_r2	lowinput_s2	2	r3	ZymoBIOMICS Spike-in Control II (Low Microbial Load)	D6321-10	PENDING	intact_cells	25	0.1	0.32	qubit_hs_measured	1000	direct_addition	NEB N3011	PENDING	1		
-lowinput_s2_r3	lowinput_s2	3	r4	ZymoBIOMICS Spike-in Control II (Low Microbial Load)	D6321-10	PENDING	intact_cells	25	1	0.40	qubit_hs_measured	1000	direct_addition	NEB N3011	PENDING	1		
+sample_id	experiment	replicate	legacy_label	standard	standard_catalogue	standard_lot	input_format	preps_per_extraction	polyA_ug	sample_dna_ng	sample_dna_basis	carrier_dna_ng	carrier_dna_basis	carrier_catalogue	carrier_lot	flow_cell_id	minknow_version	include_in_headline	include_reason	notes
+lowinput_s1_r1	lowinput_s1	1	r1	ZymoBIOMICS Microbial Community DNA Standard II (Log Distribution)	D6311	252976	extracted_dna	n/a	n/a	1.21	qubit_hs_measured	1272	dilution_series	NEB N3011	PENDING	FBC00418	24.11.10	1		Sample mass inferred from a Qubit HS reading. Carrier mass computed from the dilution scheme in the header, not read off a nominal target.
+lowinput_s1_r2	lowinput_s1	2	r2	ZymoBIOMICS Microbial Community DNA Standard II (Log Distribution)	D6311	252976	extracted_dna	n/a	n/a	1.21	qubit_hs_shared_tube	1272	dilution_series	NEB N3011	PENDING	FBC11701	24.11.10	1		Same source tube as lowinput_s1_r1, so that tube's Qubit reading applies to both. The mass is measured, but once, not independently per library.
+lowinput_s1_r3	lowinput_s1	3	r3	ZymoBIOMICS Microbial Community DNA Standard II (Log Distribution)	D6311	252976	extracted_dna	n/a	n/a	1.34	qubit_hs_measured	1272	dilution_series	NEB N3011	PENDING	FBB28196	24.11.10	1		Sample mass inferred from a Qubit HS reading.
+lowinput_s2_r0	lowinput_s2	0	r1	ZymoBIOMICS Spike-in Control II (Low Microbial Load)	D6321	PENDING	intact_cells	3	1	0.223	raw_fluorescence_extrapolated	1000	direct_addition	NEB N3011	PENDING	FBF93053	24.11.10	0	Sample mass is an extrapolation below the Qubit HS reporting range, not a reading within it	Extracted from 3 preps (60 uL); 8 uL of extract went forward with 1 ug lambda. Fewer preps than r1-r3 and correspondingly less DNA.
+lowinput_s2_r1	lowinput_s2	1	r2	ZymoBIOMICS Spike-in Control II (Low Microbial Load)	D6321-10	PENDING	intact_cells	25	0	0.26	qubit_hs_measured	1000	direct_addition	NEB N3011	PENDING	FBF90753	26.01.15	1		
+lowinput_s2_r2	lowinput_s2	2	r3	ZymoBIOMICS Spike-in Control II (Low Microbial Load)	D6321-10	PENDING	intact_cells	25	0.1	0.32	qubit_hs_measured	1000	direct_addition	NEB N3011	PENDING	FBF94151	26.01.15	1		
+lowinput_s2_r3	lowinput_s2	3	r4	ZymoBIOMICS Spike-in Control II (Low Microbial Load)	D6321-10	PENDING	intact_cells	25	1	0.40	qubit_hs_measured	1000	direct_addition	NEB N3011	PENDING	FBH11513	26.01.15	1		
