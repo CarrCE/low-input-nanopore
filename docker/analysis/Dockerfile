@@ -1,7 +1,7 @@
 # Analysis/plotting container for the low-input-nanopore pipeline.
 # Deliberately minimal and fully pinned: every number and figure in the
 # manuscript is produced inside this image.
-FROM python:3.12-slim-bookworm
+FROM python:3.12-slim-bookworm@sha256:d50fb7611f86d04a3b0471b46d7557818d88983fc3136726336b2a4c657aa30b
 
 LABEL org.opencontainers.image.source="https://github.com/CarrCE/low-input-nanopore"
 LABEL org.opencontainers.image.description="Metrics + figure generation for depletion-mode adaptive sampling analysis"

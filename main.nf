@@ -72,15 +72,24 @@ process FETCH_GENOMES {
     # same file that defines the analysis -- they cannot drift apart. Matching
     # on the accession pattern skips both the comment preamble and the header
     # row without depending on how many comment lines precede them.
-    accessions=\$(awk -F'\\t' '\$2 ~ /^GC[AF]_/ {print \$2}' ${reference_tsv} | sort -u)
+    # The pattern anchors both ends. Anchoring only the start let a field like
+    # "GCF_000005845.2 --some-flag" or one containing a glob character through,
+    # and \$accessions is deliberately unquoted below so it word-splits across
+    # several accessions -- so the field would reach `datasets` as an argument
+    # rather than as an accession.
+    accessions=\$(awk -F'\\t' '\$2 ~ /^GC[AF]_[0-9]+\\.[0-9]+\$/ {print \$2}' ${reference_tsv} | sort -u)
     if [ -z "\$accessions" ]; then
         echo "error: no GCF_/GCA_ accessions found in ${reference_tsv}" >&2; exit 1
     fi
     echo "fetching: \$accessions"
 
     mkdir -p genomes
+    # set -f disables globbing for the split, so an accession is never expanded
+    # against the work directory.
+    set -f
     datasets download genome accession \$accessions \\
         --include genome --filename genomes.zip
+    set +f
     unzip -q -o genomes.zip -d genomes
     rm -f genomes.zip
 

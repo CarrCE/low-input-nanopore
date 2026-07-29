@@ -38,3 +38,18 @@ __pycache__/
 # Editor / language scratch
 .Rhistory
 .Rproj.user/
+
+# Defensive: none of these exists in the repository today, and none should ever
+# be committed. Listed so that a careless `git add -A` cannot introduce one.
+.env
+.env.*
+*.pem
+*.key
+id_rsa
+id_ed25519
+.netrc
+_netrc
+credentials.json
+secrets.y*ml
+*.xlsx
+*.xls

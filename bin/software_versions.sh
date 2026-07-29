@@ -56,8 +56,8 @@ emit() { printf '%s\t%s\t%s\t%s\t%s\n' "$1" "$2" "$3" "$4" "$5"; }
   v=$(run "$tools_img" -c 'seqkit version' | awk '{print $2}')
   emit seqkit "${v:-unknown}" "$tools_img" "2.8.2" "prebuilt release binary"
   v=$(run "$tools_img" -c 'datasets --version' | awk '{print $3}')
-  emit "NCBI datasets" "${v:-unknown}" "$tools_img" "v2 (rolling)" \
-       "ROLLING: the Dockerfile fetches NCBI's /command-line/v2/ path, which serves the current v2 build. The version column is what this image received."
+  emit "NCBI datasets" "${v:-unknown}" "$tools_img" "sha256 (see docker/tools/Dockerfile)" \
+       "NCBI's /command-line/v2/ path is rolling, so there is no versioned URL to pin. The binary is pinned by SHA-256 instead: a new NCBI build fails the checksum and stops the build rather than silently changing this version."
   v=$(run "$tools_img" -c 'cat /etc/debian_version')
   emit "Debian (tools base)" "${v:-unknown}" "$tools_img" "bookworm-20241111-slim" "immutable base tag"
   emit "tools image ID" "$(inspect "$tools_img")" "$tools_img" n/a \
@@ -65,8 +65,8 @@ emit() { printf '%s\t%s\t%s\t%s\t%s\n' "$1" "$2" "$3" "$4" "$5"; }
 
   # ---- analysis image ---------------------------------------------------
   v=$(run "$anal_img" -c 'python3 -V' | awk '{print $2}')
-  emit Python "${v:-unknown}" "$anal_img" "3.12-slim-bookworm (rolling patch)" \
-       "ROLLING: the base tag pins the minor series, not the patch. The version column is what this image received."
+  emit Python "${v:-unknown}" "$anal_img" "python:3.12-slim-bookworm@sha256:d50fb761" \
+       "Base image pinned by digest, so the patch release is fixed rather than following the 3.12 tag."
   while read -r pkg; do
       n=${pkg%%==*}; ver=${pkg##*==}
       [[ -z "$n" ]] && continue
