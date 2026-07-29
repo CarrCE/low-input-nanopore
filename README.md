@@ -106,12 +106,13 @@ These mirror the conventions used across the lab's analysis repositories.
 | `nextflow.config` | Manifest, all `params` defaults, `docker`/`singularity`/`test` profiles, provenance reporting |
 | `conf/base.config` | Container pinning, per-label CPU/memory/time, `check_max` clamping |
 | `run.sh` | Launcher that works around Nextflow's inability to handle spaces in the project path |
-| `Makefile` | `images`, `test`, `check`, `measurements`, `seqsummary`, `versions`, `runmeta`, `poolcov`, `attribution`, `s1`, `s2`, `demo-data`, `clean`, `help` |
+| `Makefile` | `images`, `test`, `check`, `measurements`, `seqsummary`, `versions`, `runmeta`, `assigneddepth`, `poolcov`, `attribution`, `s1`, `s2`, `demo-data`, `clean`, `help` |
 | `bin/build_reference_set.py` | Concatenates fetched genomes into one FASTA + contig→organism→role map + genome sizes + provenance |
 | `bin/assign_reads.py` | Competitive per-read assignment from a qname-grouped BAM; emits counts, per-read calls, read lengths |
 | `bin/compute_metrics.py` | Enrichment and per-femtogram metrics; enforces the read-accounting reconciliation |
 | `bin/sequencing_summary.py` | `make seqsummary` — per-replicate reads, bases, median read length and median ONT qscore, before and after depleting carrier and contaminant. Quality comes from the FASTQ `qs` tag, joined positionally to the assignments with a per-read identity assertion |
 | `bin/coverage_attribution.py` | `make attribution` — per-replicate alignment depth beside the depth attributable to awarded reads. The 1x interpretability threshold is applied to the latter: a pair whose awarded reads cover 0.83x has not been sequenced deeply enough to characterise, whatever its 65x alignment depth reads. Also excludes the smoke test, which the coverage globs otherwise sweep in |
+| `bin/assigned_depth.sh` | `make assigneddepth` — per-base depth of the reads assignment *awarded* to each organism, recovered from a finished run without re-mapping the full FASTQ. `COVERAGE_PROFILE` measures every primary alignment instead, which for a member sharing sequence with an abundant relative is largely that relative's reads |
 | `bin/pool_coverage.py` | `make poolcov` — sums per-base depth across the replicates of an experiment, so every community member can be assessed rather than only those deep enough in a single library. Reports alignment depth **and** the depth attributable to reads assignment awarded, because for a member sharing sequence with an abundant relative these differ by orders of magnitude |
 | `bin/plot_pooled_coverage.py` | Figure S3 — uniformity across every member, pooled; marks the members whose depth is not attributable |
 | `bin/coverage_dropouts.py` | Locates low-coverage regions in a depth profile and annotates them against a GFF3; answers *where* and *what*, where the coverage summary answers only *how uneven* |
