@@ -82,21 +82,47 @@ clock: 48 m 43 s of mapping for seven replicates, measured. Everything
 downstream is either single-threaded or seconds long and overlaps with the next
 replicate's mapping.
 
-**Caveat on the ~1–1.5 h figure quoted in the README.** No trace in
-`results/pipeline_info/` is a complete from-scratch `make all`: the 7-replicate
-traces are 51-of-52 cached, and the one with 28 freshly-executed tasks had
-`AGGREGATE` fail. So the estimate is a reconstruction from the measured per-task
-times plus the serialisation structure above, not an end-to-end measurement.
-The closest real datapoint is 46 m 45 s of wall clock for 4 fresh mappings with
-the rest cached, which is consistent with it. Treat 1–1.5 h as an estimate with
-the mapping spine as its floor, and if you do run one from cold, replace this
-paragraph with the trace.
+### Measured cold start, 30 July 2026
 
-Add for a full reproduction of every display item: `assigneddepth` (~30–60 min,
-one FASTQ pass per replicate), `runmeta` (a full pass over ~110 GB), and
-`divergence` (breseq under amd64 emulation over all seven replicates — the
-slowest single step, and unmeasured here). Those bring the end-to-end total to
-roughly **4–6 h**, which is the figure the README quotes.
+The estimate that used to sit here was a reconstruction, because no trace was a
+complete from-scratch run. Two now are. Both were run from a fresh clone with
+freshly built images on the M3 Max, 14 cores to Docker, wiping `results/` and
+the work directory first:
+
+| phase | run A | run B |
+|---|---|---|
+| `make images` (layer-cached) | 2 s | 2 s |
+| `make test` (smoke) | 14 s | 14 s |
+| **`make all`** | **1 h 14 m 34 s** | **1 h 12 m 45 s** |
+| | 16.5 CPU-h, 53 tasks | 16.0 CPU-h, 52 tasks |
+
+Run B then completed the rest of the display items:
+
+| step | wall time |
+|---|---|
+| `attribution`, `coverage`, `modedelta`, `comparison`, `estcontrol` | 8 s combined |
+| `assigneddepth` | 3 m 44 s |
+| `poolcov` | 1 m 16 s |
+| `seqsummary` | 3 m 22 s |
+| `runmeta` | 2 m 17 s |
+| `versions`, `measurements`, `verify` | 5 s combined |
+| **preflight → verify, everything except `divergence`** | **1 h 23 m 57 s** |
+
+So the whole reproduction, minus the contaminant-divergence check, is **about an
+hour and a half**, and `make all` is ~87% of it. The earlier "4–6 h" figure was
+wrong in the same way the pre-fix numbers above were: it scaled from the stale
+benchmark rather than from a measurement. `assigneddepth` in particular was
+quoted at 30–60 min and is under four minutes — it maps only the ~712,000
+awarded reads, not the full 60 million.
+
+`divergence` remains the one unmeasured step, and is now the dominant cost:
+breseq runs under amd64 emulation over all seven replicates.
+
+**Disk, measured:** the work directory peaked at **55 GB**, not the 236 GB
+previously stated here — that figure predates the `COVERAGE_PROFILE` fix, which
+shrank the emitted depth files. Free space never fell below 562 GiB on a volume
+with 689 GiB free at the start. Budget ~111 GB for the reads and ~65 GB for
+`work/` plus `results/`.
 
 ### Two bottlenecks found and fixed
 

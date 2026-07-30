@@ -25,10 +25,34 @@ Hardware, for the shipped defaults: **48 GB of memory available to Docker and 14
 cores**, because `MAP_COMPETITIVE` asks for them (`conf/base.config`). On a
 smaller machine pass `--max_memory 16.GB --max_cpus 8`; the mapping is slower
 but nothing else changes. Budget **~110 GB** for the seven FASTQs and a further
-**~230 GB** for Nextflow's `work/` if you keep it. `make all` takes roughly
-**1–1.5 h** on 14 cores, and reproducing every display item and table takes
-**4–6 h** in total; see `docs/benchmarks.md` for how those are derived and which
-parts are measured rather than estimated.
+**~65 GB** for Nextflow's `work/` and `results/`. Measured on an M3 Max with 14
+cores to Docker: `make all` takes **1 h 13 m**, and every display item except
+the contaminant-divergence check is done **1 h 24 m** after a cold start. Only
+`make divergence` is slower, because breseq runs under amd64 emulation. See
+`docs/benchmarks.md`.
+
+### Pointing a clone at reads you already have
+
+The reads are not deposited yet, so `data/` is populated by hand. **Hard-link or
+copy them — do not symlink to a directory outside the repository.** The Nextflow
+processes resolve symlinks and stage the real file, so `make all` works either
+way; but `assigneddepth`, `poolcov`, `seqsummary`, `runmeta` and `divergence`
+run `docker run -v "$REPO":/repo`, and inside that container a symlink pointing
+outside the repo is a dangling link. Those five steps then fail with
+`no such file or directory` after the pipeline has already succeeded.
+
+Note that `data/readme.md` is tracked, so `data/` already exists in a fresh
+clone — `ln -s <dir> data` therefore creates `data/data`, not `data`. Link the
+contents:
+
+```bash
+SRC=/path/to/your/fastqs
+ln "$SRC"/*.fastq data/                       # hard links: no copy, no extra disk
+mkdir -p data/test && ln "$SRC/test_s2.fastq" data/test/
+```
+
+Hard links cost nothing and require the reads to be on the same filesystem as
+the clone. If they are not, copy them.
 
 > **Read this before step 2.** The sequencing reads are **not yet deposited**,
 > and the smoke-test FASTQ is derived from them, so *steps 2 and 3 cannot be run

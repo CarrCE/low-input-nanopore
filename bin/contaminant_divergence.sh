@@ -67,6 +67,14 @@ else
     REPLICATES=()
     for d in "${RESULTS}"/*/; do
         r="$(basename "${d}")"
+        # Skip the smoke-test subsample. It is 40,000 reads and reaches ~0.3x
+        # contaminant depth, where breseq calls the whole reference deleted
+        # rather than calling variants -- so it costs a slow emulated-amd64 run
+        # to produce a result that means nothing. Every other script here
+        # excludes it explicitly (see bin/coverage_attribution.py --exclude);
+        # this one did not, and so picked it up on every unargumented run.
+        # Naming it on the command line still works, for debugging.
+        [ "${r}" = "test_s2" ] && continue
         [ -f "${d}/competitive/${r}.assignments.tsv.gz" ] && REPLICATES+=("${r}")
     done
 fi
@@ -102,7 +110,15 @@ for rep in "${REPLICATES[@]}"; do
 
     # The contaminant organism name comes from the contig map rather than being
     # hardcoded, so this works for any reference set that declares one.
-    docker run --rm -v "${REPO}":/repo -v "${OUTDIR}":/out -w /repo "${ANALYSIS_IMAGE}" \
+    #
+    # `-i` is REQUIRED. The Python below reaches the container on stdin via the
+    # heredoc, and without -i docker does not forward stdin. `python3 -` then
+    # reads an empty program, does nothing, and exits 0 -- so `set -e` saw
+    # success, no ids.txt was written, seqkit produced a 0-byte FASTQ, and the
+    # whole step failed silently with no error message. That is why the
+    # Supplementary Section S3 table could not be regenerated from a clean
+    # clone. bin/assigned_depth.sh does the same thing correctly, with -i.
+    docker run --rm -i -v "${REPO}":/repo -v "${OUTDIR}":/out -w /repo "${ANALYSIS_IMAGE}" \
         python3 - "${assignments#${REPO}/}" "${contig_map#${REPO}/}" "${rep}" <<'PY'
 import gzip, sys
 assignments, contig_map, rep = sys.argv[1:4]
@@ -122,6 +138,12 @@ print(f"  {n} contaminant read IDs ({', '.join(sorted(orgs))})")
 if n == 0:
     sys.exit("error: no reads were assigned to the contaminant")
 PY
+
+    # Belt and braces. The step above can only fail loudly now, but the failure
+    # it hid was a container that ran and exited 0 without doing anything, and
+    # no exit status can catch that. Assert the artifact instead of the status.
+    [ -s "${out}/ids.txt" ] \
+        || die "${rep}: no contaminant read IDs were written to ${out}/ids.txt"
 
     log "${rep}: pulling reads and contaminant reference"
     docker run --rm -v "${REPO}":/repo -v "${OUTDIR}":/out -w /repo "${TOOLS_IMAGE}" bash -c "
