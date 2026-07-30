@@ -186,13 +186,20 @@ it is not a depth artifact: s1_r1 (31.2×) and s2_r1 (31.5×) are depth-matched 
 call 20 vs 84. Calls are stable within each session — 9 positions recur in all
 three S1 replicates, 52 in all four S2 — so the difference is real and between
 sessions. Two candidate explanations this design cannot separate: a different NEB
-λ lot (the sessions are 14 months apart), or seed sets that are not comparable in
+λ lot — and as of 29 Jul 2026 we know the lots do differ, 10267470 for all of S1
+and 10305153 for all of S2, with the lot boundary falling exactly on the session
+boundary — or seed sets that are not comparable in
 kind, because S1's community contains *E. coli* B-1109 so ambiguous reads never
 reach breseq, while in S2 nothing competes with *E. coli* and every
 enterobacterial read is assigned to the contaminant. The second also explains
 S2's lower mapping rate. Separating them needs a λ-only control library, which is
-a different experiment. Reported in the SI as an open observation rather than
-adjudicated.
+a different experiment — and it would now need one library per lot. Reported in
+the SI as an open observation rather than adjudicated. Knowing the lots differ
+confirms the first explanation's premise without deciding between the two: lot
+and community composition are perfectly confounded across the sessions, and both
+explanations predict exactly the within-session stability we see. The ranking is
+unchanged, because the mapping-rate asymmetry is something only the second
+explanation accounts for.
 
 ### Coverage-artifact analysis
 

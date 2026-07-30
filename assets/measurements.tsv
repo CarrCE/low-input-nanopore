@@ -17,7 +17,10 @@
 # Fields marked PENDING are real gaps, not formatting placeholders. Do not
 # substitute a plausible number: a wrong denominator propagates silently into
 # every per-femtogram quantity in the paper, where a visible hole does not.
-# Outstanding: the standard and carrier lot numbers.
+# Nothing is outstanding as of 29 July 2026; the lot numbers, the last gap, were
+# supplied from the purchasing and run records on that date. The PENDING
+# convention is documented below because it remains the correct thing to write
+# if a future row's value is not established.
 #
 # ---------------------------------------------------------------------------
 # Columns
@@ -33,6 +36,14 @@
 #   standard, standard_catalogue, standard_lot, input_format
 #       The community standard and whether it was supplied as extracted DNA or
 #       as intact cells.
+#
+#       Within lowinput_s2 the spike-in control came from two different
+#       purchases: r0 from catalogue D6321, lot 268266, and r1-r3 from D6321-10
+#       (the same product in a ten-pack), lot 256657. This is a third respect in
+#       which r0 differs from r1-r3, alongside its below-range mass and its
+#       three-prep extraction, and it is one more reason the headline rests on
+#       r1-r3 only. r1-r3 share one catalogue number and one lot, so nothing
+#       varies across the three replicates behind the main result.
 #
 #   preps_per_extraction, polyA_ug
 #       Extraction inputs. polyA is polyadenylic acid (Roche 10108626001), added
@@ -67,10 +78,23 @@
 #                           target -- see below.
 #
 #   carrier_catalogue, carrier_lot
-#       Lambda source. Same catalogue number across both sessions; the lots are
-#       14 months apart and may differ. docs/TODO.md §6 reports a
-#       reproducible difference in the carrier-derived E. coli between sessions
-#       that a lot difference is one candidate explanation for.
+#       Lambda source. Same catalogue number across both sessions, and the lots
+#       DO differ: 10267470 for all of lowinput_s1, 10305153 for all of
+#       lowinput_s2. One lot per experiment, no lot change within either.
+#
+#       That matters beyond bookkeeping. docs/TODO.md §6 and Supplementary
+#       Section~S3 report ~4x as many carrier-derived E. coli point differences
+#       in lowinput_s2 as in lowinput_s1, at matched depth, stable within each
+#       session and differing between them. A lot difference was one of the two
+#       candidate explanations, and these records establish its premise: the
+#       lots are in fact different, and the lot boundary coincides exactly with
+#       the session boundary the variant counts split on. That is a
+#       confirmation of the premise, NOT of the explanation -- the second
+#       candidate (S1's own E. coli holding ambiguous reads out of breseq) is
+#       still live and, on the mapping-rate evidence, still the more likely of
+#       the two. Because the two differences are perfectly confounded here,
+#       these lot numbers cannot separate them; only a carrier-only control
+#       library can, which is a different experiment.
 #
 #   flow_cell_id, minknow_version
 #       Transcribed from the run records, NOT derived from the reads. Every
@@ -124,10 +148,10 @@
 # the same way is unconfirmed. If it was, 1272 ng is itself an upper estimate.
 #
 sample_id	experiment	replicate	legacy_label	standard	standard_catalogue	standard_lot	input_format	preps_per_extraction	polyA_ug	sample_dna_ng	sample_dna_basis	carrier_dna_ng	carrier_dna_basis	carrier_catalogue	carrier_lot	flow_cell_id	minknow_version	include_in_headline	include_reason	notes
-lowinput_s1_r1	lowinput_s1	1	r1	ZymoBIOMICS Microbial Community DNA Standard II (Log Distribution)	D6311	252976	extracted_dna	n/a	n/a	1.21	qubit_hs_measured	1272	dilution_series	NEB N3011	PENDING	FBC00418	24.11.10	1		Sample mass inferred from a Qubit HS reading. Carrier mass computed from the dilution scheme in the header, not read off a nominal target.
-lowinput_s1_r2	lowinput_s1	2	r2	ZymoBIOMICS Microbial Community DNA Standard II (Log Distribution)	D6311	252976	extracted_dna	n/a	n/a	1.21	qubit_hs_shared_tube	1272	dilution_series	NEB N3011	PENDING	FBC11701	24.11.10	1		Same source tube as lowinput_s1_r1, so that tube's Qubit reading applies to both. The mass is measured, but once, not independently per library.
-lowinput_s1_r3	lowinput_s1	3	r3	ZymoBIOMICS Microbial Community DNA Standard II (Log Distribution)	D6311	252976	extracted_dna	n/a	n/a	1.34	qubit_hs_measured	1272	dilution_series	NEB N3011	PENDING	FBB28196	24.11.10	1		Sample mass inferred from a Qubit HS reading.
-lowinput_s2_r0	lowinput_s2	0	r1	ZymoBIOMICS Spike-in Control II (Low Microbial Load)	D6321	PENDING	intact_cells	3	1	0.223	raw_fluorescence_extrapolated	1000	direct_addition	NEB N3011	PENDING	FBF93053	24.11.10	0	Sample mass is an extrapolation below the Qubit HS reporting range, not a reading within it	Extracted from 3 preps (60 uL); 8 uL of extract went forward with 1 ug lambda. Fewer preps than r1-r3 and correspondingly less DNA.
-lowinput_s2_r1	lowinput_s2	1	r2	ZymoBIOMICS Spike-in Control II (Low Microbial Load)	D6321-10	PENDING	intact_cells	25	0	0.26	qubit_hs_measured	1000	direct_addition	NEB N3011	PENDING	FBF90753	26.01.15	1		
-lowinput_s2_r2	lowinput_s2	2	r3	ZymoBIOMICS Spike-in Control II (Low Microbial Load)	D6321-10	PENDING	intact_cells	25	0.1	0.32	qubit_hs_measured	1000	direct_addition	NEB N3011	PENDING	FBF94151	26.01.15	1		
-lowinput_s2_r3	lowinput_s2	3	r4	ZymoBIOMICS Spike-in Control II (Low Microbial Load)	D6321-10	PENDING	intact_cells	25	1	0.40	qubit_hs_measured	1000	direct_addition	NEB N3011	PENDING	FBH11513	26.01.15	1		
+lowinput_s1_r1	lowinput_s1	1	r1	ZymoBIOMICS Microbial Community DNA Standard II (Log Distribution)	D6311	252976	extracted_dna	n/a	n/a	1.21	qubit_hs_measured	1272	dilution_series	NEB N3011	10267470	FBC00418	24.11.10	1		Sample mass inferred from a Qubit HS reading. Carrier mass computed from the dilution scheme in the header, not read off a nominal target.
+lowinput_s1_r2	lowinput_s1	2	r2	ZymoBIOMICS Microbial Community DNA Standard II (Log Distribution)	D6311	252976	extracted_dna	n/a	n/a	1.21	qubit_hs_shared_tube	1272	dilution_series	NEB N3011	10267470	FBC11701	24.11.10	1		Same source tube as lowinput_s1_r1, so that tube's Qubit reading applies to both. The mass is measured, but once, not independently per library.
+lowinput_s1_r3	lowinput_s1	3	r3	ZymoBIOMICS Microbial Community DNA Standard II (Log Distribution)	D6311	252976	extracted_dna	n/a	n/a	1.34	qubit_hs_measured	1272	dilution_series	NEB N3011	10267470	FBB28196	24.11.10	1		Sample mass inferred from a Qubit HS reading.
+lowinput_s2_r0	lowinput_s2	0	r1	ZymoBIOMICS Spike-in Control II (Low Microbial Load)	D6321	268266	intact_cells	3	1	0.223	raw_fluorescence_extrapolated	1000	direct_addition	NEB N3011	10305153	FBF93053	24.11.10	0	Sample mass is an extrapolation below the Qubit HS reporting range, not a reading within it	Extracted from 3 preps (60 uL); 8 uL of extract went forward with 1 ug lambda. Fewer preps than r1-r3 and correspondingly less DNA.
+lowinput_s2_r1	lowinput_s2	1	r2	ZymoBIOMICS Spike-in Control II (Low Microbial Load)	D6321-10	256657	intact_cells	25	0	0.26	qubit_hs_measured	1000	direct_addition	NEB N3011	10305153	FBF90753	26.01.15	1		
+lowinput_s2_r2	lowinput_s2	2	r3	ZymoBIOMICS Spike-in Control II (Low Microbial Load)	D6321-10	256657	intact_cells	25	0.1	0.32	qubit_hs_measured	1000	direct_addition	NEB N3011	10305153	FBF94151	26.01.15	1		
+lowinput_s2_r3	lowinput_s2	3	r4	ZymoBIOMICS Spike-in Control II (Low Microbial Load)	D6321-10	256657	intact_cells	25	1	0.40	qubit_hs_measured	1000	direct_addition	NEB N3011	10305153	FBH11513	26.01.15	1		
