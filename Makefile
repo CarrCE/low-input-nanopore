@@ -32,7 +32,7 @@ DEMO_READS  ?= 40000
 
 .DEFAULT_GOAL := help
 
-.PHONY: help images test check verify measurements seqsummary versions runmeta poolcov attribution comparison coverage modedelta estcontrol assigneddepth s1 s2 all raghavendra q10 demo-data clean
+.PHONY: help images test check verify measurements seqsummary versions runmeta poolcov attribution comparison coverage modedelta estcontrol assigneddepth divergence s1 s2 all raghavendra q10 demo-data clean
 
 help: ## Show this help
 	@printf 'low-input-nanopore -- make targets\n\n'
@@ -136,7 +136,11 @@ verify: ## Assert every display item satisfies docs/display-items.md
 	    -v "$(ROOT)":/repo -w /repo "$(ANALYSIS_IMAGE)" \
 	    python3 bin/verify_display_items.py
 
-coverage: ## Per-replicate coverage figure (Fig. S2)
+# `attribution` is a prerequisite, not just documentation: plot_coverage.py reads
+# results/summary/coverage_attribution.tsv and exits if it is missing. It is
+# cheap (reads summary tables, no BAM pass), so always regenerating it is the
+# right trade against a reader hitting a missing-input error on a fresh tree.
+coverage: attribution ## Per-replicate coverage figure (Fig. S2)
 	@docker run --rm -u "$$(id -u):$$(id -g)" -e MPLCONFIGDIR=/tmp/mpl \
 	    -v "$(ROOT)":/repo -w /repo "$(ANALYSIS_IMAGE)" \
 	    python3 bin/plot_coverage.py \
@@ -168,7 +172,11 @@ runmeta: ## Per-run acquisition id, model and dates, read from the FASTQs (slow:
 assigneddepth: ## Per-base depth of the reads assignment AWARDED to each organism (slow: one FASTQ pass per replicate)
 	@bash "$(ROOT)/bin/assigned_depth.sh"
 
-poolcov: ## Pooled-across-replicates coverage summary and Figure S3 (needs `make assigneddepth` first)
+# `assigneddepth` is a prerequisite because pool_coverage.py --depth-kind assigned
+# has nothing to pool without it. Safe to force: bin/assigned_depth.sh skips any
+# replicate whose output already exists, so on a warm tree this is a no-op loop
+# rather than another pass over 110 GB of FASTQ.
+poolcov: assigneddepth ## Pooled-across-replicates coverage summary and Figure S3
 	@docker run --rm -u "$$(id -u):$$(id -g)" -e MPLCONFIGDIR=/tmp/mpl \
 	    -v "$(ROOT)":/repo -w /repo "$(ANALYSIS_IMAGE)" \
 	    python3 bin/pool_coverage.py --depth-kind assigned \
@@ -190,6 +198,15 @@ poolcov: ## Pooled-across-replicates coverage summary and Figure S3 (needs `make
 attribution: ## Per-replicate alignment vs attributable depth, and the 1x threshold
 	@docker run --rm -u "$$(id -u):$$(id -g)" -v "$(ROOT)":/repo -w /repo "$(ANALYSIS_IMAGE)" \
 	    python3 bin/coverage_attribution.py --out results/summary/coverage_attribution.tsv
+
+# The one analysis step outside the Nextflow DAG: breseq over the contaminant
+# reads of a finished run, in its own container. It produces the divergence table
+# in Supplementary Section S3, so a reproduction that skips it is incomplete.
+# It had no target until now, which made it the only step a reader had to know
+# existed rather than discover from `make help`. Idempotent: a replicate whose
+# output.gd exists is skipped. Slow -- breseq runs under amd64 emulation.
+divergence: ## Contaminant divergence from stock MG1655 (Supplementary Section S3; slow, emulated)
+	@bash "$(ROOT)/bin/contaminant_divergence.sh"
 
 comparison: ## Prior-work comparison figure (Fig. 3) into results/comparison/
 	@docker run --rm -u "$$(id -u):$$(id -g)" -e MPLCONFIGDIR=/tmp/mpl \
