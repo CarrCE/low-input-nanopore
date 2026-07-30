@@ -53,7 +53,50 @@ M3 Max, 14 CPUs available to Docker; from `results/pipeline_info/trace_*.txt`):
 | `COMPUTE_METRICS` | < 100 ms | ~12 MB | |
 | `AGGREGATE` | 35.7 s | 4.5 GB | pools ~35 M read-length rows |
 
-Total for `lowinput_s2`: **3 h 28 m wall-clock, 44.7 CPU-hours.**
+Total for `lowinput_s2`: **3 h 28 m wall-clock, 44.7 CPU-hours** — confirmed from
+`trace_2026-07-25_01-54-14.txt` (17 fresh tasks, 3 h 27 m 47 s).
+
+> **That total is pre-fix and is no longer the cost of running this pipeline.**
+> It is retained because it is what the two fixes below were measured against.
+> The table above it is the same run, so it is pre-fix too: `COVERAGE_PROFILE` at
+> 43–58 min per replicate is the defect, not the current behaviour. Note also
+> its scope — 4 replicates in **one** mode, not the 7 replicates in both modes
+> that `make all` runs.
+
+### Post-fix cost
+
+From `trace_2026-07-25_09-17-25.txt`, the 7-replicate both-modes run (14 cores to
+Docker, M3 Max):
+
+| Process | n | Per task | Notes |
+|---|---:|---|---|
+| `MAP_COMPETITIVE` | 7 | 6 m 04 s – 8 m 30 s | 800–1080% CPU, 8.4–10 GB RSS |
+| `ASSIGN_READS` | 14 | 2 m 09 s – 3 m 13 s | single-threaded, ~30 MB |
+| `COVERAGE_PROFILE` | 7 | 1 m 32 s – 2 m 08 s | was 43–58 min |
+| `COVERAGE_SUMMARY` | 7 | 2 – 13 s | was ~18 min |
+| `AGGREGATE` | 3 | ~1 m 20 s | one per mode plus the pooled table |
+
+`MAP_COMPETITIVE` is `process_high`, so `cpus = max_cpus` and **one mapping task
+runs at a time**. That makes it the serialised spine and a hard floor on wall
+clock: 48 m 43 s of mapping for seven replicates, measured. Everything
+downstream is either single-threaded or seconds long and overlaps with the next
+replicate's mapping.
+
+**Caveat on the ~1–1.5 h figure quoted in the README.** No trace in
+`results/pipeline_info/` is a complete from-scratch `make all`: the 7-replicate
+traces are 51-of-52 cached, and the one with 28 freshly-executed tasks had
+`AGGREGATE` fail. So the estimate is a reconstruction from the measured per-task
+times plus the serialisation structure above, not an end-to-end measurement.
+The closest real datapoint is 46 m 45 s of wall clock for 4 fresh mappings with
+the rest cached, which is consistent with it. Treat 1–1.5 h as an estimate with
+the mapping spine as its floor, and if you do run one from cold, replace this
+paragraph with the trace.
+
+Add for a full reproduction of every display item: `assigneddepth` (~30–60 min,
+one FASTQ pass per replicate), `runmeta` (a full pass over ~110 GB), and
+`divergence` (breseq under amd64 emulation over all seven replicates — the
+slowest single step, and unmeasured here). Those bring the end-to-end total to
+roughly **4–6 h**, which is the figure the README quotes.
 
 ### Two bottlenecks found and fixed
 

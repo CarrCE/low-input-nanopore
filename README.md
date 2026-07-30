@@ -25,8 +25,10 @@ Hardware, for the shipped defaults: **48 GB of memory available to Docker and 14
 cores**, because `MAP_COMPETITIVE` asks for them (`conf/base.config`). On a
 smaller machine pass `--max_memory 16.GB --max_cpus 8`; the mapping is slower
 but nothing else changes. Budget **~110 GB** for the seven FASTQs and a further
-**~230 GB** for Nextflow's `work/` if you keep it. A full `make all` takes
-roughly 4–5 h on 14 cores; see `docs/benchmarks.md`.
+**~230 GB** for Nextflow's `work/` if you keep it. `make all` takes roughly
+**1–1.5 h** on 14 cores, and reproducing every display item and table takes
+**4–6 h** in total; see `docs/benchmarks.md` for how those are derived and which
+parts are measured rather than estimated.
 
 > **Read this before step 2.** The sequencing reads are **not yet deposited**,
 > and the smoke-test FASTQ is derived from them, so *steps 2 and 3 cannot be run
@@ -45,11 +47,48 @@ make images
 # 3. The published analysis: both experiments, both assignment modes
 ./run.sh -profile docker --samplesheet assets/samplesheets/all.csv --mode both
 
-# 4. Check every display item still satisfies docs/display-items.md
-make verify
+# 4. Everything downstream of the pipeline, then the checks (see below)
+make attribution coverage modedelta comparison estcontrol
+make assigneddepth poolcov
+make seqsummary runmeta versions divergence
+make measurements verify
 ```
 
-`make test`, `make all` and `make verify` are shorthands for those.
+`make test` and `make all` are shorthands for steps 2 and 3.
+
+### Reproducing the whole paper
+
+Step 3 is **the** analysis: one Nextflow run, both experiments, both assignment
+modes. It produces main-text Figures 1 and 2 and the study-level summary tables
+directly. Everything in step 4 is either a plotter that reads
+`results/summary/`, or a check — no second pipeline is involved.
+
+Two of them are ordered, and the Makefile now enforces it rather than leaving it
+to the reader: `coverage` requires `attribution`, and `poolcov` requires
+`assigneddepth`. Both prerequisites are declared, so `make coverage` on a fresh
+tree builds what it needs instead of failing on a missing input.
+
+| step | target | produces | cost |
+|---|---|---|---|
+| 3 | `all` | Figs 1 & 2, `results/summary/` tables | ~1–1.5 h |
+| 4 | `attribution` → `coverage` | Fig. S2, Table S5 | minutes |
+| 4 | `modedelta` | Fig. S1 | seconds |
+| 4 | `comparison` | Fig. 3 | seconds |
+| 4 | `estcontrol` | estimated no-AS control | seconds |
+| 4 | `assigneddepth` → `poolcov` | Fig. S3 | ~30–60 min |
+| 4 | `seqsummary`, `runmeta`, `versions` | Tables S8, S9, software table | `runmeta` is a full pass over ~110 GB |
+| 4 | `divergence` | the Section S3 divergence table | slow: breseq under amd64 emulation |
+| 4 | `measurements`, `verify` | the two checks | seconds |
+
+`divergence` is the only step outside the Nextflow DAG — it runs breseq over the
+contaminant reads of a finished run, in its own container. It is what
+Supplementary Section S3's "is the stock reference close enough?" argument rests
+on, so a reproduction that stops at `make verify` is missing it.
+
+**`make verify` belongs last, not after step 3.** It asserts that every display
+item satisfies `docs/display-items.md`, and Figures S1, S2, S3 and Figure 3 are
+built in step 4 — so running it straight after the pipeline reports the figures
+it has not been given the chance to build yet.
 
 **Use `make all`, not `make s1` plus `make s2`.** `AGGREGATE` only sees the
 samples of the run that invokes it, and every target writes to the same
