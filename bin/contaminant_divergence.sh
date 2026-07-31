@@ -164,23 +164,60 @@ PY
     "
 
     log "${rep}: running breseq (nanopore mode)"
+    # `set -e` matters here. Without it these two commands run unconditionally
+    # and the container's exit status is gdtools', not breseq's -- so a breseq
+    # crash is masked by a subsequent successful APPLY and the `|| die` below
+    # can never fire.
+    #
+    # Under amd64 emulation breseq raises SIGABRT during teardown on most
+    # replicates, AFTER the analysis is complete and output.gd is fully
+    # written: the log reaches breseq's closing citation block and APPLY then
+    # succeeds against the .gd. That abort is benign and is tolerated on
+    # purpose, but only when the evidence says the run finished. The .gd is
+    # checked immediately below, so a breseq that dies EARLY is caught rather
+    # than being quietly dropped from the summary.
     docker run --rm --platform linux/amd64 -e HOME=/tmp -v "${OUTDIR}/${rep}":/w -w /w "${BRESEQ_IMAGE}" bash -c "
+        set -e
         breseq -x --no-junction-prediction -j ${THREADS} -n ${rep} \
-            -r contaminant.fasta -o out contam.fastq > breseq.log 2>&1
+            -r contaminant.fasta -o out contam.fastq > breseq.log 2>&1 || {
+            status=\$?
+            # Tolerate a late abort, but only if breseq got as far as writing a
+            # complete genome diff. Anything else is a real failure.
+            if [ ! -s out/output/output.gd ]; then
+                echo \"error: breseq exited \$status without writing output.gd\" >&2
+                exit \$status
+            fi
+            echo \"note: breseq exited \$status after writing output.gd (late abort, tolerated)\" >&2
+        }
         gdtools APPLY -r contaminant.fasta -f FASTA -o consensus.fasta \
             out/output/output.gd >> breseq.log 2>&1
     " || { tail -30 "${OUTDIR}/${rep}/breseq.log" >&2; die "${rep}: breseq failed"; }
+
+    [ -s "${OUTDIR}/${rep}/out/output/output.gd" ] \
+        || die "${rep}: breseq produced no output.gd"
+    [ -s "${OUTDIR}/${rep}/consensus.fasta" ] \
+        || die "${rep}: gdtools APPLY produced no consensus.fasta"
 
     log "${rep}: done"
 done
 
 # ---- summary ---------------------------------------------------------------
+# Written to a temporary file and moved into place, so that a failure part way
+# through leaves no summary at all rather than a truncated one. A short table
+# here is indistinguishable from a real result.
 summary="${OUTDIR}/summary.tsv"
+tmp="${summary}.tmp"
 {
     printf 'replicate\tcontaminant_reads\tmapped_pct\tdepth\tsnps\tindels\tstructural\n'
     for rep in "${REPLICATES[@]}"; do
         gd="${OUTDIR}/${rep}/out/output/output.gd"
-        [ -s "${gd}" ] || continue
+        # NOT `continue`. Skipping a replicate here emits a table that is short
+        # by one row and says nothing about why -- the reader has no way to
+        # tell a seven-replicate study from a six-replicate one, and the
+        # published Supplementary Section S3 table is exactly this table.
+        # A missing .gd is unreachable given the checks above; if it happens,
+        # it is a bug, and the run must fail rather than round down.
+        [ -s "${gd}" ] || die "${rep}: no genome diff at ${gd}; refusing to write a partial summary"
         ref_bp=$(grep -v '^>' "${OUTDIR}/${rep}/contaminant.fasta" | tr -d '\n' | wc -c | tr -d ' ')
         awk -v rep="${rep}" -v g="${ref_bp}" '
             /^#=INPUT-READS/     {ir=$2}
@@ -193,7 +230,14 @@ summary="${OUTDIR}/summary.tsv"
             END {printf "%s\t%d\t%.1f\t%.1f\t%d\t%d\t%d\n", rep, ir, 100*mr/cr, mb/g, s+0, i+0, v+0}
         ' "${gd}"
     done
-} > "${summary}"
+} > "${tmp}"
+
+# One row per replicate, plus the header. If that does not hold, something was
+# dropped without dying and the table must not be published.
+rows=$(( $(wc -l < "${tmp}") - 1 ))
+[ "${rows}" -eq "${#REPLICATES[@]}" ] \
+    || { rm -f "${tmp}"; die "summary has ${rows} rows for ${#REPLICATES[@]} replicates"; }
+mv "${tmp}" "${summary}"
 
 log "summary -> ${summary}"
 column -t -s "$(printf '\t')" "${summary}"
