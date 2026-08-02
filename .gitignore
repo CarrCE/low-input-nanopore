@@ -12,10 +12,15 @@ data/*
 refs/
 work/
 
-# Pipeline outputs. `results/` is the default outdir; the other two come from
-# `--outdir results_q10` (quality-matched rerun) and the Raghavendra reanalysis.
-# Matched by prefix so a new `--outdir results_<something>` cannot be committed
-# by accident -- these directories hold tens of GB.
+# Pipeline outputs. Every analysis publishes under `results/`, including the
+# secondary ones: results/q10 (quality-matched rerun) and results/raghavendra
+# (prior-study reanalysis). One ignored path therefore covers all of them.
+#
+# `results_*/` is kept as a safety net, not because anything writes there now.
+# Earlier revisions used --outdir results_q10 and --outdir results_raghavendra,
+# so a stale command line or an old working copy can still produce those, and
+# they hold GB. Ignoring the old shape costs nothing and stops a large
+# accidental commit.
 results/
 results_*/
 .nextflow/

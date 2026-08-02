@@ -122,9 +122,17 @@ study-level tables and Figures 1, 2 and S1 describing whichever ran last — and
 required for Figure S1, which compares the two assignment rules. `make s1` and
 `make s2` remain available for working on one dataset, with that caveat.
 
-Runs that must not overwrite `results/` have their own targets: `make
-raghavendra` (prior-study reanalysis → `results_raghavendra/`) and `make q10`
-(quality-matched rerun → `results_q10/`).
+Runs that must not overwrite the main tables publish into their own subdirectory
+of `results/`, so a clone has exactly one output tree:
+
+| target | writes to | is it a published result? |
+|---|---|---|
+| `make q10` | `results/q10` | **Yes.** Quality-matched rerun at Q10, reported in the main text ("The result is robust to a quality filter") and in Supplementary Table~S11. Reproducing the paper means running this. |
+| `make raghavendra` | `results/raghavendra` | Indirectly. It is the *provenance* of the Basapathi Raghavendra rows committed to `assets/comparison/prior_studies.tsv`. Figure 3 is drawn from that committed table, so the figure reproduces without this; running it re-derives those numbers from the reads. |
+
+`make q10` is a second full pass over all seven replicates in both modes and
+costs about as much as `make all`. `make raghavendra` is cheap — the deposited
+chunks under `data/raghavendra_2023/` total ~1.3 MB.
 
 ### Why `./run.sh` instead of `nextflow run`
 
