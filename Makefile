@@ -69,15 +69,28 @@ all: ## Run both experiments in both modes -- the published analysis
 	@"$(ROOT)/run.sh" -profile $(PROFILE) \
 	    --samplesheet assets/samplesheets/all.csv --mode both $(NF_ARGS)
 
-raghavendra: ## Reanalyse the Basapathi Raghavendra 2023 reads (own outdir; needs fetch_raghavendra.sh)
+# Secondary analyses publish UNDER results/, not alongside it: results/raghavendra
+# and results/q10 rather than results_raghavendra/ and results_q10/. One output
+# tree per clone is easier to reason about, to archive and to delete, and
+# `results/` alone in .gitignore then covers every one of them.
+#
+# Nesting is safe against every glob in this repository, which was checked
+# rather than assumed. Each consumer keys on a <sid>/<sid>.* shape --
+# coverage_attribution.py wants <sid>/coverage/<sid>.coverage_summary.tsv,
+# assigned_depth.sh and contaminant_divergence.sh want
+# <sid>/competitive/<sid>.assignments.tsv.gz, comparison_data.py globs
+# */<mode>/*.metrics.tsv, and `make coverage` globs results/*/coverage/*. A
+# directory named q10 satisfies none of them, so it is skipped rather than
+# mistaken for a replicate.
+raghavendra: ## Reanalyse the Basapathi Raghavendra 2023 reads (-> results/raghavendra)
 	@"$(ROOT)/run.sh" -profile $(PROFILE) \
 	    --samplesheet assets/samplesheets/raghavendra_2023.csv \
-	    --outdir results_raghavendra $(NF_ARGS)
+	    --outdir results/raghavendra $(NF_ARGS)
 
-q10: ## Quality-matched rerun of the published analysis at Q10 (own outdir)
+q10: ## Quality-matched rerun at Q10 -- a published result (-> results/q10)
 	@"$(ROOT)/run.sh" -profile $(PROFILE) \
 	    --samplesheet assets/samplesheets/all.csv --mode both \
-	    --min_qscore 10 --outdir results_q10 $(NF_ARGS)
+	    --min_qscore 10 --outdir results/q10 $(NF_ARGS)
 
 # Whole 4-line records only: a plain `head -n` is fine at 40000 but silently
 # truncates a record the moment DEMO_READS is set to a value that is not a
