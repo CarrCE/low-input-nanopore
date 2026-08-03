@@ -92,17 +92,30 @@ to the reader: `coverage` requires `attribution`, and `poolcov` requires
 `assigneddepth`. Both prerequisites are declared, so `make coverage` on a fresh
 tree builds what it needs instead of failing on a missing input.
 
+All times below are measured on a complete cold run from a fresh clone (M3 Max,
+14 cores to Docker), not estimated.
+
 | step | target | produces | cost |
 |---|---|---|---|
-| 3 | `all` | Figs 1 & 2, `results/summary/` tables | ~1–1.5 h |
-| 4 | `attribution` → `coverage` | Fig. S2, Table S5 | minutes |
-| 4 | `modedelta` | Fig. S1 | seconds |
-| 4 | `comparison` | Fig. 3 | seconds |
-| 4 | `estcontrol` | estimated no-AS control | seconds |
-| 4 | `assigneddepth` → `poolcov` | Fig. S3 | ~30–60 min |
-| 4 | `seqsummary`, `runmeta`, `versions` | Tables S8, S9, software table | `runmeta` is a full pass over ~110 GB |
-| 4 | `divergence` | the Section S3 divergence table | slow: breseq under amd64 emulation |
+| 3 | `all` | Figs 1 & 2, `results/summary/` tables | **1 h 17 m** |
+| 4 | `attribution` → `coverage` | Fig. S2, Table S5 | 4 s |
+| 4 | `modedelta` | Fig. S1 | 3 s |
+| 4 | `comparison` | Fig. 3 | 2 s |
+| 4 | `estcontrol` | estimated no-AS control | 2 s |
+| 4 | `assigneddepth` → `poolcov` | Fig. S3 | 5 m |
+| 4 | `seqsummary`, `runmeta`, `versions` | Tables S8, S9, software table | 5 m (`runmeta` reads all ~110 GB) |
+| 4 | `q10` | **Table S11** and the main text's quality-filter section | **1 h 12 m** |
+| 4 | `raghavendra` | the committed prior-study rows behind Fig. 3 | 38 s |
+| 4 | `divergence` | the Section S3 divergence table | **1 h 33 m** (breseq under amd64 emulation) |
 | 4 | `measurements`, `verify` | the two checks | seconds |
+| | | **total** | **4 h 14 m** |
+
+Two of these are easy to leave out and both are published results. **`make q10`**
+is a second complete pass over all seven replicates in both modes — it costs
+about as much as `make all` and produces Supplementary Table S11.
+**`make divergence`** is over a third of the total on its own. A reproduction
+that skips either is incomplete, which is why they are in the table rather than
+in a footnote.
 
 `divergence` is the only step outside the Nextflow DAG — it runs breseq over the
 contaminant reads of a finished run, in its own container. It is what
@@ -113,6 +126,28 @@ on, so a reproduction that stops at `make verify` is missing it.
 item satisfies `docs/display-items.md`, and Figures S1, S2, S3 and Figure 3 are
 built in step 4 — so running it straight after the pipeline reports the figures
 it has not been given the chance to build yet.
+
+### Verified
+
+On 3 August 2026 the sequence above was run end to end from a fresh `git clone`
+with containers rebuilt from `docker/`, on a machine holding no prior state from
+this project. Every reported value reproduced:
+
+- `results/summary/experiment_summary.tsv` byte-identical to the published
+  tables; `per_organism.tsv` and `coverage_attribution.tsv` identical
+- all twelve values of Supplementary Table S11 (the Q10 analysis) to printed
+  precision, and its quoted retention ranges — 89.76–98.38% of reads and
+  77.20–91.16% of bases against the stated 89.8–98.4% and 77.2–91.2%
+- all seven rows of the Section S3 contaminant-divergence table, including the
+  per-replicate SNP counts
+- all fourteen prior-study rows in `assets/comparison/prior_studies.tsv`
+  re-derived from the deposited Basapathi Raghavendra reads
+
+This is stated because "the code is available" and "the code reproduces the
+paper" are different claims, and only the second is worth much. Note the
+prerequisite the reader cannot yet satisfy: the reads are not deposited, so the
+run above used local FASTQs. Until deposition, an outside reader can reproduce
+main-text Figure 3 — which is built from committed tables — and nothing else.
 
 **Use `make all`, not `make s1` plus `make s2`.** `AGGREGATE` only sees the
 samples of the run that invokes it, and every target writes to the same
