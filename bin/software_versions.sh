@@ -79,8 +79,11 @@ emit() { printf '%s\t%s\t%s\t%s\t%s\n' "$1" "$2" "$3" "$4" "$5"; }
   # ---- breseq (upstream image, so a real digest does exist) -------------
   v=$(docker run --rm --platform linux/amd64 --entrypoint sh "$breseq_img" \
         -c 'breseq --version' 2>/dev/null | awk '/^breseq/{print $2; exit}')
+  # Not "unused". breseq produces the contaminant-divergence table reported in
+  # Supplementary Section S3, which is a reported result; it is only the
+  # --breseq_consensus assignment path that no reported number depends on.
   emit breseq "${v:-unknown}" "$breseq_img" "0.40.1--h3be2455_0" \
-       "upstream biocontainer, immutable tag; optional path, not used for the reported results"
+       "upstream biocontainer, immutable tag; produces the Section S3 divergence table; the --breseq_consensus assignment path is optional and feeds no reported number"
   d=$(docker image inspect --format '{{index .RepoDigests 0}}' "$breseq_img" 2>/dev/null || true)
   emit "breseq image digest" "${d##*@}" "$breseq_img" n/a "registry digest (this image is pulled, not built)"
 } > "${out:-/dev/stdout}"
