@@ -71,11 +71,53 @@
 #
 #   carrier_dna_ng, carrier_dna_basis
 #       Lambda gDNA mass into library preparation. Basis is one of:
-#         direct_addition   a measured aliquot added straight to the sample.
-#                           Exact; nothing propagates.
-#         dilution_series   the endpoint of a serial dilution. Must be computed
-#                           from the scheme, NOT assumed to equal the nominal
-#                           target -- see below.
+#         direct_addition   a quantified aliquot added straight to the sample:
+#                           concentration measured by Qubit, multiplied by the
+#                           volume pipetted. It carries the Qubit assay's own
+#                           uncertainty -- it is NOT exact -- but it does not
+#                           depend on the supplier's stated stock concentration,
+#                           which is the error this distinction exists to track.
+#         dilution_series   the endpoint of a serial dilution: computed from the
+#                           scheme and the stock concentration. Must be computed,
+#                           NOT assumed to equal the nominal target -- see below.
+#                           Whether the stock concentration was measured or taken
+#                           from the label is the thing that matters, and is
+#                           recorded per row. For lowinput_s1 it was measured.
+#
+#       This field previously read "Exact; nothing propagates" for
+#       direct_addition. That was wrong twice over: the value rests on a
+#       fluorometric reading like any other, and until August 2026 the
+#       lowinput_s2 rows carried 1000, which was the TARGET mass and not a
+#       measurement at all.
+#
+# ---------------------------------------------------------------------------
+# lowinput_s2 carrier mass: measured, and it is not 1000 ng
+# ---------------------------------------------------------------------------
+# Per J. McKaig, August 2026. The carrier was quantified by Qubit BR and the
+# delivered mass is concentration x volume pipetted, on two separate occasions:
+#
+#   r1-r3   stock diluted 1:10, the dilution read 43.6 ng/uL,
+#           23 uL added   -> 1002.8 ng
+#           All three tubes were prepared at the same time from that one
+#           dilution, then frozen at -80 C. The carrier mass is therefore a
+#           single shared quantity across r1-r3, not three measurements.
+#
+#   r0      prepared on a different day with its own quantification,
+#           422 ng/uL, 2.6 uL added -> 1097.2 ng
+#           A fourth respect in which r0 stands apart from r1-r3, and ~9.4%
+#           more carrier than they received.
+#
+# BOTH readings fall well below NEB's stated 500 ng/uL for N3011: the 1:10
+# dilution implies a 436 ng/uL stock, and the direct reading gave 422 ng/uL,
+# i.e. 12.8% and 15.6% low.
+#
+# A third reading, from the lowinput_s1 session and a DIFFERENT lot (10267470),
+# gave 422.67 ng/uL. Three independent Qubit readings, across two lots and two
+# sessions fourteen months apart, agree that the material assays at roughly
+# 420-436 ng/uL against a label of 500. Whether NEB overstates or Qubit reads
+# lambda gDNA low, the readings are what this study used, and every carrier mass
+# here now rests on one. The stated 500 ng/uL no longer enters any number in
+# this paper.
 #
 #   carrier_catalogue, carrier_lot
 #       Lambda source. Same catalogue number across both sessions, and the lots
@@ -122,36 +164,47 @@
 #       Anything that qualifies the row.
 #
 # ---------------------------------------------------------------------------
-# lowinput_s1 carrier mass: 1272 ng, not the nominal 1000 ng
+# lowinput_s1 masses: computed from MEASURED stock concentrations
 # ---------------------------------------------------------------------------
-# Sample and carrier were brought to a nominal 1:1000 ratio by two dilution
-# steps, with a FRESH aliquot of carrier added at each step so the carrier was
-# not diluted along with the sample. Working the scheme through with the stated
-# stock concentrations (community 11 ng/uL, lambda 500 ng/uL):
+# Per J. McKaig, August 2026. Both stocks were quantified by Qubit before the
+# dilution, and the step volumes were NOT changed. Every lowinput_s1 mass below
+# follows from those readings and the fixed scheme:
+#
+#   measured   community  8.38 ng/uL (r1, r2, one shared tube)
+#              community  9.31 ng/uL (r3)
+#              lambda   422.67 ng/uL (all three; lot 10267470)
 #
 #   step 1   3 uL community + 3 uL lambda + 44 uL water -> 50 uL
-#            community 0.660 ng/uL, lambda 30.0 ng/uL
 #   step 2   3 uL of step 1 + 3 uL lambda + 44 uL water -> 50 uL
-#            community 0.0396 ng/uL, lambda 31.8 ng/uL
-#              (90 ng carried over from step 1, plus 1500 ng fresh)
+#              (a FRESH lambda aliquot enters at each step, so the carrier is
+#               not diluted along with the sample)
 #   40 uL taken into library preparation
-#            community 1.584 ng, lambda 1272 ng   -> a ratio of 1:803
 #
-# The nominal 1000 ng is therefore low by a factor of 1.272, and enrichment --
-# which divides by the input sample fraction -- is understated by that factor.
+#            r1, r2   sample 1.20672 ng, lambda 1075.27 ng   -> 1:891
+#            r3       sample 1.34064 ng, lambda 1075.27 ng   -> 1:802
 #
-# The per-replicate sample masses below are inferred from Qubit readings and are
-# lower than the 1.584 ng this scheme predicts. The manuscript attributes that
-# to the stocks having been re-quantified and the step volumes adjusted; that is
-# the most economical explanation, but it is an inference from the discrepancy,
-# not something the run records establish. Whether the carrier was adjusted in
-# the same way is unconfirmed. If it was, 1272 ng is itself an upper estimate.
+# This replaces two earlier readings of the same scheme, both now superseded:
+#
+#   1000 ng   the nominal target. Never a measurement; it was a prior
+#             calculation that sat in the samplesheets unchallenged.
+#   1272 ng   the scheme worked through with the STATED stock concentrations
+#             (11 and 500 ng/uL). Correct arithmetic on the wrong inputs.
+#
+# It also settles a question this file previously recorded as open. The header
+# used to say the per-replicate sample masses came in below the 1.584 ng the
+# nominal scheme predicts, that the manuscript attributed this to "the stocks
+# having been re-quantified and the step volumes adjusted", and that this was an
+# inference the run records did not establish. The records now establish it, and
+# they establish half of it as wrong: the stocks WERE re-quantified, and the
+# volumes were NOT adjusted. 8.38/11 x 1.584 = 1.2067 exactly, which is the
+# whole of the discrepancy. Nothing about the scheme changed; only the numbers
+# going into it were real rather than assumed.
 #
 sample_id	experiment	replicate	legacy_label	standard	standard_catalogue	standard_lot	input_format	preps_per_extraction	polyA_ug	sample_dna_ng	sample_dna_basis	carrier_dna_ng	carrier_dna_basis	carrier_catalogue	carrier_lot	flow_cell_id	minknow_version	include_in_headline	include_reason	notes
-lowinput_s1_r1	lowinput_s1	1	r1	ZymoBIOMICS Microbial Community DNA Standard II (Log Distribution)	D6311	252976	extracted_dna	n/a	n/a	1.21	qubit_hs_measured	1272	dilution_series	NEB N3011	10267470	FBC00418	24.11.10	1		Sample mass inferred from a Qubit HS reading. Carrier mass computed from the dilution scheme in the header, not read off a nominal target.
-lowinput_s1_r2	lowinput_s1	2	r2	ZymoBIOMICS Microbial Community DNA Standard II (Log Distribution)	D6311	252976	extracted_dna	n/a	n/a	1.21	qubit_hs_shared_tube	1272	dilution_series	NEB N3011	10267470	FBC11701	24.11.10	1		Same source tube as lowinput_s1_r1, so that tube's Qubit reading applies to both. The mass is measured, but once, not independently per library.
-lowinput_s1_r3	lowinput_s1	3	r3	ZymoBIOMICS Microbial Community DNA Standard II (Log Distribution)	D6311	252976	extracted_dna	n/a	n/a	1.34	qubit_hs_measured	1272	dilution_series	NEB N3011	10267470	FBB28196	24.11.10	1		Sample mass inferred from a Qubit HS reading.
-lowinput_s2_r0	lowinput_s2	0	r1	ZymoBIOMICS Spike-in Control II (Low Microbial Load)	D6321	268266	intact_cells	3	1	0.223	raw_fluorescence_extrapolated	1000	direct_addition	NEB N3011	10305153	FBF93053	24.11.10	0	Sample mass is an extrapolation below the Qubit HS reporting range, not a reading within it	Extracted from 3 preps (60 uL); 8 uL of extract went forward with 1 ug lambda. Fewer preps than r1-r3 and correspondingly less DNA.
-lowinput_s2_r1	lowinput_s2	1	r2	ZymoBIOMICS Spike-in Control II (Low Microbial Load)	D6321-10	256657	intact_cells	25	0	0.26	qubit_hs_measured	1000	direct_addition	NEB N3011	10305153	FBF90753	26.01.15	1		
-lowinput_s2_r2	lowinput_s2	2	r3	ZymoBIOMICS Spike-in Control II (Low Microbial Load)	D6321-10	256657	intact_cells	25	0.1	0.32	qubit_hs_measured	1000	direct_addition	NEB N3011	10305153	FBF94151	26.01.15	1		
-lowinput_s2_r3	lowinput_s2	3	r4	ZymoBIOMICS Spike-in Control II (Low Microbial Load)	D6321-10	256657	intact_cells	25	1	0.40	qubit_hs_measured	1000	direct_addition	NEB N3011	10305153	FBH11513	26.01.15	1		
+lowinput_s1_r1	lowinput_s1	1	r1	ZymoBIOMICS Microbial Community DNA Standard II (Log Distribution)	D6311	252976	extracted_dna	n/a	n/a	1.20672	qubit_hs_measured	1075.27	dilution_series	NEB N3011	10267470	FBC00418	24.11.10	1		Community stock 8.38 ng/uL and lambda stock 422.67 ng/uL, both by Qubit; masses into library preparation computed from those readings through the dilution scheme in the header. Carrier mass computed from the dilution scheme in the header using the measured lambda concentration, not a nominal target.
+lowinput_s1_r2	lowinput_s1	2	r2	ZymoBIOMICS Microbial Community DNA Standard II (Log Distribution)	D6311	252976	extracted_dna	n/a	n/a	1.20672	qubit_hs_shared_tube	1075.27	dilution_series	NEB N3011	10267470	FBC11701	24.11.10	1		Same source tubes as lowinput_s1_r1, so the same two stock readings apply to both. The mass is measured once, not independently per library.
+lowinput_s1_r3	lowinput_s1	3	r3	ZymoBIOMICS Microbial Community DNA Standard II (Log Distribution)	D6311	252976	extracted_dna	n/a	n/a	1.34064	qubit_hs_measured	1075.27	dilution_series	NEB N3011	10267470	FBB28196	24.11.10	1		Community stock 9.31 ng/uL, lambda stock 422.67 ng/uL (same lambda as r1 and r2), both by Qubit.
+lowinput_s2_r0	lowinput_s2	0	r1	ZymoBIOMICS Spike-in Control II (Low Microbial Load)	D6321	268266	intact_cells	3	1	0.223	raw_fluorescence_extrapolated	1097.2	direct_addition	NEB N3011	10305153	FBF93053	24.11.10	0	Sample mass is an extrapolation below the Qubit HS reporting range, not a reading within it	Carrier quantified separately on a different day from r1-r3: 422 ng/uL by Qubit BR, 2.6 uL added = 1097.2 ng. Extracted from 3 preps (60 uL); 8 uL of extract went forward with 1 ug lambda. Fewer preps than r1-r3 and correspondingly less DNA.
+lowinput_s2_r1	lowinput_s2	1	r2	ZymoBIOMICS Spike-in Control II (Low Microbial Load)	D6321-10	256657	intact_cells	25	0	0.26	qubit_hs_measured	1002.8	direct_addition	NEB N3011	10305153	FBF90753	26.01.15	1		
+lowinput_s2_r2	lowinput_s2	2	r3	ZymoBIOMICS Spike-in Control II (Low Microbial Load)	D6321-10	256657	intact_cells	25	0.1	0.32	qubit_hs_measured	1002.8	direct_addition	NEB N3011	10305153	FBF94151	26.01.15	1		
+lowinput_s2_r3	lowinput_s2	3	r4	ZymoBIOMICS Spike-in Control II (Low Microbial Load)	D6321-10	256657	intact_cells	25	1	0.40	qubit_hs_measured	1002.8	direct_addition	NEB N3011	10305153	FBH11513	26.01.15	1		
