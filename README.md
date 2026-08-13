@@ -418,10 +418,67 @@ Everything lands under `params.outdir` (default `results/`).
 | `results/<sample_id>/competitive/<sample_id>.metrics.tsv` | `COMPUTE_METRICS` | Per-organism table: reads, bases, aligned bases, theoretical vs measured fraction, `dna_fg`, `reads_per_fg`, `bases_per_fg`, plus an `All organisms` row |
 | `results/<sample_id>/competitive/<sample_id>.summary.json` | `COMPUTE_METRICS` | Totals by role, `input_sample_fraction`, `output_sample_fraction`, `enrichment`, per-fg headline numbers |
 | `results/<sample_id>/coverage/<sample_id>.depth.tsv.gz` | `COVERAGE_PROFILE` | Per-base depth over community (`role=sample`) contigs only; carrier depth is uninformative and would dominate the file |
+| `results/<sample_id>/human/<sample_id>.masked.fastq.gz` | `MASK_HUMAN` | The deposited reads: same records, same lengths, human-attributable intervals replaced with `N` (only with `--mask_human`) |
+| `results/<sample_id>/human/<sample_id>.human_mask.tsv.gz` | `MASK_HUMAN` | Per-read audit trail for every HRRT-flagged read: call, organism, masked intervals, reason |
+| `results/<sample_id>/human/<sample_id>.human_stats.json` | `MASK_HUMAN` | Counts, percentages, the rule applied and its provenance |
 | `results/pipeline_info/{timeline,report,trace,dag}_<timestamp>.*` | Nextflow | Provenance for every run |
 
 Fetched genomes are cached in `params.refdir` (default `refs/`) via `storeDir`, so
 re-runs do not re-download from NCBI.
+
+---
+
+## Human read masking
+
+Human sequence has to be removed before reads from a human-handled sample can
+be deposited publicly. Run it with:
+
+```bash
+make all NF_ARGS="--mask_human true"
+make masksummary          # per-replicate statistics table
+```
+
+It is **off by default**, so any run without it is bit-identical to one from
+before the feature existed.
+
+**The screen is not the decision.** NCBI's Human Read Removal Tool (HRRT) flags
+candidates, and HRRT alone is far too blunt for a microbial community: on this
+study's reads it flags 49.4% of all *S. cerevisiae* and 92.0% of all
+*C. neoformans*, because a conserved region is a conserved region whichever
+genome it sits in. So a flagged read is released intact only when this
+pipeline's own competitive assignment **positively attributes** it to a
+community organism. The inverse rule — "mask unless it failed to look human" —
+reads almost identically and is backwards for a privacy filter; do not
+refactor toward it.
+
+Three further properties are worth knowing before reading the outputs:
+
+- **Nothing is deleted.** Masking replaces bases with `N` in place, so read
+  count, read order and every read length are preserved exactly. The
+  per-record length invariant is asserted at run time and a violation is fatal.
+- **A rescued read can still be partly masked.** The kept interval is the part
+  some organism accounts for; anything human-exclusive goes, and a read with
+  at least `--chimera_min_bp` (default 150) of human-exclusive sequence is
+  masked regardless of its assignment. Whole-read best-hit assignment cannot
+  catch those on its own — the read wins its comparison on the microbial half.
+- **The flag list is the only thing taken from HRRT.** Its own masked output is
+  discarded; the intervals come from a separate `map-ont` alignment of the
+  flagged reads against T2T-CHM13v2.0 (`--human_accession`, cached in
+  `refs/human/`).
+
+`make check` covers the rule with 18 logic assertions and 11 more against a
+committed 1,529-read fixture (`assets/testdata/`) that includes GIAB HG002
+reads, conserved-region reads a real HRRT run flagged, and synthetic chimeras
+spliced at recorded offsets. Neither suite needs the network or a mapping pass.
+
+**What may and may not be claimed.** Reads confidently assignable to human were
+masked. That is not the same as "no human sequence remains" — recall is roughly
+91.5% on alignable reads — and identity to CHM13 is a measure of similarity,
+not of read quality.
+
+The `--mask_human` run needs the amd64 `scrubber` image (HRRT has no arm64
+build) and about 9 GB of memory for `MAP_HUMAN`, whose footprint is set by the
+7.55 GB human index rather than by read volume.
 
 ---
 
@@ -434,6 +491,7 @@ Pinned in `conf/base.config`. Nothing runs on host-installed software.
 | `tools` | `low-input-nanopore/tools:0.1.0` | `docker/tools/Dockerfile` — built locally by `make images`; minimap2 2.28, htslib 1.21, samtools 1.21, seqkit 2.8.2, NCBI `datasets` v2, on `debian:bookworm-20241111-slim` | `FETCH_GENOMES`, `MAP_COMPETITIVE`, `COVERAGE_PROFILE` |
 | `analysis` | `low-input-nanopore/analysis:0.1.0` | `docker/analysis/Dockerfile` — built locally by `make images`; `python:3.12-slim-bookworm` + pinned `requirements.txt` (numpy 2.1.3, pandas 2.2.3, matplotlib 3.9.2, openpyxl 3.1.5, pysam 0.22.1, scipy 1.14.1) | `BUILD_REFERENCE`, `ASSIGN_READS`, `COMPUTE_METRICS` |
 | `breseq` | `quay.io/biocontainers/breseq:0.40.1--h3be2455_0` | Upstream biocontainer, forced to `--platform linux/amd64`, run as root with `-e HOME=/tmp` | The optional sequential/`--breseq_consensus` path |
+| `scrubber` | `low-input-nanopore/scrubber:0.1.0` | `docker/scrubber/Dockerfile` — built locally by `make images`; NCBI `sra-human-scrubber` pinned by digest, plus `procps` | `HRRT_SCREEN`, on the optional `--mask_human` path |
 
 The two local images are built from pinned source rather than pulled from
 bioconda because bioconda publishes **linux/amd64 only**, while this study's

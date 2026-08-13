@@ -33,7 +33,7 @@ DEMO_READS  ?= 40000
 
 .DEFAULT_GOAL := help
 
-.PHONY: help images test check verify measurements seqsummary versions runmeta poolcov attribution comparison coverage modedelta estcontrol assigneddepth divergence s1 s2 all raghavendra q10 demo-data clean
+.PHONY: help images test check verify measurements masksummary seqsummary versions runmeta poolcov attribution comparison coverage modedelta estcontrol assigneddepth divergence s1 s2 all raghavendra q10 demo-data clean
 
 help: ## Show this help
 	@printf 'low-input-nanopore -- make targets\n\n'
@@ -153,6 +153,15 @@ check: ## Assert consensus accounting and human masking (needs `make test` first
 
 # Exit 2 means "pendings, no errors" and is tolerated; exit 1 (a real
 # inconsistency) still fails the target.
+# Only meaningful after a run with --mask_human true, which is what writes the
+# per-sample human_stats.json files this reads.
+masksummary: ## Per-replicate human masking statistics (Supplementary table)
+	@docker run --rm -u "$$(id -u):$$(id -g)" \
+	    -v "$(ROOT)":/repo -w /repo "$(ANALYSIS_IMAGE)" \
+	    python3 bin/masking_summary.py \
+	        --stats 'results/*/human/*.human_stats.json' \
+	        --out results/summary/human_masking.tsv
+
 measurements: ## Check assets/measurements.tsv for gaps and inconsistencies
 	@docker run --rm -u "$$(id -u):$$(id -g)" \
 	    -v "$(ROOT)":/repo -w /repo "$(ANALYSIS_IMAGE)" \
