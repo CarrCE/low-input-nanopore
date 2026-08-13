@@ -144,6 +144,11 @@ check: ## Assert consensus accounting and human masking (needs `make test` first
 	    -v "$(ROOT)":/repo -w /repo "$(ANALYSIS_IMAGE)" \
 	    python3 tests/consensus_accounting.py \
 	        --bam "$(TEST_BAM)" --contig-map "$(TEST_CONTIG_MAP)"
+	@echo "==> attribution floor (--min_aln_frac)"
+	@docker run --rm -u "$$(id -u):$$(id -g)" \
+	    -v "$(ROOT)":/repo -w /repo "$(ANALYSIS_IMAGE)" \
+	    python3 tests/attribution_floor.py \
+	        --bam "$(TEST_BAM)" --contig-map "$(TEST_CONTIG_MAP)"
 	@echo "==> human masking: decision logic"
 	@docker run --rm -u "$$(id -u):$$(id -g)" \
 	    -v "$(ROOT)":/repo -w /repo "$(ANALYSIS_IMAGE)" \
