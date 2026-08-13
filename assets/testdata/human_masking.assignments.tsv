@@ -1,0 +1,1521 @@
+read_id	organism	call	role	as_best	as_runnerup	margin	read_length	aligned_bases
+b91d3183-7a07-4b2b-b196-d9c383d0d882	unassigned	unmapped	none	0	0	0	1706	0
+350f1bc1-00aa-4d9f-ae5b-6f697670fe47	unassigned	unmapped	none	0	0	0	1527	0
+3f9cfa61-b1e8-40e0-9085-82f7a0d95ede	unassigned	unmapped	none	0	0	0	2659	0
+3bfc7bb2-6aa6-418b-aae9-ce128b470881	unassigned	unmapped	none	0	0	0	1833	0
+0e49671b-fbbb-4906-be30-dfc4d326b666	unassigned	unmapped	none	0	0	0	6423	0
+60f8a5e4-4860-4286-ab25-bbd6be15723c	unassigned	unmapped	none	0	0	0	624	0
+f970bc95-fdeb-4eca-9623-d437e20985f1	unassigned	unmapped	none	0	0	0	5549	0
+d24c163b-2dc5-4804-b27a-3ba5df16e23c	unassigned	unmapped	none	0	0	0	10922	0
+b50c0ab6-da5c-4cc4-903f-6bea5470af0e	unassigned	unmapped	none	0	0	0	2334	0
+eb758a7c-4be3-455c-8894-6320d616f2f5	unassigned	unmapped	none	0	0	0	7302	0
+b50db513-2227-4d28-84cb-3dee1fa585d8	unassigned	unmapped	none	0	0	0	1069	0
+43304b1e-8ced-4b55-8da0-add2342095cc	unassigned	unmapped	none	0	0	0	4828	0
+9226d913-481a-4bb4-8d07-65fee97d1967	unassigned	unmapped	none	0	0	0	4170	0
+31dac527-8a2a-47e0-870e-961c82351c1e	unassigned	unmapped	none	0	0	0	5847	0
+9a3d45a1-9b05-4164-80b8-577bd4a213ac	unassigned	unmapped	none	0	0	0	5000	0
+1aef0829-0d93-4677-a6d7-0bd1e057ac50	unassigned	unmapped	none	0	0	0	5344	0
+d5563e98-74f6-464c-b4a2-5eea93546bdc	unassigned	unmapped	none	0	0	0	1666	0
+b9d6faa0-c872-4021-8872-e2f5bca95c66	unassigned	unmapped	none	0	0	0	4761	0
+8ab85bf9-dd2d-443f-9a1c-d556723e87ec	unassigned	unmapped	none	0	0	0	10145	0
+81a595c5-4ad8-4ebd-a866-2d651b94a455	unassigned	unmapped	none	0	0	0	3491	0
+5371df50-eaa0-49ed-8334-a16d061b622b	unassigned	unmapped	none	0	0	0	614	0
+c8958928-bbb3-4da3-9860-75c8a69bed83	unassigned	unmapped	none	0	0	0	3769	0
+24fc0d46-dff7-4c79-a856-23f8b54c834a	unassigned	unmapped	none	0	0	0	2425	0
+362ebcaa-8ec4-4f4c-8239-19ff0f6b8903	unassigned	unmapped	none	0	0	0	1101	0
+d19ee399-ded2-4346-978b-9b32bdf87a07	unassigned	unmapped	none	0	0	0	9251	0
+1ec00294-4887-483f-99da-ff4d34930403	unassigned	unmapped	none	0	0	0	2537	0
+b12091e4-64b6-42e0-8999-95aee4548b25	unassigned	unmapped	none	0	0	0	3863	0
+3a54ed79-a861-4dd7-b665-aaa7b0c1112c	unassigned	unmapped	none	0	0	0	11131	0
+db473836-de96-4af2-ac9e-af43b04b5806	unassigned	unmapped	none	0	0	0	1104	0
+b66b23e5-22a8-4cc5-955d-c7a1e5c2a6d5	unassigned	unmapped	none	0	0	0	7517	0
+bd5807ee-4c34-4de9-8cf0-d7fc5d6004b6	unassigned	unmapped	none	0	0	0	2062	0
+a5e9f2bb-1e8a-4fa4-88c4-1f2c3ec4eddf	unassigned	unmapped	none	0	0	0	1045	0
+9574c07c-e0d4-4154-b63c-54ab126c9c2f	unassigned	unmapped	none	0	0	0	8472	0
+cc87855c-d971-40cd-907d-3a7672e8a57c	unassigned	unmapped	none	0	0	0	312	0
+852ad99e-b566-48ff-96c5-deb96fb1c6ec	unassigned	unmapped	none	0	0	0	5190	0
+28762c46-e9b9-4177-8e68-f4242c787faa	unassigned	unmapped	none	0	0	0	7185	0
+ee229325-278c-4468-a85c-261f08a48021	unassigned	unmapped	none	0	0	0	4102	0
+755c8544-2f05-4ded-b776-60edea8875ee	unassigned	unmapped	none	0	0	0	738	0
+e4a7cfaa-06bd-4264-bca7-96876d6172d3	unassigned	unmapped	none	0	0	0	3420	0
+bffaeb9a-a128-4f10-9161-5480cc733195	unassigned	unmapped	none	0	0	0	1168	0
+0d46a52a-4a93-40a8-b6fe-064e562a7a30	unassigned	unmapped	none	0	0	0	4007	0
+2c4061a6-906a-4b62-b9bb-79f2396b9a21	unassigned	unmapped	none	0	0	0	543	0
+df691413-3b0f-4e2d-a4e4-6700b6bdf4ed	unassigned	unmapped	none	0	0	0	1351	0
+a17106fe-5db2-420b-b8c1-8469fb0e84b3	unassigned	unmapped	none	0	0	0	1023	0
+1de8acad-0d1e-4145-951c-83ed1fd4f8f0	unassigned	unmapped	none	0	0	0	1309	0
+4300881c-e4dc-4dc4-90f5-40fe90e004a4	unassigned	unmapped	none	0	0	0	3344	0
+f9e5d435-4f00-4a3f-93f8-bba566073fd2	unassigned	unmapped	none	0	0	0	2827	0
+de8c0087-45c1-4e44-ad1e-683e6392ff41	unassigned	unmapped	none	0	0	0	1773	0
+f0504426-98c2-4dd2-8b2d-0afafecdf882	unassigned	unmapped	none	0	0	0	685	0
+f89ae17e-1aaa-4b89-a2ec-5f595e2ad03b	unassigned	unmapped	none	0	0	0	781	0
+086ea592-6af3-48bc-a0e4-7a9e04e59b58	unassigned	unmapped	none	0	0	0	9707	0
+89666209-3e94-431d-80ae-67c0c8ac3600	unassigned	unmapped	none	0	0	0	578	0
+00b651cc-554e-4449-a567-77c56a0e8023	unassigned	unmapped	none	0	0	0	781	0
+c327a0b6-77bf-4daa-8599-8add54d93f7c	unassigned	unmapped	none	0	0	0	3950	0
+b8ed9699-d697-425f-923a-e06039dd8a1c	unassigned	unmapped	none	0	0	0	3037	0
+f2e1cb3c-cb8b-4052-be72-8641186cc480	unassigned	unmapped	none	0	0	0	3470	0
+f6c35d7f-8a8c-42f7-88b3-eec17cadf486	unassigned	unmapped	none	0	0	0	5714	0
+cf307129-e191-4c55-9146-0c51e2bec028	unassigned	unmapped	none	0	0	0	766	0
+61732a1a-12c1-4171-ad56-2ae9615aeb25	unassigned	unmapped	none	0	0	0	5222	0
+211b446e-e5e9-4753-ab0d-a9dacf523d12	unassigned	unmapped	none	0	0	0	657	0
+a86a71ed-e115-423d-8907-c15a7ac7e90c	unassigned	unmapped	none	0	0	0	639	0
+8fc13376-4a87-4a8d-b3a8-1d310a6b600a	unassigned	unmapped	none	0	0	0	1454	0
+78ce561d-cc85-4636-887c-29e20c56e42f	unassigned	unmapped	none	0	0	0	5023	0
+f70f5dee-5f4e-4288-9707-d2deb4922708	unassigned	unmapped	none	0	0	0	1246	0
+22dcaaf4-2526-4f63-9226-429cd49c2ff1	unassigned	unmapped	none	0	0	0	850	0
+3cec5c73-22a1-441b-ae21-37567b11e6b6	unassigned	unmapped	none	0	0	0	10673	0
+37f06ce5-ddfc-4e46-8e68-e6d3dd8d43ff	unassigned	unmapped	none	0	0	0	1558	0
+67ef77c5-4b87-4778-8c25-931b455c023e	unassigned	unmapped	none	0	0	0	1664	0
+1a004275-b0db-4e30-9691-3a7ab4ca696a	unassigned	unmapped	none	0	0	0	10045	0
+63f3bf05-a3d7-40e7-bfd2-7c7bea9fbb3a	unassigned	unmapped	none	0	0	0	11167	0
+3cdeeba4-2aa0-4002-80a8-fb844bd02fda	unassigned	unmapped	none	0	0	0	1067	0
+b71d4d79-2101-4d57-9f2f-b04e003464d5	unassigned	unmapped	none	0	0	0	6331	0
+916f7868-f81d-4ea5-bfa2-ebe6cdda4c48	unassigned	unmapped	none	0	0	0	2591	0
+f3b5b2f5-b335-4bd6-8804-da06b4fdb779	unassigned	unmapped	none	0	0	0	980	0
+c68cf210-e302-420e-8a5d-84a8233ee9ea	unassigned	unmapped	none	0	0	0	1694	0
+52240135-bb73-4bcc-97d7-ee2617c6dd9a	unassigned	unmapped	none	0	0	0	5012	0
+fa290d1f-41e2-47d3-b83c-d21e1f459c32	unassigned	unmapped	none	0	0	0	3942	0
+8e35bd78-04b4-4f68-b5a0-e980286bd121	unassigned	unmapped	none	0	0	0	2421	0
+16ffd703-54fb-4074-b8d5-c39fd75ce421	unassigned	unmapped	none	0	0	0	914	0
+d7235435-2815-40bc-ba41-37519df79384	unassigned	unmapped	none	0	0	0	1724	0
+9317bf59-d4cd-4dad-bbf3-61d25052244a	unassigned	unmapped	none	0	0	0	673	0
+e4636c97-a6ec-4caa-9752-b3179311518a	unassigned	unmapped	none	0	0	0	892	0
+ac483cef-a14e-48dd-b9a6-9867cd0a8b2d	unassigned	unmapped	none	0	0	0	3940	0
+7b990926-a99c-43ab-8199-8aa4f65a69d1	unassigned	unmapped	none	0	0	0	1282	0
+12d74abf-a1c2-4eb7-a77e-1568312f53af	unassigned	unmapped	none	0	0	0	6494	0
+00cdfbc5-257b-4994-bbce-7ba444238a14	unassigned	unmapped	none	0	0	0	2621	0
+6def8038-b9ac-4624-b08f-f8c272e4609b	unassigned	unmapped	none	0	0	0	3107	0
+d4b7a8d9-7fc8-4b7f-a98e-0f9d2df94e42	unassigned	unmapped	none	0	0	0	4196	0
+b0f7f6d6-1f7d-4eab-805a-47ecb9230cac	unassigned	unmapped	none	0	0	0	4464	0
+060968bc-bffc-45d4-a60f-06a491cbcdbe	unassigned	unmapped	none	0	0	0	4894	0
+40c07aa1-37f5-4c68-a305-2ce7736a8878	unassigned	unmapped	none	0	0	0	1060	0
+758d1b02-00fe-446c-9df7-97301300eeb3	unassigned	unmapped	none	0	0	0	698	0
+ef19396d-5df4-4cb4-9b79-4292a523db7b	unassigned	unmapped	none	0	0	0	3418	0
+607a6e14-9f98-4cbc-88d4-4360c708847c	unassigned	unmapped	none	0	0	0	3744	0
+e428fccb-5a3c-40ef-b91e-1b2928e7eb9e	unassigned	unmapped	none	0	0	0	1117	0
+fc590ddc-9b7c-4005-97ec-f667f514a6e1	unassigned	unmapped	none	0	0	0	6772	0
+cdd2d3b3-ee73-4c19-9dbc-1e0c4c033d71	unassigned	unmapped	none	0	0	0	1058	0
+64f50f7d-fd71-41e7-be9d-18c4acfe2cdd	unassigned	unmapped	none	0	0	0	4022	0
+f5f16b31-232f-4e0e-8e62-e9951b73368b	unassigned	unmapped	none	0	0	0	9045	0
+4a4c8dc5-24d6-4fe9-8632-6f17adae64b3	unassigned	unmapped	none	0	0	0	1038	0
+1c6fbb74-4029-47af-853e-3ca6e1f72c83	unassigned	unmapped	none	0	0	0	11165	0
+4a914b3c-1f3c-4bc2-a9ef-a815058779ea	unassigned	unmapped	none	0	0	0	777	0
+8115733d-dc46-4352-868b-bd819461aebd	unassigned	unmapped	none	0	0	0	4232	0
+dbf42ff9-4014-4ee5-8641-22034080198b	unassigned	unmapped	none	0	0	0	2798	0
+e04b2611-87ec-4960-9a10-04ab8e59d38c	unassigned	unmapped	none	0	0	0	2388	0
+8d5bc8fc-c429-4a6a-bbdc-d01e535df05c	unassigned	unmapped	none	0	0	0	1223	0
+bb92f874-abdf-4831-97c0-15ce33f5400c	unassigned	unmapped	none	0	0	0	1024	0
+0d5889b4-08b4-4881-a20d-a56649b630f2	unassigned	unmapped	none	0	0	0	6510	0
+7dcbe5b4-eb9a-426b-9fc7-ad0c2a0ee72f	unassigned	unmapped	none	0	0	0	1747	0
+bc9d42ab-6a33-4606-bb51-e71e76c4e088	unassigned	unmapped	none	0	0	0	1525	0
+ad9f9f3c-6b3c-4462-827e-d102e04eb97e	unassigned	unmapped	none	0	0	0	4219	0
+f7267dd1-a3e3-4f2d-a948-3cca033a733a	unassigned	unmapped	none	0	0	0	2618	0
+65093d88-e416-48a6-bead-7d504479d4d5	unassigned	unmapped	none	0	0	0	11177	0
+4ae05a73-976b-4873-a0ef-00ef8b38d299	unassigned	unmapped	none	0	0	0	6603	0
+3b3d2678-55af-46ee-a4bd-9ea0d4878aec	unassigned	unmapped	none	0	0	0	11549	0
+b1410a86-5f5a-48b6-8961-f4a19fe0474f	unassigned	unmapped	none	0	0	0	1053	0
+a62d2d94-c44f-421b-be19-9a108b4236e7	unassigned	unmapped	none	0	0	0	2965	0
+d632671e-828a-465b-8fc7-c57d1c16d4a4	unassigned	unmapped	none	0	0	0	1550	0
+b0f474c9-dbf3-4f20-aafa-17f2eb829f2f	unassigned	unmapped	none	0	0	0	481	0
+83d8581a-946f-4121-9586-ce9e8965ab71	unassigned	unmapped	none	0	0	0	10517	0
+32c025f7-592d-4c56-bd75-6fe1a24c555f	unassigned	unmapped	none	0	0	0	3884	0
+dcf63b43-658e-4fb7-9fba-edabb6d1c523	unassigned	unmapped	none	0	0	0	6514	0
+ca6b1291-d6a1-45fe-a4d3-7beb7d61db99	unassigned	unmapped	none	0	0	0	11463	0
+8086235d-7edc-4b15-abd3-e96ed90a6135	unassigned	unmapped	none	0	0	0	633	0
+68280982-e9d1-4f6b-92b2-17367b2911eb	unassigned	unmapped	none	0	0	0	8837	0
+9dbbe135-b349-4edc-ab06-f4801a83acc7	unassigned	unmapped	none	0	0	0	3957	0
+d31b5914-2f6d-4e2e-ab0e-7417b3b7c48e	unassigned	unmapped	none	0	0	0	1685	0
+725198d8-7ab9-475a-ad15-0e164312ea8d	unassigned	unmapped	none	0	0	0	720	0
+226e77cc-619c-4859-b1db-d8d18e143cee	unassigned	unmapped	none	0	0	0	2014	0
+ed051275-814b-41f3-9ffd-fc76589a7b85	unassigned	unmapped	none	0	0	0	2583	0
+79b60d25-8a79-4336-8f00-5abef596fa08	unassigned	unmapped	none	0	0	0	1831	0
+30d3466d-9c3e-491c-ac5a-600dd254034a	unassigned	unmapped	none	0	0	0	2782	0
+0e21e74b-e799-4768-b62f-27f2e15f7580	unassigned	unmapped	none	0	0	0	747	0
+18a90e65-116e-4d98-be43-c31203aa299b	unassigned	unmapped	none	0	0	0	1496	0
+d9ed81b6-1630-4fc5-8a12-3d1280eea2fd	unassigned	unmapped	none	0	0	0	693	0
+755b0e2d-987f-432e-b915-cdcb00b3b81a	unassigned	unmapped	none	0	0	0	5216	0
+94fe7e6f-0d37-424a-9bd6-d7b4af40bc73	unassigned	unmapped	none	0	0	0	3702	0
+b0004c37-315e-4d86-b6bc-fabfab7943f4	unassigned	unmapped	none	0	0	0	5454	0
+c0f8259a-d3bc-4fec-9670-a2f6dbcd5e6e	unassigned	unmapped	none	0	0	0	4972	0
+a82585d8-bde9-4452-a4be-2c0c9c345906	unassigned	unmapped	none	0	0	0	7266	0
+90a28e1f-f46a-42de-aca5-68802d5d1c80	unassigned	unmapped	none	0	0	0	4970	0
+91d351da-128d-4464-b33c-8757d7aee5f2	unassigned	unmapped	none	0	0	0	2280	0
+b2e276a0-a947-4acf-9aa1-854080debcd4	unassigned	unmapped	none	0	0	0	7277	0
+8f66f1bc-f326-41cb-907f-1a5693defe71	unassigned	unmapped	none	0	0	0	2198	0
+41f129f8-f8c6-451f-9fe5-3f4b11905ead	unassigned	unmapped	none	0	0	0	3674	0
+3989411e-2bcd-47ec-b558-fc0b51cc4a05	unassigned	unmapped	none	0	0	0	1190	0
+fa2ab613-c0b6-4acd-b572-1feacb69f1b9	unassigned	unmapped	none	0	0	0	739	0
+5ceaa4fb-0ded-40d2-9823-373b55046829	unassigned	unmapped	none	0	0	0	2140	0
+3ace4eac-ec8a-415e-ad04-adf99e277930	unassigned	unmapped	none	0	0	0	9273	0
+a19510b8-5e80-4c81-ab2d-f566e0f08968	unassigned	unmapped	none	0	0	0	8597	0
+e545bf5d-bd7e-4a4f-8e33-a3661e85bad7	unassigned	unmapped	none	0	0	0	6332	0
+1fd10a15-40ad-46ea-a988-f59130aeb059	unassigned	unmapped	none	0	0	0	2798	0
+abdaa255-eff6-44f6-9437-f04b7a430f4c	unassigned	unmapped	none	0	0	0	1841	0
+eb00852e-6123-4f40-9914-364d83b4c57a	unassigned	unmapped	none	0	0	0	507	0
+324d41bf-05ab-4c11-b028-acfd7bd8cc10	unassigned	unmapped	none	0	0	0	1503	0
+e4ce27dc-79c0-4c89-b28f-3b3e6f656bb0	unassigned	unmapped	none	0	0	0	5865	0
+5b7fa2cc-4125-4bef-9ad1-20aa88227c66	unassigned	unmapped	none	0	0	0	1978	0
+b46e304a-2f1c-48b3-86c0-23c19774af7d	unassigned	unmapped	none	0	0	0	5621	0
+0ff57875-d804-42d0-a777-a39ef147dc07	unassigned	unmapped	none	0	0	0	1214	0
+3eea4b7d-05aa-4638-8531-d93be4a63f77	unassigned	unmapped	none	0	0	0	2404	0
+99a5afad-727b-4c8d-9092-1d711e687a92	unassigned	unmapped	none	0	0	0	400	0
+a229b73c-118b-45cb-b3c1-e00ce22ada52	unassigned	unmapped	none	0	0	0	967	0
+fb9562ad-7dae-42fb-ab74-6b343a6502d6	unassigned	unmapped	none	0	0	0	866	0
+1ed0cde5-f116-4b44-8016-5b95e073dc28	unassigned	unmapped	none	0	0	0	8131	0
+87ee65cf-401b-4220-ab3c-5967276daae3	unassigned	unmapped	none	0	0	0	1756	0
+d2eedeaa-76f6-4ff6-bc36-2f4d53ca3b3d	unassigned	unmapped	none	0	0	0	8847	0
+8f48c15a-4d91-4c4e-8195-f840fd08ed59	unassigned	unmapped	none	0	0	0	3314	0
+a77889f9-7cc9-460f-ad9e-23ffbaf3c3dc	unassigned	unmapped	none	0	0	0	2305	0
+b192052e-7cf0-4b8f-bc7d-90ecb8202dfd	unassigned	unmapped	none	0	0	0	661	0
+79cc37b8-37ab-4849-83b0-16a91ba42df6	unassigned	unmapped	none	0	0	0	3184	0
+fda64dcb-62bb-4f6a-98e2-ef84559b1d64	unassigned	unmapped	none	0	0	0	1760	0
+a935f575-5c2b-4c4a-abbb-574d85faa6b2	unassigned	unmapped	none	0	0	0	7525	0
+c38010ad-40d8-4c23-9f91-58d03f3a240c	unassigned	unmapped	none	0	0	0	2946	0
+7d8ce61e-f3ee-4fc7-94f0-ac9dade6391b	unassigned	unmapped	none	0	0	0	9525	0
+20624354-2c0f-4476-9dce-53283286eaba	unassigned	unmapped	none	0	0	0	4219	0
+b96a8a8c-e1a1-44cf-b14b-c5cdf0d37072	unassigned	unmapped	none	0	0	0	6520	0
+b669dd63-d7ee-4f31-b8d7-65c3efcd82a1	unassigned	unmapped	none	0	0	0	966	0
+718a0050-bc8c-4fb6-80de-02db0e745935	unassigned	unmapped	none	0	0	0	7673	0
+fe36b25e-6dc8-405e-a365-a7543789f506	unassigned	unmapped	none	0	0	0	950	0
+a0eaf998-af60-427c-9452-cf8ba7966171	unassigned	unmapped	none	0	0	0	2756	0
+1cc40821-813a-4e15-b0ea-5f39f5074487	unassigned	unmapped	none	0	0	0	2522	0
+28f121fe-e74f-477e-b2aa-9dc20a67d91e	unassigned	unmapped	none	0	0	0	2233	0
+0575b531-7db6-4716-b37c-dd38504f7380	unassigned	unmapped	none	0	0	0	9917	0
+8bb9b35e-f7a8-4bc8-9752-fa18d49513ba	unassigned	unmapped	none	0	0	0	461	0
+32307c1b-4ef5-4953-be41-ad196feb9af1	unassigned	unmapped	none	0	0	0	5429	0
+bd3b79e2-37b4-4bc0-805a-0baa11f05ade	unassigned	unmapped	none	0	0	0	2982	0
+0c0f48d2-0d64-4dd2-af5f-4e661f517f85	unassigned	unmapped	none	0	0	0	6847	0
+57281712-b795-434a-b6a6-3833022f5aec	unassigned	unmapped	none	0	0	0	2326	0
+8282e431-a8ac-446a-ae3d-cc01519b7c81	unassigned	unmapped	none	0	0	0	994	0
+48554c23-5fe1-49c2-a41d-ef6087971653	unassigned	unmapped	none	0	0	0	1799	0
+ac965d8b-a380-4359-8132-f350c6362a34	unassigned	unmapped	none	0	0	0	843	0
+a019c74a-48da-4d59-a72c-957dc7b11b83	unassigned	unmapped	none	0	0	0	1875	0
+f4e0f156-81e4-4a11-8ab9-ddb8f3e3e64c	unassigned	unmapped	none	0	0	0	5921	0
+8491981b-bc9b-4d9f-9e4a-b8b2c81930ec	unassigned	unmapped	none	0	0	0	3623	0
+fc73aabe-e0c9-4b1e-849e-224f1116eff6	unassigned	unmapped	none	0	0	0	6812	0
+7ed5eef6-cba6-47d7-af84-d038dfd2c962	unassigned	unmapped	none	0	0	0	2758	0
+5cd35859-91ee-4504-beb3-a7d7a9ac1a70	unassigned	unmapped	none	0	0	0	5176	0
+111f8a09-506a-4a04-ad07-c5e694f7fe12	unassigned	unmapped	none	0	0	0	492	0
+77c4d8af-1096-4b0b-8393-c9e0242fc364	unassigned	unmapped	none	0	0	0	788	0
+820da6cb-64c3-4aee-b56f-1b6da9871515	unassigned	unmapped	none	0	0	0	3837	0
+34ca6a56-8d54-4690-8234-1dc116d050c8	unassigned	unmapped	none	0	0	0	460	0
+cb7e7d8e-76d4-46e6-985e-d9dc013f3b5e	unassigned	unmapped	none	0	0	0	3441	0
+24c9c8a4-68c9-45ac-a523-d1d03233f26a	unassigned	unmapped	none	0	0	0	5812	0
+94d24b7e-3130-4676-b048-2eece9cadb4a	unassigned	unmapped	none	0	0	0	4686	0
+442553ff-c69c-47e1-b5db-3ed81c199a7c	unassigned	unmapped	none	0	0	0	4055	0
+800266c7-9075-4cb5-88bf-0c77fdc8b8fc	unassigned	unmapped	none	0	0	0	1172	0
+2ee76d8e-251d-407a-bdf7-1e16fdfc9e1e	unassigned	unmapped	none	0	0	0	3007	0
+43a10db3-8446-4261-b117-cf09df1e6cca	unassigned	unmapped	none	0	0	0	6876	0
+89deff27-0c40-4544-9868-6668b1c7f3eb	unassigned	unmapped	none	0	0	0	2008	0
+d13ebbdf-05c8-4440-b462-2872b2a18c45	unassigned	unmapped	none	0	0	0	1610	0
+a684a577-28c4-46de-b7be-b42576cec8de	unassigned	unmapped	none	0	0	0	11259	0
+ad69380d-98a3-4c6e-80bd-4d5c4285e245	unassigned	unmapped	none	0	0	0	452	0
+a8e25143-0cb4-4396-91e6-f78d4403f4d4	unassigned	unmapped	none	0	0	0	1283	0
+f6bdaa3d-d449-4dcb-b33d-bec57e95678c	unassigned	unmapped	none	0	0	0	11583	0
+6a02c9b3-3d21-4ec9-9ad3-89b478935ec3	unassigned	unmapped	none	0	0	0	3068	0
+244b6db9-38e6-4a35-ac27-6c2cce39724a	unassigned	unmapped	none	0	0	0	582	0
+1d7a987d-6ae8-4481-b89d-4420fae2685a	unassigned	unmapped	none	0	0	0	2274	0
+600bcdcc-e68f-485e-8a6f-b724f0020c90	unassigned	unmapped	none	0	0	0	9544	0
+06081617-f5dc-4282-a155-0a12c07a76cc	unassigned	unmapped	none	0	0	0	555	0
+7c7e2420-65b2-4c54-b1f1-044590a1fa05	unassigned	unmapped	none	0	0	0	7711	0
+f4323baf-3f09-4b52-a677-6f65d70228cf	unassigned	unmapped	none	0	0	0	3661	0
+3a87be2a-f6c9-4be8-9f66-a6713ffc2700	unassigned	unmapped	none	0	0	0	8786	0
+27fb2b02-834c-4c7c-8aab-00233e08c500	unassigned	unmapped	none	0	0	0	6905	0
+b7458362-a439-4491-a85f-edcad25ec7b7	unassigned	unmapped	none	0	0	0	2875	0
+4ec54bdc-0ca0-4bae-8d72-523e8eec97c0	unassigned	unmapped	none	0	0	0	2804	0
+b59a29e6-1fe6-42f9-af19-dc94b218324e	unassigned	unmapped	none	0	0	0	1478	0
+d7dc1cc1-5e01-43dd-b9ad-ccb8e2aac367	unassigned	unmapped	none	0	0	0	1430	0
+b158166d-89d4-4790-ac35-26c3a3083f19	unassigned	unmapped	none	0	0	0	11440	0
+4b290454-16da-4363-b089-0fa21abf2748	unassigned	unmapped	none	0	0	0	3328	0
+cfd56d84-7a8b-4eb2-b20d-17467a16def6	unassigned	unmapped	none	0	0	0	4583	0
+551b2d4b-6746-475b-8571-f280504334db	unassigned	unmapped	none	0	0	0	2553	0
+dabd8478-61d6-4d37-9ca5-e782f1f2ad92	unassigned	unmapped	none	0	0	0	5733	0
+1e3a600a-e447-422e-b2b9-bd514dfeb4f9	unassigned	unmapped	none	0	0	0	2095	0
+d87e542f-010e-4e09-96d2-bcdc67988be9	unassigned	unmapped	none	0	0	0	1690	0
+dfa6a23d-3f96-4de7-85fa-684a05124854	unassigned	unmapped	none	0	0	0	2197	0
+195847b6-ce94-4a4b-8d02-fb8634ba2042	unassigned	unmapped	none	0	0	0	8985	0
+f5176f13-1c96-4563-a111-d74c5cf4dd4f	unassigned	unmapped	none	0	0	0	393	0
+8e23ea8e-c188-41ac-80ed-031fd9174ac6	unassigned	unmapped	none	0	0	0	2429	0
+aaf2a6fd-e734-4cf0-9077-a4c9cfc17e1a	unassigned	unmapped	none	0	0	0	2981	0
+8943e71e-0d4f-4c1f-82ab-9ced716cb2d6	unassigned	unmapped	none	0	0	0	550	0
+7f0c6c12-2e52-425d-8aa7-80ed6ec547a6	unassigned	unmapped	none	0	0	0	4538	0
+989cbd25-8802-41e6-979a-98947062f5fb	unassigned	unmapped	none	0	0	0	3300	0
+17e97231-c679-4f94-b50b-88ca6985a78e	unassigned	unmapped	none	0	0	0	4030	0
+40e5e00a-64fa-4a56-8fda-fdf4c25f8b43	unassigned	unmapped	none	0	0	0	1353	0
+9b0cb0e2-9d29-4ef7-aefe-1ade5ab28811	unassigned	unmapped	none	0	0	0	1487	0
+e6eb721a-91c2-4006-be03-ae2768264230	unassigned	unmapped	none	0	0	0	4318	0
+24795fac-b1d9-40c0-ba37-c11e84f8cbc1	unassigned	unmapped	none	0	0	0	5614	0
+9c9ef1ee-73c2-4109-bdec-3b15b3dc22d6	unassigned	unmapped	none	0	0	0	4304	0
+a77b23d3-54be-4326-a26a-f1d110f6e36c	unassigned	unmapped	none	0	0	0	528	0
+de32ff72-07ef-4431-9f57-6d2bb3fa1175	unassigned	unmapped	none	0	0	0	3490	0
+b3f29660-7f53-4d1a-b25f-26ecf22f9049	unassigned	unmapped	none	0	0	0	2369	0
+2644aecc-69a6-4289-87f8-c438a153984a	unassigned	unmapped	none	0	0	0	8359	0
+fc393860-b166-43b3-b50c-255bb3e26134	unassigned	unmapped	none	0	0	0	813	0
+5dac4ca4-b41d-4ed0-bf2e-d15fffea71bd	unassigned	unmapped	none	0	0	0	1867	0
+53f8bfd0-58db-4183-86c6-269ddc27ef45	unassigned	unmapped	none	0	0	0	3269	0
+6266f00f-73c1-495b-99d7-1ec8053dc2a6	unassigned	unmapped	none	0	0	0	853	0
+10afb5b7-3c55-47e8-b15f-2b972a7b5de8	unassigned	unmapped	none	0	0	0	3825	0
+810f5736-0b27-458f-b255-63fc9c271248	unassigned	unmapped	none	0	0	0	1704	0
+de91fcb4-b6f4-40bf-9fa6-476931bee7fd	unassigned	unmapped	none	0	0	0	2313	0
+007cb8b0-af79-45b1-9fb3-2b465e76c29c	unassigned	unmapped	none	0	0	0	3255	0
+b1ab9116-3e00-4ac1-993d-8d31e13b950c	unassigned	unmapped	none	0	0	0	10343	0
+2eea9bee-f9b7-48ff-8863-7e366667c904	unassigned	unmapped	none	0	0	0	2692	0
+849c1950-40f8-46dd-93ab-49408cc4b261	unassigned	unmapped	none	0	0	0	1280	0
+6eda8223-d739-41a8-9918-e7b85f4a5556	unassigned	unmapped	none	0	0	0	1072	0
+6320ac07-921c-4675-a352-6fd736662e50	unassigned	unmapped	none	0	0	0	478	0
+13956e76-a340-4c65-84b1-b3b9204c98bd	unassigned	unmapped	none	0	0	0	5296	0
+58ce539f-6bfc-47fd-b89b-748790bd8460	unassigned	unmapped	none	0	0	0	1199	0
+81f7f7b0-a14c-4eab-9665-b05830f5a552	unassigned	unmapped	none	0	0	0	1333	0
+7b24ec21-aa7d-4c2f-8d40-4a070854b826	unassigned	unmapped	none	0	0	0	1095	0
+95a9bebb-9064-475b-bee1-aa5a2f43ced9	unassigned	unmapped	none	0	0	0	5369	0
+cd6ca2da-b305-4351-9b80-e9eb9dba4f32	unassigned	unmapped	none	0	0	0	8798	0
+45cd88c4-c694-40b1-997c-00549d32408f	unassigned	unmapped	none	0	0	0	389	0
+925a4620-320f-4fac-b7c2-95f313d3bcc1	unassigned	unmapped	none	0	0	0	4034	0
+a35f215f-002d-4f83-8761-d24a0f12a4b5	unassigned	unmapped	none	0	0	0	595	0
+231239bc-aec5-44b4-bd4e-b4b469933743	unassigned	unmapped	none	0	0	0	1325	0
+8befa93d-d6fe-49d9-8709-575f34116a98	unassigned	unmapped	none	0	0	0	7900	0
+122a895d-6c18-4a8e-aedb-b5b09aba427e	unassigned	unmapped	none	0	0	0	4291	0
+be5141d0-2f87-4a35-bf31-5ec09cec4667	unassigned	unmapped	none	0	0	0	1665	0
+ec63f336-4123-41b5-a7f3-b5101580d3c2	unassigned	unmapped	none	0	0	0	1317	0
+64980fa4-dfe8-4712-843a-d6423be975ff	unassigned	unmapped	none	0	0	0	1144	0
+5d9a3d2b-ed02-44f3-bc0e-491657b0d130	unassigned	unmapped	none	0	0	0	11558	0
+cecfb5a4-198f-4df3-a91e-d9a2c7db7b3b	unassigned	unmapped	none	0	0	0	5362	0
+39764c35-894b-4418-84cc-0e3cf35ed970	unassigned	unmapped	none	0	0	0	7728	0
+6ece1082-2114-4a53-bbd0-a0fd405df912	unassigned	unmapped	none	0	0	0	2562	0
+76d559b3-8ad7-412c-b755-d6185d9caa1c	unassigned	unmapped	none	0	0	0	988	0
+a148f77d-74d1-44b6-bc02-20858ff33216	unassigned	unmapped	none	0	0	0	10508	0
+ce1d984a-6c9b-4c08-a0aa-90aea38c8642	unassigned	unmapped	none	0	0	0	6782	0
+4e6a354c-8d51-400e-a15b-9e6649bef9ca	unassigned	unmapped	none	0	0	0	1881	0
+14eee560-60d9-4440-b715-1576be83ebee	unassigned	unmapped	none	0	0	0	5982	0
+671ed19d-1d6f-48fe-a74b-2360cc3ed416	unassigned	unmapped	none	0	0	0	1244	0
+93fb9261-b00c-41e3-9930-96660ff045d5	unassigned	unmapped	none	0	0	0	9339	0
+196b36b4-6f68-4d81-97c3-7680553f0bad	unassigned	unmapped	none	0	0	0	4024	0
+5d6849ae-b300-4d76-a56d-4bad9139de54	unassigned	unmapped	none	0	0	0	5837	0
+c5b7071a-9b4b-4989-bb4a-f2deb78f0b6e	unassigned	unmapped	none	0	0	0	3377	0
+09cb3202-83a1-4415-8522-2b0b07d5fb4a	unassigned	unmapped	none	0	0	0	6433	0
+0c7dc2db-751b-4c5a-ba59-8b65d97e86ab	unassigned	unmapped	none	0	0	0	7773	0
+581ea894-a136-4aab-a62f-ec95695657e2	unassigned	unmapped	none	0	0	0	5077	0
+c7304959-28d8-463b-8d0d-39fba3e70d28	unassigned	unmapped	none	0	0	0	4740	0
+fbbad8dc-f9e4-41d1-a457-b2447c8f20d1	unassigned	unmapped	none	0	0	0	839	0
+20108890-a500-460a-b8d2-fa97e23bf147	unassigned	unmapped	none	0	0	0	1427	0
+c3e10177-855f-40af-b2c2-7eb44be3d600	unassigned	unmapped	none	0	0	0	6547	0
+a5e3b7a9-7761-4238-81c7-6df4ad77f508	unassigned	unmapped	none	0	0	0	1429	0
+61d27a45-699e-426d-a7ab-9ad400c4b79a	unassigned	unmapped	none	0	0	0	2486	0
+fdf01b9c-2405-4ff1-b775-01247734abf5	unassigned	unmapped	none	0	0	0	1473	0
+58ccedaa-d1ba-45d1-9d13-ec641ee34155	unassigned	unmapped	none	0	0	0	587	0
+cd561b7d-4f4c-4916-9f88-05b52f408148	unassigned	unmapped	none	0	0	0	5390	0
+222e255c-39be-4c27-b39f-3286c7b6cb94	unassigned	unmapped	none	0	0	0	4908	0
+66081a4d-c4ed-41b6-8c6b-66e60f6a9494	unassigned	unmapped	none	0	0	0	9781	0
+ffc3d623-dc77-43ad-8466-45e2c416be9c	unassigned	unmapped	none	0	0	0	9384	0
+9fb3a948-2332-42b2-beb1-fcc406310611	unassigned	unmapped	none	0	0	0	4969	0
+da44f9fe-0b14-4207-a67b-e6033b8a2b10	unassigned	unmapped	none	0	0	0	4346	0
+c0db57d3-61f3-4ec6-827a-d9338125fa27	unassigned	unmapped	none	0	0	0	4989	0
+7e5fc5b1-7639-4e8c-858d-12d61f093b4d	unassigned	unmapped	none	0	0	0	1843	0
+0cd94751-dc42-40de-8f36-062e77974c1d	unassigned	unmapped	none	0	0	0	2173	0
+800e2d42-9412-4e32-a6cb-92051d02a7cf	unassigned	unmapped	none	0	0	0	2819	0
+874933aa-aeda-4f9e-a00b-040ff62accd8	unassigned	unmapped	none	0	0	0	9650	0
+a83f98bf-45d1-4814-9305-da83e92b49f2	unassigned	unmapped	none	0	0	0	1612	0
+2546b12e-c7ad-4d7c-a236-6758f207b3ec	unassigned	unmapped	none	0	0	0	3741	0
+be8ce000-11e4-46e0-8177-7951818c1c71	unassigned	unmapped	none	0	0	0	8908	0
+b228b304-6bd2-47f2-bef1-8a1e0dc599a2	unassigned	unmapped	none	0	0	0	7253	0
+7a3e9098-c3e0-4f55-9103-49c91c3fcdaf	unassigned	unmapped	none	0	0	0	753	0
+7bdc866e-273f-470f-99af-8c9eae43367f	unassigned	unmapped	none	0	0	0	1522	0
+ce990c65-1573-4bf3-9314-b0819d6c8a99	unassigned	unmapped	none	0	0	0	1217	0
+9461a034-4e3e-4a0d-964e-b998421d0b3a	unassigned	unmapped	none	0	0	0	6461	0
+2ff61295-62c6-407f-993e-5b6004b89137	unassigned	unmapped	none	0	0	0	6182	0
+238f5e37-7424-4e8e-9b31-271e876953c1	unassigned	unmapped	none	0	0	0	5900	0
+74d9a04e-d797-49b9-ac0e-fcd28f8b772f	unassigned	unmapped	none	0	0	0	4849	0
+1bbbb7f1-2d23-4be0-acff-4e12b4aef399	unassigned	unmapped	none	0	0	0	509	0
+6d0e54ba-257a-4879-965b-9d1bdf4b62b0	unassigned	unmapped	none	0	0	0	7488	0
+cdab8f94-1ca0-4f8f-acc3-92a652583b8f	unassigned	unmapped	none	0	0	0	4028	0
+81ae6894-8aec-404b-bf61-45138777e223	unassigned	unmapped	none	0	0	0	3558	0
+176ee0b7-2228-4db0-9d7e-8ce9d359ae5b	unassigned	unmapped	none	0	0	0	1004	0
+c4b87478-c1ba-4891-b392-ddc01652a757	unassigned	unmapped	none	0	0	0	1292	0
+c5f1f14c-2357-4fcc-be0d-5abae3cea7cf	unassigned	unmapped	none	0	0	0	1560	0
+2f5fd4b4-44a3-4a15-9030-d1c57aff2c44	unassigned	unmapped	none	0	0	0	504	0
+376e6e07-91d1-464d-8dba-4cebb8867805	unassigned	unmapped	none	0	0	0	9207	0
+01500bc3-12ab-47d3-8a71-a1b9b9024f95	unassigned	unmapped	none	0	0	0	843	0
+79d32829-2f64-4bf1-ab18-5ed209e76ac7	unassigned	unmapped	none	0	0	0	4600	0
+48788ce8-de11-479f-80bb-24d2b0b24a21	unassigned	unmapped	none	0	0	0	7293	0
+d0d19114-b9d7-4949-b924-70a003514c84	unassigned	unmapped	none	0	0	0	4559	0
+60593109-9040-4dc0-90bd-5200ddb0a017	unassigned	unmapped	none	0	0	0	5913	0
+0a4787f2-6895-4d8b-aa1b-83a182a5be22	unassigned	unmapped	none	0	0	0	1129	0
+859efc3e-3000-4566-b848-04448a410633	unassigned	unmapped	none	0	0	0	4028	0
+66748f54-e20a-4edd-a198-f9480cc73192	unassigned	unmapped	none	0	0	0	3233	0
+72b41260-19d2-439e-aa45-d02dcf3caa70	unassigned	unmapped	none	0	0	0	4282	0
+ebaf702e-96cd-4269-85fc-56fc5bec062a	unassigned	unmapped	none	0	0	0	1549	0
+50e7cd77-4cb9-4c6e-9a54-ab5c8a4b7f07	unassigned	unmapped	none	0	0	0	1762	0
+31cbc65d-91c9-4108-9973-96aec656d4a7	unassigned	unmapped	none	0	0	0	2336	0
+ed50661b-5f5b-463c-aa3b-dc69ae02acad	unassigned	unmapped	none	0	0	0	3277	0
+69a4e5f6-166a-4b4a-bab2-df226115e2a9	unassigned	unmapped	none	0	0	0	4310	0
+c8b2e728-9aaa-42bc-9f5e-a80f48b0ef14	unassigned	unmapped	none	0	0	0	2763	0
+40fb3009-c986-4102-b4f7-1b051101fce0	unassigned	unmapped	none	0	0	0	597	0
+09cc07c1-2d86-43fa-b49d-ccc091d1002c	unassigned	unmapped	none	0	0	0	10278	0
+c26f0297-9a90-4f03-bf4d-47b9ffaa350e	unassigned	unmapped	none	0	0	0	1535	0
+3150c19a-adf5-4cec-ba5a-93ae9454a9ac	unassigned	unmapped	none	0	0	0	1818	0
+bbc47ec7-db5c-4b61-92e1-b7cc1bcec612	unassigned	unmapped	none	0	0	0	10519	0
+52c12771-7d62-421c-97b4-130beae83c9d	unassigned	unmapped	none	0	0	0	2263	0
+50abd1f2-ae75-4889-93aa-c4b053caafeb	unassigned	unmapped	none	0	0	0	2046	0
+ee53a3ef-7af6-4629-8153-ec2af2801a31	unassigned	unmapped	none	0	0	0	4151	0
+4a260e20-eb82-475c-8dbe-1de616a2f116	unassigned	unmapped	none	0	0	0	2219	0
+fc7d8aaf-f247-4dce-979b-79fce01b076c	unassigned	unmapped	none	0	0	0	4103	0
+c27610b1-a99f-4214-8b64-2bc5458fd9cf	unassigned	unmapped	none	0	0	0	10935	0
+1373e0d8-ac1f-436d-addc-099bdd9127d3	unassigned	unmapped	none	0	0	0	1701	0
+42f0dd77-ddaf-43c0-8ec0-837c69738f1d	unassigned	unmapped	none	0	0	0	2676	0
+67c3855d-e512-469c-8f53-54de0c588989	unassigned	unmapped	none	0	0	0	1534	0
+56ff4cf3-2ae8-4405-87b6-081f43d9e50f	unassigned	unmapped	none	0	0	0	6489	0
+899035f7-fd83-41bd-a033-591ed4a19023	unassigned	unmapped	none	0	0	0	1325	0
+2a5ffa58-f700-45d8-98a6-ec84877c043e	unassigned	unmapped	none	0	0	0	2368	0
+0b73bf44-90d6-413f-b90b-61419095c503	unassigned	unmapped	none	0	0	0	707	0
+985bc685-cdf3-464d-9a14-bafe3e87e8f6	unassigned	unmapped	none	0	0	0	8461	0
+3794b1c4-9cf6-489c-9ca1-4e08a4094646	unassigned	unmapped	none	0	0	0	2763	0
+a8e0d0a1-dcfa-45ca-82f4-d3ff2428ae05	unassigned	unmapped	none	0	0	0	2036	0
+8ce029b5-b6f9-4b3e-b4a5-6fa547f47550	unassigned	unmapped	none	0	0	0	3301	0
+fa264e61-8151-4a10-a93f-fbac82764a45	unassigned	unmapped	none	0	0	0	5274	0
+4b500069-0ac7-4403-9cef-f7a522e3a6e2	unassigned	unmapped	none	0	0	0	4194	0
+91d937a7-eff1-4dd0-a830-c340a043f5bb	unassigned	unmapped	none	0	0	0	461	0
+7aaa6c66-8de1-438c-9099-c9116f00d972	unassigned	unmapped	none	0	0	0	580	0
+ad87186a-16aa-4b7a-b4b8-971dd1e40129	unassigned	unmapped	none	0	0	0	7488	0
+81508367-c51f-4e7e-ad33-077163a38de3	unassigned	unmapped	none	0	0	0	5896	0
+05ad5962-ef10-490b-a9e8-474a5e5e522c	unassigned	unmapped	none	0	0	0	2891	0
+298cb186-d557-4c19-a4dc-58fc80e5cd81	unassigned	unmapped	none	0	0	0	407	0
+9476dbab-4231-47f3-919a-0f560d8a18bc	unassigned	unmapped	none	0	0	0	1976	0
+85f4b963-b563-48f7-ac0b-c25eefb0d2ac	unassigned	unmapped	none	0	0	0	598	0
+baf6c138-4fc8-4493-8229-a0a4856ff6e0	unassigned	unmapped	none	0	0	0	10286	0
+3e629a6e-23ed-4f1e-a785-0a51a8c962d9	unassigned	unmapped	none	0	0	0	4044	0
+2d987d7d-93ae-47cc-bcae-b57e27f351af	unassigned	unmapped	none	0	0	0	3404	0
+4fe30f43-b622-46a6-a120-995f46914821	unassigned	unmapped	none	0	0	0	8599	0
+0e7bd800-44d8-413c-82e1-211f409a885f	unassigned	unmapped	none	0	0	0	2353	0
+e3dff0df-4138-4a99-982f-609f9c3da6c3	unassigned	unmapped	none	0	0	0	6418	0
+c7609c39-e019-43ce-a77d-46a82a008c32	unassigned	unmapped	none	0	0	0	4337	0
+bd8f76e2-b8d3-4ba6-9469-ddc696c3123b	unassigned	unmapped	none	0	0	0	1875	0
+296c8eee-236e-40b8-824e-6ac8ebff5213	unassigned	unmapped	none	0	0	0	1221	0
+d8f4025a-e97f-4158-9deb-7b9bc657aee0	unassigned	unmapped	none	0	0	0	2037	0
+6463499d-333a-4980-90ad-5f10d99e65d0	unassigned	unmapped	none	0	0	0	677	0
+25d23058-4531-40d8-a92b-06c5a80fdb4d	unassigned	unmapped	none	0	0	0	373	0
+b79acf51-4f79-4a29-a278-b3ec2d40c48b	unassigned	unmapped	none	0	0	0	848	0
+7194911b-c055-4d5a-be74-0e5f094a7a8e	unassigned	unmapped	none	0	0	0	5867	0
+61de3cb8-9570-4f60-941b-48a6967e7e07	unassigned	unmapped	none	0	0	0	4060	0
+b111ac09-3deb-4b2e-bfe5-0e46f1f7a21e	unassigned	unmapped	none	0	0	0	638	0
+aaae3593-5ec6-4346-acaf-dcf3e2477e6a	unassigned	unmapped	none	0	0	0	1174	0
+ba398120-a8f2-4854-84e5-d0adcec23871	unassigned	unmapped	none	0	0	0	1130	0
+cee11f60-cdc8-4afa-be36-f5495cbca7c9	unassigned	unmapped	none	0	0	0	787	0
+c6a8accb-2ee0-4cf5-83a9-ccead05b12fe	unassigned	unmapped	none	0	0	0	480	0
+72b250e7-2a10-44be-a1a0-4d94a48a81ae	unassigned	unmapped	none	0	0	0	1749	0
+fd08791c-f1bd-46b6-a94f-4bbabe170699	unassigned	unmapped	none	0	0	0	791	0
+50b9f441-1d41-48db-8c9b-7fbf0fa53277	unassigned	unmapped	none	0	0	0	4388	0
+e77ce83c-88ab-4382-af1f-e0500e536685	unassigned	unmapped	none	0	0	0	1864	0
+f4eae208-c70f-41d2-9749-5391587a2dc3	unassigned	unmapped	none	0	0	0	1766	0
+41f73784-c7c7-45f3-af5b-6b4e13d7cfa5	unassigned	unmapped	none	0	0	0	971	0
+fe8fb8d9-5dac-4f1c-a2da-914b77b651d5	unassigned	unmapped	none	0	0	0	11379	0
+96011bbe-e9ca-4832-84ab-e402898bdf11	unassigned	unmapped	none	0	0	0	2130	0
+de706b5a-fd08-4088-ad3e-06c4440a751f	unassigned	unmapped	none	0	0	0	5219	0
+238eba5d-54d0-480c-8990-e70f9a3314c4	unassigned	unmapped	none	0	0	0	300	0
+0e3b7fd2-24e0-4958-9338-895941471862	unassigned	unmapped	none	0	0	0	2441	0
+bf553a3c-5ccb-44e4-87cb-4a3aa7cd4d1e	unassigned	unmapped	none	0	0	0	534	0
+c80cc166-b8c1-490f-a46f-4bb62a07501a	unassigned	unmapped	none	0	0	0	7299	0
+f6efea26-b1a8-4c07-8a83-4d5a9f56e861	unassigned	unmapped	none	0	0	0	525	0
+16271d09-2506-4413-a4c0-d4eede7e6b77	unassigned	unmapped	none	0	0	0	5353	0
+f0188b9b-cd3d-44e4-853c-d58b4a37e11b	unassigned	unmapped	none	0	0	0	628	0
+ac34d1c0-f070-4eed-8562-457c694b48d0	unassigned	unmapped	none	0	0	0	8569	0
+c9f9d642-20bf-4add-ae8a-7232d86fc8f3	unassigned	unmapped	none	0	0	0	9725	0
+f82f4781-a562-4b38-9ba1-189a5a2faebc	unassigned	unmapped	none	0	0	0	1162	0
+9c0d18ae-0989-4977-bb63-bc8787f9ce16	unassigned	unmapped	none	0	0	0	5502	0
+a1cae5e6-d475-417c-ac6d-cd2b468bc188	unassigned	unmapped	none	0	0	0	9107	0
+56f4bd78-7429-4dc1-bcf0-cce72eecbe9a	unassigned	unmapped	none	0	0	0	395	0
+98bb419b-ad4b-4901-828a-3f8ce3c3e960	unassigned	unmapped	none	0	0	0	1381	0
+16ec2363-e3cd-4c6a-b27c-87b523fd8419	unassigned	unmapped	none	0	0	0	1565	0
+84802e5f-92bc-4165-8c95-07307d524145	unassigned	unmapped	none	0	0	0	483	0
+9ac6f567-f1ba-4126-9a90-0a202e737761	unassigned	unmapped	none	0	0	0	1676	0
+19c61a9b-1047-42c0-9c30-6f8fa7988bc7	unassigned	unmapped	none	0	0	0	10168	0
+590c08a4-fa92-4261-ad0d-06c2c7369bc9	unassigned	unmapped	none	0	0	0	3585	0
+b4ada656-6f71-410b-91ed-bab76817ba10	unassigned	unmapped	none	0	0	0	995	0
+757da24b-9b66-4839-abe1-f6bc50fead67	unassigned	unmapped	none	0	0	0	4771	0
+a70d6f5b-6135-4be1-816c-d5535f338706	unassigned	unmapped	none	0	0	0	2745	0
+c2fdf590-e613-4d3a-8379-2901ac098af6	unassigned	unmapped	none	0	0	0	5093	0
+f9f68a21-097a-4ee1-bc60-ae5caa57d66d	unassigned	unmapped	none	0	0	0	11166	0
+9d1d5ce3-0438-4b1d-bec9-ebcc5980178b	unassigned	unmapped	none	0	0	0	1038	0
+555e36a6-4a99-434e-9808-7842a99d38e4	unassigned	unmapped	none	0	0	0	2617	0
+d7cc1e54-d2e9-49c8-8407-3bc77e99f560	unassigned	unmapped	none	0	0	0	4013	0
+ab7bf559-4ea0-4d74-9a64-eed37cf29123	unassigned	unmapped	none	0	0	0	3764	0
+2f3a20c1-8dc8-4da2-85d9-0be79fee7f6a	unassigned	unmapped	none	0	0	0	2364	0
+feb610f4-845a-48ce-81b7-188f98f10649	unassigned	unmapped	none	0	0	0	1519	0
+8930c7af-30b4-46e5-8b99-3d0593af521e	unassigned	unmapped	none	0	0	0	2871	0
+914a5eda-f6e3-48ff-a791-566b52a63afa	unassigned	unmapped	none	0	0	0	7519	0
+994b7faf-5a5c-4e91-a165-085b2d88f9ad	unassigned	unmapped	none	0	0	0	1867	0
+280ff59f-6e2f-4ad3-8f30-f6fb550ee2e2	unassigned	unmapped	none	0	0	0	1010	0
+bf7a2579-8aa0-4d92-b99f-19bef86b3a90	unassigned	unmapped	none	0	0	0	7730	0
+17b98f0a-bc7a-477c-898f-88ddd6c9bd69	unassigned	unmapped	none	0	0	0	1674	0
+dc4e98a5-6098-4cf3-849a-cb4cc01c348a	unassigned	unmapped	none	0	0	0	1344	0
+df4bb86a-fc15-4a52-9f57-e28710b695c3	unassigned	unmapped	none	0	0	0	313	0
+0e892e64-dc74-42bf-a146-61bcbbe4d98f	unassigned	unmapped	none	0	0	0	6926	0
+850c6982-3e3a-4095-b8e4-d3dadb62d7f3	unassigned	unmapped	none	0	0	0	4778	0
+ca7fde7e-9a8d-4c90-a47f-8b8e15f10aaa	unassigned	unmapped	none	0	0	0	4389	0
+3f5fe563-51c1-43cf-983c-3f66a751bb4f	unassigned	unmapped	none	0	0	0	1933	0
+f61a9ea5-7ed8-44bb-87bf-a8538d6b4065	unassigned	unmapped	none	0	0	0	695	0
+8fadd4bb-82d6-4b35-8f48-3d3770565ade	unassigned	unmapped	none	0	0	0	461	0
+d13cc66b-b3c5-4dc5-97e8-13c0e4f75b3c	unassigned	unmapped	none	0	0	0	770	0
+58504281-aaf9-4b0a-b7be-d57aee3c7431	unassigned	unmapped	none	0	0	0	8542	0
+32bb1304-e22e-4489-b1d6-0c112185ed30	unassigned	unmapped	none	0	0	0	1630	0
+56f1997a-cadc-4606-be6e-2dcead5dfcb7	unassigned	unmapped	none	0	0	0	8538	0
+cb77dcbd-4b22-4fee-bbc3-ee7e1b7da6db	unassigned	unmapped	none	0	0	0	2748	0
+ed5ecb7e-f44c-40e1-be2a-4bf734a067db	unassigned	unmapped	none	0	0	0	1183	0
+91646d47-867f-4641-b47c-be22ec0daf6e	unassigned	unmapped	none	0	0	0	2737	0
+077b8401-0059-4184-bd66-904726f8f484	unassigned	unmapped	none	0	0	0	2500	0
+b08954e1-816b-4027-840c-98277d3b79b5	unassigned	unmapped	none	0	0	0	2901	0
+cb6012bb-8543-497b-9f03-fb7a38aae850	unassigned	unmapped	none	0	0	0	2944	0
+e98e0dfb-b748-4964-be2f-898afa95dbba	unassigned	unmapped	none	0	0	0	5530	0
+b4d45d80-b27e-4024-9c7c-a6d7c0a35df8	unassigned	unmapped	none	0	0	0	7099	0
+cfc233f4-a527-409e-9c00-c7e240b5644b	unassigned	unmapped	none	0	0	0	2198	0
+a89d4243-bfa2-4196-a6c6-85b2760ec16c	unassigned	unmapped	none	0	0	0	2418	0
+41b7f0f7-0356-400b-a8c8-e58cc65a0a26	unassigned	unmapped	none	0	0	0	1310	0
+d5d1916d-2ab5-4a34-b7cd-d7919b7920d9	unassigned	unmapped	none	0	0	0	9321	0
+681796c8-a1f1-4efb-9786-cec033557afa	unassigned	unmapped	none	0	0	0	2834	0
+c187dc60-18cb-4777-8ce6-6507e60971bf	unassigned	unmapped	none	0	0	0	2767	0
+e7227b26-c433-44c0-926f-ee6057037d93	unassigned	unmapped	none	0	0	0	1227	0
+837f047f-d483-48f7-8741-98db9ba5534d	unassigned	unmapped	none	0	0	0	1712	0
+b2298848-6b88-4990-b47e-4d077fa11731	unassigned	unmapped	none	0	0	0	692	0
+92e422db-7a32-4150-8f4e-0db65c489c33	unassigned	unmapped	none	0	0	0	5382	0
+c1ac7870-c680-4a3c-a07e-1ae9de8e37c8	unassigned	unmapped	none	0	0	0	1142	0
+55c86212-d6a5-4e37-a247-7f006823e79b	unassigned	unmapped	none	0	0	0	5775	0
+2cd9976b-4777-4c0a-b78e-7cb8c866506b	unassigned	unmapped	none	0	0	0	2131	0
+988b75a3-6682-4a95-b950-feece206525b	unassigned	unmapped	none	0	0	0	2522	0
+eda702cf-6498-40e5-92fd-df1589df164f	unassigned	unmapped	none	0	0	0	6412	0
+7a63d387-abbd-4f43-ba1b-36ace9db002d	unassigned	unmapped	none	0	0	0	6344	0
+da351193-5a39-4798-ba32-6485c3f1ba32	unassigned	unmapped	none	0	0	0	2438	0
+f8a8e3d3-7ba4-40e7-adbc-2ee266096ab3	unassigned	unmapped	none	0	0	0	718	0
+b8e577a1-c522-4d4c-8007-22ca30bfbd8d	unassigned	unmapped	none	0	0	0	1986	0
+03433234-abf7-40a9-8d97-fe07aa556ac3	unassigned	unmapped	none	0	0	0	1950	0
+74dc0876-51d9-46df-ab6e-4888a79c52f0	unassigned	unmapped	none	0	0	0	3080	0
+6f6eae69-6332-4f6a-b1d1-5ffd24a7441a	unassigned	unmapped	none	0	0	0	912	0
+8246fdda-ba12-450a-934d-706a52a6fd62	unassigned	unmapped	none	0	0	0	2200	0
+d7d2b626-827e-4bd5-9fe5-9e7ada48eb31	unassigned	unmapped	none	0	0	0	1123	0
+65af6abb-8f11-47e0-99a9-f651b02439d6	unassigned	unmapped	none	0	0	0	10668	0
+51997ca9-c939-4ab0-b35f-1a88bad3fe06	unassigned	unmapped	none	0	0	0	9135	0
+97c365cf-583c-419a-a07b-48900e8f86a2	unassigned	unmapped	none	0	0	0	8082	0
+b4c4cf19-9304-47bb-9b22-9f0f43cf7afb	unassigned	unmapped	none	0	0	0	2383	0
+61840cd4-8cf8-4771-8565-fbc1b102e092	unassigned	unmapped	none	0	0	0	1510	0
+1b821c65-1927-45dc-b8ee-781ee411eff5	unassigned	unmapped	none	0	0	0	589	0
+f4d69e18-65e9-4be0-8fce-c43d86ae622e	unassigned	unmapped	none	0	0	0	4432	0
+3981cd1e-8363-409c-9cbc-c493858cb21a	unassigned	unmapped	none	0	0	0	3634	0
+6368dca6-7d63-4ffc-a7c0-375f611c3d36	unassigned	unmapped	none	0	0	0	4180	0
+445ebb52-a990-4b9a-9ab2-042c867b6d74	unassigned	unmapped	none	0	0	0	1968	0
+34478019-943b-4ff2-a494-0d711f9c5ace	unassigned	unmapped	none	0	0	0	11366	0
+2a72f1e4-49ed-4578-b539-0fb8393a5b9d	unassigned	unmapped	none	0	0	0	7529	0
+62eb2fe6-2da0-4e3a-864f-ea4f4f57907d	unassigned	unmapped	none	0	0	0	3993	0
+862204eb-bced-4a7d-b74e-aa1521953b65	unassigned	unmapped	none	0	0	0	4234	0
+d779edb3-9df8-476a-a27b-faeca91640fa	unassigned	unmapped	none	0	0	0	8601	0
+06e0e3d8-8bc8-4014-b267-3dc83ee4de8a	unassigned	unmapped	none	0	0	0	2308	0
+22905704-01d1-4866-8154-17124d70d020	unassigned	unmapped	none	0	0	0	1444	0
+2e3d3136-d54c-4516-a1af-c7cf5730b187	unassigned	unmapped	none	0	0	0	10464	0
+547be0a1-87a0-44be-90b0-6d858b1d14ac	unassigned	unmapped	none	0	0	0	6313	0
+f1573288-7279-4c76-987c-643bdc25d7be	unassigned	unmapped	none	0	0	0	3199	0
+a125aac0-7573-46a6-9499-08933fc64e96	unassigned	unmapped	none	0	0	0	865	0
+5aaa9d1c-7b0c-4309-a210-faac044cb28e	unassigned	unmapped	none	0	0	0	3310	0
+8e49af9c-7f52-4c96-840c-4aae84619d24	unassigned	unmapped	none	0	0	0	5101	0
+f5432ba1-270a-4f69-b007-4b84f04d59fc	unassigned	unmapped	none	0	0	0	1871	0
+68c5ccd6-bb0d-414e-9b6b-4ae16f817305	unassigned	unmapped	none	0	0	0	4515	0
+9b6ca79f-c987-49fb-b57c-cdfcf4e2ad12	unassigned	unmapped	none	0	0	0	3969	0
+d83ee239-0ffc-45f1-99b8-7ed7fe534a6d	unassigned	unmapped	none	0	0	0	1287	0
+70d175b5-b7e0-44ef-aed7-e689d881934c	unassigned	unmapped	none	0	0	0	6658	0
+306d3238-efcb-46ae-8e82-d611bf438da7	unassigned	unmapped	none	0	0	0	832	0
+b4842a2b-9242-45f4-831a-5d8fdb4ba68f	unassigned	unmapped	none	0	0	0	3131	0
+24a936c7-0c1d-4a28-8879-9f2f88f1b9a9	unassigned	unmapped	none	0	0	0	659	0
+a5134b4a-f0f9-4985-953e-e26db240b971	unassigned	unmapped	none	0	0	0	403	0
+bf652212-0bc0-47ea-91b1-b5874ae88a5a	unassigned	unmapped	none	0	0	0	5523	0
+5ef161af-eeec-43cb-9d64-76e40efe53eb	unassigned	unmapped	none	0	0	0	6369	0
+bc77d21c-d789-4bd0-b788-2c1f7fc66d4e	unassigned	unmapped	none	0	0	0	3979	0
+1937ecb3-b881-4a24-b034-f46349b356dd	unassigned	unmapped	none	0	0	0	1916	0
+5f6c2835-398b-49c8-8a74-e2e2c926eef8	unassigned	unmapped	none	0	0	0	6919	0
+044c9ff0-3036-4f18-8c81-5b77d07aed26	unassigned	unmapped	none	0	0	0	2298	0
+6d23fc62-e121-4e57-af82-09c486120bf5	unassigned	unmapped	none	0	0	0	1475	0
+6d7429bc-2649-43c8-b362-7e2f170167e9	unassigned	unmapped	none	0	0	0	1524	0
+857316ab-9be5-411e-a97c-715d75489931	unassigned	unmapped	none	0	0	0	3453	0
+67331f4e-abe2-4a09-acb3-26163792aa8e	unassigned	unmapped	none	0	0	0	4343	0
+3ccc5dbc-efcf-4def-93cb-e71efa16d023	unassigned	unmapped	none	0	0	0	2693	0
+76db31e2-49e6-4597-9313-0dbea9efd412	unassigned	unmapped	none	0	0	0	7178	0
+5304b9bc-8cff-4c19-ac72-365a54bc9d9d	unassigned	unmapped	none	0	0	0	4690	0
+478e98ba-5f31-4ca2-b9d7-994908f3419d	unassigned	unmapped	none	0	0	0	5353	0
+4dac9b72-c6aa-4184-87b8-51c50db44692	unassigned	unmapped	none	0	0	0	9641	0
+420e6ee7-f80f-4a27-87eb-c91296259bc9	unassigned	unmapped	none	0	0	0	576	0
+2258f780-40a9-40c4-8e45-51a8c1d568ca	unassigned	unmapped	none	0	0	0	2574	0
+a70d6098-6a4d-4e9b-aa0c-f04d904ccda3	unassigned	unmapped	none	0	0	0	3174	0
+a064164c-9ec9-4c3a-b583-d6b8ba88a570	unassigned	unmapped	none	0	0	0	502	0
+784290b2-48b1-481b-bba6-aa29859c25d3	unassigned	unmapped	none	0	0	0	1782	0
+6a665772-101f-4cba-85ab-1e9faac86f82	unassigned	unmapped	none	0	0	0	2067	0
+202b659a-1079-4f83-8cb9-5921d3df92d0	unassigned	unmapped	none	0	0	0	6074	0
+66ad4879-65ae-493e-a0e7-51d731b21900	unassigned	unmapped	none	0	0	0	7624	0
+e075813c-852a-4867-ac94-df66a6617120	unassigned	unmapped	none	0	0	0	4456	0
+23c9335d-0e43-4285-80a3-e96b6c8e26c0	unassigned	unmapped	none	0	0	0	1200	0
+74ed0c8d-e584-4487-9008-fc22be7565fc	unassigned	unmapped	none	0	0	0	6275	0
+686b0ca8-f692-4640-96b7-4625d3968686	unassigned	unmapped	none	0	0	0	1767	0
+d3450c88-dfca-42df-a5cc-02ede85ecfce	unassigned	unmapped	none	0	0	0	1502	0
+33894627-4ab5-4b9d-99eb-c8d2381b8cc6	unassigned	unmapped	none	0	0	0	3178	0
+cbd92837-2b3f-485f-bf34-756c11dc3a55	unassigned	unmapped	none	0	0	0	3299	0
+17f4c3f8-cd02-4d72-b185-67e257ad9e8c	unassigned	unmapped	none	0	0	0	7407	0
+9125c822-6982-42ef-aeec-1443ed059834	unassigned	unmapped	none	0	0	0	2480	0
+0b0ea20a-e4ed-4e31-a972-b37e73fe1846	unassigned	unmapped	none	0	0	0	4254	0
+70da1369-04a5-4c00-8626-92c36d23f17c	unassigned	unmapped	none	0	0	0	2676	0
+5c356ed6-c881-4e3a-9c3c-ccdc81348b7e	unassigned	unmapped	none	0	0	0	634	0
+fbee262f-6791-4771-b997-715e955f366d	unassigned	unmapped	none	0	0	0	6673	0
+3aa9ee89-9878-434f-bbad-04e46ae869ad	unassigned	unmapped	none	0	0	0	2891	0
+ad773e24-92f5-4be9-bd85-253a44e4184c	unassigned	unmapped	none	0	0	0	10046	0
+18f378ca-2c4d-4b30-bda2-03cec1911db4	unassigned	unmapped	none	0	0	0	1643	0
+c3c4eab6-3f02-49fa-834b-a5687660eb70	unassigned	unmapped	none	0	0	0	2554	0
+f70b5e71-351d-4069-9843-7de4cc4cbe5c	unassigned	unmapped	none	0	0	0	1974	0
+37a9684c-53de-44f7-9e7c-bb7515384804	unassigned	unmapped	none	0	0	0	10320	0
+50cfce65-5f04-4da1-b645-f11b74b06bb5	unassigned	unmapped	none	0	0	0	2505	0
+78595b3d-1557-4655-807d-a9118a90e7bb	unassigned	unmapped	none	0	0	0	607	0
+f147a2c2-840d-4413-acd2-bfa7d0db2c61	unassigned	unmapped	none	0	0	0	940	0
+c2ec9317-33c8-47e2-9131-e2251a57e582	unassigned	unmapped	none	0	0	0	611	0
+7204b683-8f37-4b88-b73a-929ffac378eb	unassigned	unmapped	none	0	0	0	394	0
+a9254a98-0b1e-4166-b2c4-011760a043eb	unassigned	unmapped	none	0	0	0	2060	0
+59d70b0f-6b76-4e00-8cab-27b400a88db5	unassigned	unmapped	none	0	0	0	7369	0
+9c6ff336-9330-46fd-b8c5-4dc6cfc8b60a	unassigned	unmapped	none	0	0	0	2409	0
+4f5946c7-4ad5-445e-b5f0-2cb953ccc077	unassigned	unmapped	none	0	0	0	4797	0
+2b3d72b2-e24c-4aa8-a5e0-910fd563601a	unassigned	unmapped	none	0	0	0	1510	0
+e5ef669b-f6b0-4fe7-8df1-dece3789c78d	unassigned	unmapped	none	0	0	0	7044	0
+54dac68a-e868-4d13-9b93-4575f716a1d4	unassigned	unmapped	none	0	0	0	4776	0
+63353662-fbbf-4596-8c59-68615ab99299	unassigned	unmapped	none	0	0	0	4648	0
+3b3441fd-1584-4c8b-a8a3-0a79e269c8a0	unassigned	unmapped	none	0	0	0	2598	0
+a05a0c2b-b1b3-4552-aaf2-8c3152078615	unassigned	unmapped	none	0	0	0	11895	0
+81d76d32-09f4-464f-ab03-6cfcbd9f35e8	unassigned	unmapped	none	0	0	0	2832	0
+43601181-fa3b-40b4-8c6b-f0505f6b1a06	unassigned	unmapped	none	0	0	0	660	0
+733d1969-970a-4886-a892-757a87379245	unassigned	unmapped	none	0	0	0	3363	0
+43909bd3-2f6f-438a-9a13-84b0918dd8a7	unassigned	unmapped	none	0	0	0	6511	0
+db6150be-5d88-47a7-87e3-a25936c1093f	unassigned	unmapped	none	0	0	0	2922	0
+14c3a56f-2ca9-4e21-a15a-e1fab0196687	unassigned	unmapped	none	0	0	0	371	0
+8fdcc057-5a04-4d47-b143-939deab94375	unassigned	unmapped	none	0	0	0	950	0
+c6aa1173-2d7d-428d-9fff-de1c4db23f78	unassigned	unmapped	none	0	0	0	1241	0
+01ff96fb-d5fb-4aed-bb76-62171e0de455	unassigned	unmapped	none	0	0	0	879	0
+a5736e1d-7248-4efc-a69e-935e1dd5ecab	unassigned	unmapped	none	0	0	0	2311	0
+4c7b153c-0966-4eae-bf76-9acaa8732269	unassigned	unmapped	none	0	0	0	4583	0
+8a4a3fd4-2e93-4644-afff-efc0c5fd7a3b	unassigned	unmapped	none	0	0	0	5286	0
+e3ae5575-8199-460c-8200-8b6dfb2f39a1	unassigned	unmapped	none	0	0	0	8674	0
+e30f549d-0fba-4a08-a7cf-b3efe3c65710	unassigned	unmapped	none	0	0	0	4527	0
+d51d836f-d3e0-45ea-9836-1c598fcea1f1	unassigned	unmapped	none	0	0	0	502	0
+3b5f274c-bda5-4c94-8f0e-baab8882f14d	unassigned	unmapped	none	0	0	0	509	0
+ed787690-75b2-435f-8369-5ea9fa924e6b	unassigned	unmapped	none	0	0	0	4259	0
+c104b27c-da03-4f4a-8122-8472c5517061	unassigned	unmapped	none	0	0	0	4890	0
+4b874f18-1563-46f7-b153-eb432fd10d62	unassigned	unmapped	none	0	0	0	4005	0
+2a52d855-c213-4e5c-9e94-db4e4d47efe9	unassigned	unmapped	none	0	0	0	1157	0
+440c78bb-d702-4101-b943-5b6afc92cb8b	unassigned	unmapped	none	0	0	0	2937	0
+a8735adc-1a18-4c4f-9fc2-cae88412ab35	unassigned	unmapped	none	0	0	0	3814	0
+e9233cff-5517-4078-8723-8c4971b74c2b	unassigned	unmapped	none	0	0	0	2234	0
+9fbb06e7-912c-4a77-8a72-50f14d91fbdb	unassigned	unmapped	none	0	0	0	6568	0
+c15fdcad-9c87-4844-97dc-01fba09af563	unassigned	unmapped	none	0	0	0	11721	0
+6bd11dc0-bf4a-447f-9240-4b9260183337	unassigned	unmapped	none	0	0	0	371	0
+35e3acc3-8493-4c5f-914d-be5fbff0df61	unassigned	unmapped	none	0	0	0	1840	0
+784a1476-d366-457f-9479-0ae2d0a61c91	unassigned	unmapped	none	0	0	0	3034	0
+ef7ffbf5-8b35-4994-a00a-7464f2d64660	unassigned	unmapped	none	0	0	0	1638	0
+36c43782-18da-4041-a0d6-31620d87adc6	unassigned	unmapped	none	0	0	0	4611	0
+61cb2ec1-3ce0-40eb-b99e-99c632f0e1ae	unassigned	unmapped	none	0	0	0	1885	0
+42d523a5-5e03-48ef-9c33-4e236b271e91	unassigned	unmapped	none	0	0	0	359	0
+a267220b-ec15-4e69-af59-aa8024911aa7	unassigned	unmapped	none	0	0	0	702	0
+1c710beb-35c5-4ae0-ac89-679c626205f5	unassigned	unmapped	none	0	0	0	1433	0
+a887ad4e-164b-44bf-ae26-57f0959efe83	unassigned	unmapped	none	0	0	0	451	0
+af6159a8-4d0a-4d19-8766-be405409384e	unassigned	unmapped	none	0	0	0	616	0
+c886d3e7-9779-441c-a493-72d22e1d23a0	unassigned	unmapped	none	0	0	0	11184	0
+b31abf22-7d09-4fc0-b88d-bee93c33c2df	unassigned	unmapped	none	0	0	0	669	0
+1dce3c92-7f7e-4f56-a83d-89317de8e2a2	unassigned	unmapped	none	0	0	0	9577	0
+bdf9dbb1-9cad-4a8c-b611-8b70b8532b05	unassigned	unmapped	none	0	0	0	515	0
+b1398e72-4345-49e5-8297-9c00ed75124c	unassigned	unmapped	none	0	0	0	505	0
+09aa5663-887f-4a62-9b24-eb5c339e8122	unassigned	unmapped	none	0	0	0	3193	0
+e8cec6aa-2c4a-422d-bdcc-aa4745abe081	unassigned	unmapped	none	0	0	0	376	0
+ddc65b1d-c2f1-49f6-ac84-79bbf3209086	unassigned	unmapped	none	0	0	0	6229	0
+d65ea2f2-929b-4674-8855-cc472864e84f	unassigned	unmapped	none	0	0	0	1186	0
+6d231daa-d738-474f-a7d3-24d400d90b7a	unassigned	unmapped	none	0	0	0	4415	0
+bdfdc9f0-53b8-4985-8e54-b891658e8ff7	unassigned	unmapped	none	0	0	0	2829	0
+1fda6c7a-b094-45f2-aed3-cfe07e11ee39	unassigned	unmapped	none	0	0	0	1482	0
+b1d2fca3-7fa6-45ce-8986-ea156161742c	unassigned	unmapped	none	0	0	0	400	0
+6c5938c7-3f54-4639-a37c-cf1a6a7d7ae5	unassigned	unmapped	none	0	0	0	1699	0
+aca08d51-d226-49a3-8678-1a4d53e0aa40	unassigned	unmapped	none	0	0	0	2486	0
+7a9ea3dc-1a50-4516-a062-af904ed77e02	unassigned	unmapped	none	0	0	0	3017	0
+ddbf64be-f4f6-4d46-a4f7-b1be552e3ddc	unassigned	unmapped	none	0	0	0	3453	0
+238409e4-8a49-4aaa-9be2-d509a3d539cb	unassigned	unmapped	none	0	0	0	1336	0
+1982c86c-60a1-4201-8c87-d718f76cb23e	unassigned	unmapped	none	0	0	0	4844	0
+220bb278-9f51-453d-b969-7245a882b5e2	unassigned	unmapped	none	0	0	0	674	0
+816b6203-72ec-43fa-9808-38e389547330	unassigned	unmapped	none	0	0	0	389	0
+dc3a6204-44c0-497e-a087-a0c8c0c19f00	unassigned	unmapped	none	0	0	0	3612	0
+82f7f963-e9d2-4846-a3db-e5333f496a91	unassigned	unmapped	none	0	0	0	309	0
+161547a5-c51d-404f-9855-b57d01dc7413	unassigned	unmapped	none	0	0	0	662	0
+b34100ff-5f99-479e-ae7b-2702a5243d74	unassigned	unmapped	none	0	0	0	477	0
+cd9c6353-b6d9-4093-828a-f2d18f4d6641	unassigned	unmapped	none	0	0	0	3634	0
+a3401ad9-acb1-4425-8244-0b0525616c44	unassigned	unmapped	none	0	0	0	1092	0
+d3a9f18f-834a-4c2c-a23b-3192eeb9ccbe	unassigned	unmapped	none	0	0	0	10423	0
+3767f335-f05c-4328-b679-178cfcb26612	unassigned	unmapped	none	0	0	0	1719	0
+dc8dce45-987a-4923-b74c-00e8c4dbf417	unassigned	unmapped	none	0	0	0	383	0
+17960258-90a0-4b13-a779-942a38f3c8d9	unassigned	unmapped	none	0	0	0	4813	0
+7d9714dd-5b53-45ad-97c7-c77ff9d21a61	unassigned	unmapped	none	0	0	0	2719	0
+1de74b2c-5002-4250-b829-8e9b26d8b1b1	unassigned	unmapped	none	0	0	0	509	0
+3961605d-2a36-4c33-a9d2-2a743b8c26ce	unassigned	unmapped	none	0	0	0	3431	0
+13fe47f8-8918-4f15-b40b-16fb82a0a352	unassigned	unmapped	none	0	0	0	381	0
+f0204465-8987-4efc-8b7c-21b193d6fc12	unassigned	unmapped	none	0	0	0	1744	0
+84905183-0bda-4d9f-a16f-a2962ca2201d	unassigned	unmapped	none	0	0	0	994	0
+7e79ae25-0bbb-43ff-8e68-1be2f50023dc	unassigned	unmapped	none	0	0	0	1609	0
+59d71eca-61d2-4f0c-b563-55f386cee7b7	unassigned	unmapped	none	0	0	0	1940	0
+ac87e44e-0458-45f1-b90f-613ad3f03d0a	unassigned	unmapped	none	0	0	0	8391	0
+445cd27b-3559-4682-8d44-3c575fdc6038	unassigned	unmapped	none	0	0	0	1141	0
+80c9d5ef-5c10-48f5-9f05-0e02926ba2bd	unassigned	unmapped	none	0	0	0	601	0
+8fcbcd23-b50d-4a58-bafb-7cad9c1882cf	unassigned	unmapped	none	0	0	0	3841	0
+c99fedab-cd5d-456c-a21b-152eb42c41aa	unassigned	unmapped	none	0	0	0	3261	0
+cc55f696-07db-4532-b3a2-5829825fae60	unassigned	unmapped	none	0	0	0	1093	0
+5e2661ec-e19b-4d94-b319-79900999d5d0	unassigned	unmapped	none	0	0	0	3648	0
+1d5df37d-cb65-440b-b1b6-a038b902ff8d	unassigned	unmapped	none	0	0	0	1964	0
+8e9b8174-b5b3-48e4-9d4e-9ac4e36d48ce	unassigned	unmapped	none	0	0	0	961	0
+3ec259fa-68da-4e7f-b70a-2d55b6bdbcf1	unassigned	unmapped	none	0	0	0	7416	0
+61c9d4b4-41c9-4ab7-9088-d8f8799f3acd	unassigned	unmapped	none	0	0	0	4096	0
+dbcd1714-2294-4feb-a0bf-c8b7c7d94353	unassigned	unmapped	none	0	0	0	1374	0
+6984e803-1211-41ef-aa1c-702dba87ecf2	unassigned	unmapped	none	0	0	0	7272	0
+76a54f1a-9ee7-4b71-82de-beb7ce5e70e5	unassigned	unmapped	none	0	0	0	2030	0
+b89ac01b-0b01-43fb-b219-9443afa60fac	unassigned	unmapped	none	0	0	0	3312	0
+db4b475d-31ab-4324-a0b3-81dc3c1cbaf1	unassigned	unmapped	none	0	0	0	4283	0
+9df9f728-071e-45b3-bbac-530eb78d9340	unassigned	unmapped	none	0	0	0	4161	0
+cb32d0df-1b96-4ee4-a63c-5bdc026925f1	unassigned	unmapped	none	0	0	0	5048	0
+7ea4946d-4e7c-4585-914e-ccaec56edcb5	unassigned	unmapped	none	0	0	0	2215	0
+dbd0a2bc-2a7f-4529-bf18-b72be4a156f1	unassigned	unmapped	none	0	0	0	316	0
+0fc8bd3b-170d-4da2-830d-cff93de513fa	unassigned	unmapped	none	0	0	0	967	0
+53082260-05b5-4fea-96b9-3e39602a7144	unassigned	unmapped	none	0	0	0	2609	0
+0ca954f2-6b59-4884-afce-be8eef4e1cb6	unassigned	unmapped	none	0	0	0	7101	0
+8a590074-3a21-48e1-821b-7bc45735500e	unassigned	unmapped	none	0	0	0	2571	0
+3a9ccfdb-9fa2-49ac-a4ca-1d969f60db1f	unassigned	unmapped	none	0	0	0	601	0
+a017ce8c-f8d0-4c78-b08f-5bcb7bd4aebe	unassigned	unmapped	none	0	0	0	1921	0
+b34b0c5a-ac9e-4889-85e3-52973c7697a1	unassigned	unmapped	none	0	0	0	5904	0
+17852a8b-10d2-40a7-b4e5-7e9d44002afd	unassigned	unmapped	none	0	0	0	4864	0
+1ee5b0f4-d340-4f48-ab13-6467cf998785	unassigned	unmapped	none	0	0	0	4457	0
+2f441660-611c-4cc7-bc83-95c026039a3e	unassigned	unmapped	none	0	0	0	2947	0
+80f22b78-6d94-4b2c-95a2-2a0c9153198a	unassigned	unmapped	none	0	0	0	8675	0
+56ecda38-4d50-446e-89d7-df96dd87a5eb	unassigned	unmapped	none	0	0	0	2002	0
+8f832cb7-ab9f-49d4-a44b-c8424288f2e0	unassigned	unmapped	none	0	0	0	4651	0
+cb51bea0-a824-4d32-b840-d817385e5123	unassigned	unmapped	none	0	0	0	2682	0
+64554abe-c0ec-471d-907a-4e185efd05e7	unassigned	unmapped	none	0	0	0	1640	0
+4d07bf4b-4a62-429c-85a5-2b11ddd9ca77	unassigned	unmapped	none	0	0	0	1781	0
+a33e2bd5-0e7d-476f-a00f-0359363a11a0	unassigned	unmapped	none	0	0	0	2417	0
+cc822645-77fa-4f47-a020-ce4a06efa03e	unassigned	unmapped	none	0	0	0	824	0
+9876e4ce-4302-40f0-99f8-1447bb5169d8	unassigned	unmapped	none	0	0	0	3268	0
+87caf14b-6032-4f69-9e73-f0c9ce2802fe	unassigned	unmapped	none	0	0	0	597	0
+d7acbdc7-54e1-46ff-85af-8d35ed3e0f0b	unassigned	unmapped	none	0	0	0	8992	0
+0a750bc6-ae96-4a3c-9f43-5735ba28df81	incidental	assigned	none	0	0	0	10425	0
+2116d944-10c2-4bb4-b43a-e37408f5239e	incidental	assigned	none	0	0	0	4803	0
+3b767ed9-11d2-4144-a405-d6a99161596b	incidental	assigned	none	0	0	0	635	0
+200d5920-6208-42bd-a2f3-43011fd80da8	incidental	assigned	none	0	0	0	7994	0
+8ab9dc6a-9afb-436a-a1e5-a015f1d6f687	incidental	assigned	none	0	0	0	2699	0
+69bebd70-fdb4-4e44-a5b2-3e879693c0a7	incidental	assigned	none	0	0	0	855	0
+276f6b24-58cb-49e5-a979-7990f03afe53	incidental	assigned	none	0	0	0	8146	0
+e4baca19-b533-4090-bf13-c788623018ab	incidental	assigned	none	0	0	0	2891	0
+cf51126b-5dc4-44de-9116-d5bee2e41eb8	incidental	assigned	none	0	0	0	6801	0
+b0101ea9-8ef7-468c-99a7-b509db3501e2	Enterobacteria phage lambda	assigned	none	0	0	0	533	0
+1285881a-883d-4a7d-b21f-9986aeebf555	Enterobacteria phage lambda	assigned	none	0	0	0	427	0
+2ee76902-35cc-4359-891f-3a5392999138	Enterobacteria phage lambda	assigned	none	0	0	0	397	0
+f75011ee-d9fa-4e7a-aefb-b2fda87be327	Enterobacteria phage lambda	assigned	none	0	0	0	35636	0
+0a5feb22-ccf0-4f22-9a01-f9a13a9cf22c	Enterobacteria phage lambda	assigned	none	0	0	0	587	0
+11a5b545-530b-4164-a240-6e940c8a585a	Enterobacteria phage lambda	assigned	none	0	0	0	501	0
+19889083-4fe1-4e21-b84a-86a61493af92	Enterobacteria phage lambda	assigned	none	0	0	0	416	0
+d6115a0a-52c9-4d71-b6e3-753de98cb12f	Enterobacteria phage lambda	assigned	none	0	0	0	580	0
+f263c16f-0ee8-4c70-8243-d55d0ae64ac2	Enterobacteria phage lambda	assigned	none	0	0	0	4965	0
+772f55de-a970-41c4-b4a1-988f08ba79a6	Enterobacteria phage lambda	assigned	none	0	0	0	495	0
+331827ce-6966-4645-bc74-b2897dbbc0c5	Enterobacteria phage lambda	assigned	none	0	0	0	373	0
+dc4d4261-0b65-4e51-b0b5-a5f66c908074	Enterobacteria phage lambda	assigned	none	0	0	0	538	0
+89b8eadf-de3d-48bd-a631-cd35a3220360	Enterobacteria phage lambda	assigned	none	0	0	0	504	0
+b110a8f2-89f5-42b6-9f86-b013c499e410	Enterobacteria phage lambda	assigned	none	0	0	0	377	0
+6934fc91-e0db-4362-95df-a15c6aa2c1a8	Enterobacteria phage lambda	assigned	none	0	0	0	461	0
+c3c6b742-5589-4b16-ac26-0a3d88b30c55	Enterobacteria phage lambda	assigned	none	0	0	0	494	0
+29dcf2c9-8b97-4892-9bda-83b4129379c4	Enterobacteria phage lambda	assigned	none	0	0	0	571	0
+c4573278-d92d-422e-83bc-3cd3b070cdb3	Enterobacteria phage lambda	assigned	none	0	0	0	486	0
+37ebedf2-9f12-4050-a55f-f05d813cc9b9	Enterobacteria phage lambda	assigned	none	0	0	0	434	0
+a21d221f-ca5a-436c-808b-b40d87382029	Enterobacteria phage lambda	assigned	none	0	0	0	288	0
+7a08e70f-d9a0-4495-bca7-d9a73fcb944f	Enterobacteria phage lambda	assigned	none	0	0	0	515	0
+9a005caa-2981-4154-b66e-388f99d3ba17	Enterobacteria phage lambda	assigned	none	0	0	0	479	0
+6fe8699f-05ba-47cd-a594-43d6b46013c9	Enterobacteria phage lambda	assigned	none	0	0	0	528	0
+e356d569-8144-4a79-a056-68e4cac5351e	Enterobacteria phage lambda	assigned	none	0	0	0	552	0
+f2d0d72f-7ebc-4cac-be8d-d37c7ccf3b37	Enterobacteria phage lambda	assigned	none	0	0	0	584	0
+f41d150a-fcbe-461c-8b64-26f793869c20	Enterobacteria phage lambda	assigned	none	0	0	0	486	0
+4a1b226b-e063-4baa-a489-b3c04df65a35	Enterobacteria phage lambda	assigned	none	0	0	0	452	0
+7715a634-0ef8-407a-a902-e1f84090bad8	Enterobacteria phage lambda	assigned	none	0	0	0	498	0
+fc5fb5e7-574a-4596-a8fe-014d51e66f5f	Enterobacteria phage lambda	assigned	none	0	0	0	544	0
+f94fcda3-a8b5-47e3-bde8-d79aaf83f621	Enterobacteria phage lambda	assigned	none	0	0	0	397	0
+6571e526-9a9d-4652-9993-9d5aeb3207f5	Enterobacteria phage lambda	assigned	none	0	0	0	524	0
+86a99d80-0612-4162-b0c2-072ce344e256	Enterobacteria phage lambda	assigned	none	0	0	0	446	0
+034d5d36-61a9-41ac-87a8-62b722cc5725	Enterobacteria phage lambda	assigned	none	0	0	0	474	0
+eaac7fc4-62c1-4eb6-bb94-4cec052340fb	Enterobacteria phage lambda	assigned	none	0	0	0	734	0
+537eb32c-a61f-4566-80da-048c6a773f20	Enterobacteria phage lambda	assigned	none	0	0	0	515	0
+1dd9805b-b5f3-4eda-9b5e-71ed9c972ef2	Enterobacteria phage lambda	assigned	none	0	0	0	117	0
+73ada05c-99ca-4a0c-9798-832580165e61	Enterobacteria phage lambda	assigned	none	0	0	0	426	0
+185e7881-5efe-4f73-b908-5e952caece13	Enterobacteria phage lambda	assigned	none	0	0	0	450	0
+651897b4-4bd7-45f3-8035-396ddbaa085f	Enterobacteria phage lambda	assigned	none	0	0	0	534	0
+630e7405-9d85-41d1-9e13-4551138d4adb	Enterobacteria phage lambda	assigned	none	0	0	0	601	0
+54246305-f4cf-43c2-9ee9-34150214944d	Enterobacteria phage lambda	assigned	none	0	0	0	680	0
+e36fc2ab-9fd8-49f9-9c36-c656c4eedbfd	Enterobacteria phage lambda	assigned	none	0	0	0	563	0
+0624f8fc-c6e2-4501-9b79-480dfef0f211	Enterobacteria phage lambda	assigned	none	0	0	0	534	0
+0b34075f-c944-4b3e-adb1-fb4eb4f874cd	Enterobacteria phage lambda	assigned	none	0	0	0	690	0
+2a6dab26-850f-415b-ae6e-f70906dbb6ae	Enterobacteria phage lambda	assigned	none	0	0	0	490	0
+f8caad92-ef24-484e-91ec-09deb375d6f6	Enterobacteria phage lambda	assigned	none	0	0	0	437	0
+0ed83fe0-0400-49b6-90f9-ba8dcbc3b471	Enterobacteria phage lambda	assigned	none	0	0	0	363	0
+4bbfe5fe-313c-450d-b42e-66430fe0c5bf	Enterobacteria phage lambda	assigned	none	0	0	0	562	0
+0fe716ce-9886-4af7-9064-a2e6a6875879	Enterobacteria phage lambda	assigned	none	0	0	0	463	0
+f70afff1-1ecc-4d46-b387-dde2f69ac6c5	Enterobacteria phage lambda	assigned	none	0	0	0	371	0
+f79b4117-9d50-4b91-b059-343f019f511d	Enterobacteria phage lambda	assigned	none	0	0	0	536	0
+a93a4f36-ac2b-477b-8334-e349cdfd99b7	Enterobacteria phage lambda	assigned	none	0	0	0	419	0
+f2d79929-d599-465e-b83f-e4d144e723d5	Enterobacteria phage lambda	assigned	none	0	0	0	530	0
+a23220ae-7ed6-415b-9297-20b8107b6eb4	Enterobacteria phage lambda	assigned	none	0	0	0	239	0
+ec01c2e4-d8a9-434f-afae-916b59e936ef	Enterobacteria phage lambda	assigned	none	0	0	0	377	0
+f018afa6-0210-47a9-98b4-3ae0ab5b29c4	Escherichia coli K-12	assigned	none	0	0	0	555	0
+471ded7d-e7d4-49b9-a244-e465de2100a8	Enterobacteria phage lambda	assigned	none	0	0	0	510	0
+d00944c4-1254-42c7-a28d-cf800cf51f9d	Enterobacteria phage lambda	assigned	none	0	0	0	402	0
+162f52f6-fbbc-41cb-9d60-2b0562d21b5b	Enterobacteria phage lambda	assigned	none	0	0	0	468	0
+cb1e5c78-9417-40ac-bf9a-081b22b82248	Enterobacteria phage lambda	assigned	none	0	0	0	469	0
+9c93f8e6-ec32-4bb7-b078-e0fe8c830abb	Enterobacteria phage lambda	assigned	none	0	0	0	564	0
+e585d55a-22f2-48d3-abf6-a409cb69d830	Enterobacteria phage lambda	assigned	none	0	0	0	444	0
+7eebda04-be68-4999-a193-f45751ec2662	Enterobacteria phage lambda	assigned	none	0	0	0	255	0
+9a8e2db3-2198-4ccb-8fc3-0ceb5c8b9c6a	Enterobacteria phage lambda	assigned	none	0	0	0	501	0
+4a513ca0-0850-42c5-8eca-eb5f554d9a48	Enterobacteria phage lambda	assigned	none	0	0	0	551	0
+9efd4933-e83f-48bd-9525-0d4b464a45e3	Enterobacteria phage lambda	assigned	none	0	0	0	422	0
+6d6c979c-e695-4bce-943b-87fee4436e0d	Enterobacteria phage lambda	assigned	none	0	0	0	481	0
+b5ffa6b1-d03f-4221-9a10-7ab6d4c2abff	Enterobacteria phage lambda	assigned	none	0	0	0	133	0
+3e6de8e7-c46f-4e89-8450-b35c9c8f7958	Listeria monocytogenes	assigned	none	0	0	0	997	0
+b1bc3f9d-2222-446e-bf86-9160f299426c	Enterobacteria phage lambda	assigned	none	0	0	0	536	0
+da7ecb33-9e87-48cd-bdc1-4dc07b642543	Listeria monocytogenes	assigned	none	0	0	0	2005	0
+d3fc4ba3-94c4-4b63-937d-0e9133b176f5	Enterobacteria phage lambda	assigned	none	0	0	0	456	0
+6599a9cc-3f5b-44ac-967b-5a51483a917f	Enterobacteria phage lambda	assigned	none	0	0	0	557	0
+4cb79fae-8c06-4470-b44e-59a03f546b9e	Enterobacteria phage lambda	assigned	none	0	0	0	470	0
+9e8b1368-7244-474a-a003-4cafe65295ff	Enterobacteria phage lambda	assigned	none	0	0	0	457	0
+6d6571b8-a91e-480c-8c9d-4b61903d45b2	Enterobacteria phage lambda	assigned	none	0	0	0	400	0
+213bd97f-03cc-40c3-b7b3-b7dcc4119bd1	Enterobacteria phage lambda	assigned	none	0	0	0	477	0
+5f8159f6-c9fd-434d-b64f-f7e09cbf2177	Enterobacteria phage lambda	assigned	none	0	0	0	479	0
+df1d1d6e-bc76-437a-a10d-b90ab826aa5c	Enterobacteria phage lambda	assigned	none	0	0	0	180	0
+2142da48-51aa-4962-a42a-348b4f76349d	Enterobacteria phage lambda	assigned	none	0	0	0	493	0
+5ced8295-0324-4864-9385-fe27ba94ae00	Enterobacteria phage lambda	assigned	none	0	0	0	448	0
+b25d7ed2-1583-484c-9483-ff76d97faa23	Enterobacteria phage lambda	assigned	none	0	0	0	471	0
+758951bd-1e06-40a8-b957-8aa9fc8e8315	Enterobacteria phage lambda	assigned	none	0	0	0	303	0
+fa3af33f-cffe-4297-909e-4ed4d6535dd4	Enterobacteria phage lambda	assigned	none	0	0	0	483	0
+76f88aff-6b56-46d5-b002-6b85688e6de3	Enterobacteria phage lambda	assigned	none	0	0	0	468	0
+2f4675fa-05fb-4cdd-8d69-e7d277b1a0f3	Enterobacteria phage lambda	assigned	none	0	0	0	531	0
+b60a424a-91d8-4bc2-9846-6840c079bd61	Enterobacteria phage lambda	assigned	none	0	0	0	513	0
+15b7dc1f-d86d-48e6-94cb-56fc7db46b1c	Enterobacteria phage lambda	assigned	none	0	0	0	567	0
+752606f3-9749-4915-b4c6-e52e23bdba36	Enterobacteria phage lambda	assigned	none	0	0	0	389	0
+42cdf0a8-49d2-4eca-a754-5d8de673633c	Enterobacteria phage lambda	assigned	none	0	0	0	396	0
+5e05c341-2763-4e3d-aaaa-fe690a481804	Pseudomonas aeruginosa	assigned	none	0	0	0	265	0
+487fcc67-d2c1-44eb-83ff-c83e94f31d54	Enterobacteria phage lambda	assigned	none	0	0	0	614	0
+f3c9c421-a391-4e72-860c-d3f7b400519a	Enterobacteria phage lambda	assigned	none	0	0	0	2496	0
+e536a407-5a66-4bf3-a4a9-1ee8717a51fd	Enterobacteria phage lambda	assigned	none	0	0	0	528	0
+7d9a3039-a30e-4b22-a2a7-c642f032bc94	Enterobacteria phage lambda	assigned	none	0	0	0	553	0
+e052fbbf-0e4e-423a-9057-55e71c5a32bd	Enterobacteria phage lambda	assigned	none	0	0	0	585	0
+1084a446-9ec5-4967-99d3-80e20586198e	Enterobacteria phage lambda	assigned	none	0	0	0	534	0
+35c525e8-1a42-4166-8d6b-bf047ec645f5	Enterobacteria phage lambda	assigned	none	0	0	0	407	0
+0338ef56-4275-45c6-b7d3-91da9d803fc1	Enterobacteria phage lambda	assigned	none	0	0	0	366	0
+b98d10d3-ff90-4d0d-83fd-c512ea585d17	Enterobacteria phage lambda	assigned	none	0	0	0	490	0
+d7628f60-7a1c-4a76-86e4-0a949d68b080	Enterobacteria phage lambda	assigned	none	0	0	0	493	0
+85ed5715-7ca7-46f8-8d21-177a96b7d43f	Enterobacteria phage lambda	assigned	none	0	0	0	340	0
+e6e539f8-a4ed-48bc-8845-5c365630655f	Enterobacteria phage lambda	assigned	none	0	0	0	287	0
+2d10de8c-99d2-443f-bf67-f273e54232f6	Enterobacteria phage lambda	assigned	none	0	0	0	498	0
+8a348967-093f-4b07-a3c6-eb1412c71e34	Enterobacteria phage lambda	assigned	none	0	0	0	179	0
+c290fdb8-b899-45b6-ad00-a334740b89ea	Enterobacteria phage lambda	assigned	none	0	0	0	305	0
+451452b5-b42c-4fa7-9cb1-df28a499615c	Enterobacteria phage lambda	assigned	none	0	0	0	542	0
+88b0d5ac-695d-4a5d-b1fc-5c38c6b83d0f	Enterobacteria phage lambda	assigned	none	0	0	0	563	0
+c452e6c1-f44d-4ea1-8633-361e2155a261	Enterobacteria phage lambda	assigned	none	0	0	0	403	0
+f6ed0a5f-7ae5-4376-af18-15fe95227984	Enterobacteria phage lambda	assigned	none	0	0	0	441	0
+e376241b-c44c-4e0b-bc95-c52dc8ee5c7a	Enterobacteria phage lambda	assigned	none	0	0	0	430	0
+a5673762-2f53-4078-a08e-cd22c0bbb2ea	Enterobacteria phage lambda	assigned	none	0	0	0	445	0
+7ab2db6c-c26d-45fc-b910-f35fefa17815	Enterobacteria phage lambda	assigned	none	0	0	0	486	0
+f261ad24-bf27-4c76-a327-c1fea0a9423b	Enterobacteria phage lambda	assigned	none	0	0	0	478	0
+08c178b6-25ef-4485-9566-8064c2086035	Enterobacteria phage lambda	assigned	none	0	0	0	389	0
+6023e516-3963-4779-9a02-b26973c685c5	Enterobacteria phage lambda	assigned	none	0	0	0	506	0
+614e3f15-c663-46d4-94ff-3466142de888	Enterobacteria phage lambda	assigned	none	0	0	0	461	0
+58465ac1-15af-4b03-9d76-552d09032d17	Enterobacteria phage lambda	assigned	none	0	0	0	519	0
+07840112-86df-42b1-aed1-736b0ba154df	Enterobacteria phage lambda	assigned	none	0	0	0	413	0
+3fc25169-ed48-438b-b1f3-b6fcbd075bf0	Enterobacteria phage lambda	assigned	none	0	0	0	557	0
+ce138174-1860-42c2-a843-8e338b44104f	Enterobacteria phage lambda	assigned	none	0	0	0	458	0
+6ccf086b-e1f2-4fb8-b8b4-c611ef2764ca	Enterobacteria phage lambda	assigned	none	0	0	0	667	0
+b9f0024e-4c4b-4555-a4da-936935d525df	Enterobacteria phage lambda	assigned	none	0	0	0	542	0
+989504f0-e6dd-4c00-b1dd-0ebfb2ec85df	Enterobacteria phage lambda	assigned	none	0	0	0	416	0
+9136ab09-def5-42e9-b771-c2406fb8fcfd	Enterobacteria phage lambda	assigned	none	0	0	0	553	0
+005d7bb1-9fa2-4ca1-b53c-6693233fa746	Enterobacteria phage lambda	assigned	none	0	0	0	635	0
+eac3e08c-a411-405b-b2bf-cdc9ddbd7b8a	Enterobacteria phage lambda	assigned	none	0	0	0	458	0
+a623c885-9957-47ed-859f-4aa3d48000dd	Enterobacteria phage lambda	assigned	none	0	0	0	606	0
+964d43ec-ef3a-4c2d-913e-e4d6dc214044	Enterobacteria phage lambda	assigned	none	0	0	0	1352	0
+37b15ff1-b16e-41bd-a2a1-167223e57ee0	Enterobacteria phage lambda	assigned	none	0	0	0	468	0
+000a0d2d-d791-4059-99b7-f10151240aa0	Enterobacteria phage lambda	assigned	none	0	0	0	648	0
+6af22dde-d289-48e9-ac4f-5c107bdf2c1c	Enterobacteria phage lambda	assigned	none	0	0	0	258	0
+9bf19cf6-0662-4ebe-bc6f-0ceca5c26efa	Enterobacteria phage lambda	assigned	none	0	0	0	431	0
+ac8350a5-5b47-4bbb-9fcf-74b83d9ee0bb	Enterobacteria phage lambda	assigned	none	0	0	0	480	0
+fd143946-05cb-42a8-a26d-f27a77c27db7	Pseudomonas aeruginosa	assigned	none	0	0	0	2698	0
+20ee62ce-93f5-4618-a7f5-b83077defd17	Enterobacteria phage lambda	assigned	none	0	0	0	582	0
+dd17cbb2-7903-4975-a7e8-d6fdc1b4b5f2	Enterobacteria phage lambda	assigned	none	0	0	0	965	0
+5a5d832e-5dde-43f0-9f3c-562a5108c88a	Enterobacteria phage lambda	assigned	none	0	0	0	514	0
+1c37a581-d8cb-4d05-bc58-9e2f848cc4ba	Enterobacteria phage lambda	assigned	none	0	0	0	139	0
+a7d825da-03b8-482b-adb3-dd7d39891b0d	Enterobacteria phage lambda	assigned	none	0	0	0	565	0
+eae3e35f-b4b4-4025-b48b-91901383e00f	Enterobacteria phage lambda	assigned	none	0	0	0	664	0
+a503e8f6-9c3c-44a3-9dc4-844ec6225242	Enterobacteria phage lambda	assigned	none	0	0	0	469	0
+314ada82-324a-49e3-a1c5-7007ab773bc0	Enterobacteria phage lambda	assigned	none	0	0	0	352	0
+77c13113-fede-41e8-9f73-09cbe9027e70	Enterobacteria phage lambda	assigned	none	0	0	0	407	0
+505ed5d6-8997-4497-9a9a-8c536aa4102b	Enterobacteria phage lambda	assigned	none	0	0	0	484	0
+730e3830-9d1b-4fdc-a6dd-74bced2fb9ef	Enterobacteria phage lambda	assigned	none	0	0	0	437	0
+1bea3632-6a41-47bc-9518-9904f2163f92	Enterobacteria phage lambda	assigned	none	0	0	0	455	0
+80f59a5a-00e1-4be5-b690-8a41e4cf51b5	Enterobacteria phage lambda	assigned	none	0	0	0	393	0
+21dac243-45c0-44f9-89ce-51e81c4bb567	Enterobacteria phage lambda	assigned	none	0	0	0	8573	0
+07200c5e-9f36-4e79-95b5-4bc1a79c2514	Enterobacteria phage lambda	assigned	none	0	0	0	418	0
+887c8198-3514-4e90-9734-fb9ad0053f5f	Enterobacteria phage lambda	assigned	none	0	0	0	325	0
+19779ad2-3d21-44b7-af29-12f709f12f38	Enterobacteria phage lambda	assigned	none	0	0	0	223	0
+59cfab39-3621-4813-8205-bd9c0bfb166e	Enterobacteria phage lambda	assigned	none	0	0	0	428	0
+c3b592ca-dc5b-4fe7-96b9-0988253a78c5	Enterobacteria phage lambda	assigned	none	0	0	0	429	0
+024006a4-a06b-4682-a8c9-4a9afa256c21	Enterobacteria phage lambda	assigned	none	0	0	0	508	0
+b90e8c6d-0567-40dc-9884-f51744b099da	Enterobacteria phage lambda	assigned	none	0	0	0	540	0
+c70172e5-a4d3-445c-890d-c8f6bfb6bea5	Enterobacteria phage lambda	assigned	none	0	0	0	563	0
+46c85eca-9328-4393-b4ea-8d64a5b864b9	Enterobacteria phage lambda	assigned	none	0	0	0	593	0
+dbbaf6c3-8944-4f80-893a-baa53074d776	Enterobacteria phage lambda	assigned	none	0	0	0	396	0
+769fd81a-c498-45ba-8b3d-2322e9f14eea	Enterobacteria phage lambda	assigned	none	0	0	0	355	0
+e2122fba-e735-499a-a332-be391416630d	Enterobacteria phage lambda	assigned	none	0	0	0	493	0
+57cd4dc7-db4c-4c4b-96ba-260ea90480e8	Enterobacteria phage lambda	assigned	none	0	0	0	493	0
+1dafa483-ac5e-4014-9e70-fa53d6f1d7b6	Enterobacteria phage lambda	assigned	none	0	0	0	567	0
+3fabc657-9f22-44e3-bf26-3cfea30c6e9b	Enterobacteria phage lambda	assigned	none	0	0	0	453	0
+e4eb86aa-d13c-4a5f-a746-f12f62715bbd	Enterobacteria phage lambda	assigned	none	0	0	0	441	0
+60467c6b-a0fd-430e-ab0e-4bfe16371999	Enterobacteria phage lambda	assigned	none	0	0	0	282	0
+ffdc7c78-bba1-4a41-9da5-5cdd03b4b597	Enterobacteria phage lambda	assigned	none	0	0	0	502	0
+cfc32313-2c14-4f5e-8de6-2b29d88a5044	Enterobacteria phage lambda	assigned	none	0	0	0	436	0
+64b9674d-6509-4ea9-8d8c-e4a63247ed82	Enterobacteria phage lambda	assigned	none	0	0	0	555	0
+509a2845-f0e3-435a-bfa8-b0bed00a5a50	Enterobacteria phage lambda	assigned	none	0	0	0	496	0
+a4a48803-9d8e-4e03-b8f2-6e85689217e4	Enterobacteria phage lambda	assigned	none	0	0	0	433	0
+d622563a-fc31-4dc3-95e5-9b11acaf3d43	Enterobacteria phage lambda	assigned	none	0	0	0	148	0
+c3019af6-25b1-4668-8869-227c359f0252	Enterobacteria phage lambda	assigned	none	0	0	0	570	0
+c67a5b77-2475-4daf-be5b-bc270c334586	Enterobacteria phage lambda	assigned	none	0	0	0	445	0
+a13a541e-1913-416b-8773-e4e86d355e8f	Enterobacteria phage lambda	assigned	none	0	0	0	480	0
+aad96e06-9c20-44f3-8461-78544dd95c4d	Enterobacteria phage lambda	assigned	none	0	0	0	394	0
+c48962eb-a693-4a14-a559-3014605e17dc	Enterobacteria phage lambda	assigned	none	0	0	0	588	0
+f21ef953-2a0e-4eef-a1ae-bcb1def021c3	Enterobacteria phage lambda	assigned	none	0	0	0	9761	0
+fa61e9a2-76f6-41ee-a342-42fbb7493c20	Enterobacteria phage lambda	assigned	none	0	0	0	490	0
+0b390870-1e4e-48c9-a901-cc6fdb3a57a3	Enterobacteria phage lambda	assigned	none	0	0	0	395	0
+c0ba4cf6-0bce-49e1-945c-bcc2585aeec4	Enterobacteria phage lambda	assigned	none	0	0	0	398	0
+6b0821f1-b48d-45d9-bf47-8043210345cf	Enterobacteria phage lambda	assigned	none	0	0	0	550	0
+b2c75ef8-f5da-44ce-a7e7-a1b0af0945c9	Enterobacteria phage lambda	assigned	none	0	0	0	545	0
+60962600-a345-4fda-87eb-73a3dab50f66	Enterobacteria phage lambda	assigned	none	0	0	0	554	0
+66fbdcb5-1739-4a19-b5de-08d457ad0912	Escherichia coli K-12	assigned	none	0	0	0	503	0
+3f6f9722-5337-4405-a993-1cd455f402a5	Enterobacteria phage lambda	assigned	none	0	0	0	610	0
+583fc510-46b9-4ed6-a30d-9095e7b554f9	Enterobacteria phage lambda	assigned	none	0	0	0	412	0
+25fc737c-59ba-4264-b6ea-f04524015c67	Enterobacteria phage lambda	assigned	none	0	0	0	265	0
+afd316b1-237b-414a-a68a-33fe9f111d8d	Enterobacteria phage lambda	assigned	none	0	0	0	434	0
+bfdea2b8-98fa-48e2-b6b5-f9f64a35a32d	Enterobacteria phage lambda	assigned	none	0	0	0	373	0
+de54d811-d92f-4085-809d-9603af0eef22	Enterobacteria phage lambda	assigned	none	0	0	0	436	0
+a97ba58e-f759-468b-9bef-37b2fcb944be	Enterobacteria phage lambda	assigned	none	0	0	0	546	0
+b4c3deae-5bcb-4f71-b9c8-0a77ec0f633a	Enterobacteria phage lambda	assigned	none	0	0	0	222	0
+2c01fc10-88bf-4bd2-92f0-4ad94a8f367c	Enterobacteria phage lambda	assigned	none	0	0	0	466	0
+8b34e952-f4c9-44af-8e32-9d26b1565bc6	Enterobacteria phage lambda	assigned	none	0	0	0	480	0
+eccdb123-adef-43d1-b6d2-ecaa232e7432	Enterobacteria phage lambda	assigned	none	0	0	0	234	0
+dc75fea8-1f19-494f-b915-dbf0e34b8a1e	Enterobacteria phage lambda	assigned	none	0	0	0	480	0
+8600eec9-3a54-48ff-b865-b496ffcd2c16	Enterobacteria phage lambda	assigned	none	0	0	0	313	0
+e9e1134b-3cfd-4ce7-965d-99c23ec37f8b	Enterobacteria phage lambda	assigned	none	0	0	0	566	0
+2b83368c-419c-4283-86b1-c2275720fe55	Enterobacteria phage lambda	assigned	none	0	0	0	3668	0
+02e349f4-da5d-48f7-a58a-07053039767e	Enterobacteria phage lambda	assigned	none	0	0	0	304	0
+7fa27eda-7fc2-42db-9d36-027d2fe36223	Enterobacteria phage lambda	assigned	none	0	0	0	397	0
+8ca8338b-2b6f-4ac4-b459-7949a2ea36b5	Enterobacteria phage lambda	assigned	none	0	0	0	500	0
+93e0dc37-c13f-4d7a-a65f-87326a941a39	Enterobacteria phage lambda	assigned	none	0	0	0	153	0
+2c84b577-adb8-4490-bff8-5d475b61f00e	Listeria monocytogenes	assigned	none	0	0	0	1953	0
+e640af48-9e0b-48de-9990-b20c739613c4	Enterobacteria phage lambda	assigned	none	0	0	0	471	0
+a8b27f87-3b27-486a-a182-2a91dba15e6a	Enterobacteria phage lambda	assigned	none	0	0	0	616	0
+fd83944d-a7f8-411d-86a4-2d103ee1b805	Enterobacteria phage lambda	assigned	none	0	0	0	295	0
+ba73d9d5-3b62-4741-bc45-eef3ee8018e2	Enterobacteria phage lambda	assigned	none	0	0	0	454	0
+83c9b26a-5ad4-4916-b361-4a6752bba80d	Enterobacteria phage lambda	assigned	none	0	0	0	467	0
+34949a49-a430-402b-b5e2-be90fde0d1c7	Enterobacteria phage lambda	assigned	none	0	0	0	469	0
+419a3d84-48c2-43a3-9568-fb24d3d211be	Enterobacteria phage lambda	assigned	none	0	0	0	434	0
+b1a898d5-27f6-427d-8407-807dd8705b52	Enterobacteria phage lambda	assigned	none	0	0	0	115	0
+2a9540f6-f221-46dc-ac16-24b94b21c296	Enterobacteria phage lambda	assigned	none	0	0	0	571	0
+a3a96f3a-44f3-4bf8-8d8a-e7ce28ce3699	Enterobacteria phage lambda	assigned	none	0	0	0	629	0
+70e61f4c-b21a-45f4-8cab-89cf0d83c51f	Enterobacteria phage lambda	assigned	none	0	0	0	624	0
+77e89b8e-dad4-4eb5-9489-1d9b0d0aad70	Enterobacteria phage lambda	assigned	none	0	0	0	332	0
+75c4d5d2-3d69-4992-8d4f-34206adea4b1	Enterobacteria phage lambda	assigned	none	0	0	0	502	0
+85b63f4f-145c-4e0b-b81f-b9c8a4e44b25	Listeria monocytogenes	assigned	none	0	0	0	376	0
+6259d6f0-d9f4-4597-814a-f7570fcbce04	Enterobacteria phage lambda	assigned	none	0	0	0	516	0
+90150f47-bee2-4e00-bd6e-60d35129c813	Enterobacteria phage lambda	assigned	none	0	0	0	251	0
+ec9ccd73-0a58-4cee-b458-7d4ae3b207cb	Enterobacteria phage lambda	assigned	none	0	0	0	379	0
+407e873f-89b2-4814-82ff-ec7a987108e8	Enterobacteria phage lambda	assigned	none	0	0	0	574	0
+19984349-b5f8-42e2-beed-2df7bcd71956	Enterobacteria phage lambda	assigned	none	0	0	0	441	0
+bb943058-0fde-4d52-a657-7ff409042995	Enterobacteria phage lambda	assigned	none	0	0	0	268	0
+e6c4f3bb-3ae7-44ae-a02e-24493d6e02b5	Enterobacteria phage lambda	assigned	none	0	0	0	450	0
+462f2406-b008-4de8-8b1a-11be51eaa89d	Enterobacteria phage lambda	assigned	none	0	0	0	611	0
+7b0aa48f-4c46-4bc0-ab5e-d2e4508dfec7	Enterobacteria phage lambda	assigned	none	0	0	0	539	0
+8f365d66-730f-4595-adc6-b4b69083a421	Enterobacteria phage lambda	assigned	none	0	0	0	554	0
+9760ba79-e57d-4d09-bfcf-73c2c2af75b0	Escherichia coli K-12	assigned	none	0	0	0	1871	0
+ff42eef3-9da3-4691-8765-2b05e0f2e2d0	Enterobacteria phage lambda	assigned	none	0	0	0	502	0
+9681c227-90d2-4b97-8723-84183dd86c7e	Enterobacteria phage lambda	assigned	none	0	0	0	529	0
+96db8609-fcdb-45f4-acd8-2fc4926df6b0	Enterobacteria phage lambda	assigned	none	0	0	0	614	0
+ea9b9707-14ca-4378-adb8-eed220a921f1	Enterobacteria phage lambda	assigned	none	0	0	0	438	0
+7ebd21e5-9604-4929-ad54-648d449a68e5	Enterobacteria phage lambda	assigned	none	0	0	0	467	0
+207d48a3-1eac-4633-b861-af8b2d59f6aa	Enterobacteria phage lambda	assigned	none	0	0	0	489	0
+7cde05a5-4058-42ae-9f64-cda554def89e	Enterobacteria phage lambda	assigned	none	0	0	0	444	0
+45ddbdfd-d7bd-4387-a824-954dd7cd49e6	Listeria monocytogenes	assigned	none	0	0	0	1602	0
+f98e46e9-d967-4bd1-a873-864142c47588	Enterobacteria phage lambda	assigned	none	0	0	0	366	0
+55bf3ff3-0af2-45fe-8375-23e146fc0304	Enterobacteria phage lambda	assigned	none	0	0	0	524	0
+8b9a2fa0-c79f-4bc1-af81-ba5ad6232b16	Enterobacteria phage lambda	assigned	none	0	0	0	452	0
+3aca5968-cb3f-44d9-8bea-5253eeb20f1a	Enterobacteria phage lambda	assigned	none	0	0	0	446	0
+65788051-580f-4608-ae44-7fde6913b454	Pseudomonas aeruginosa	assigned	none	0	0	0	216	0
+5cfe6b48-74a7-4a35-a4ae-cbb3cebbc694	Enterobacteria phage lambda	assigned	none	0	0	0	437	0
+bf9a63bb-73a4-4265-ad03-dcba6a74663f	Enterobacteria phage lambda	assigned	none	0	0	0	435	0
+06f2f353-4033-4097-a706-8dcae15909a5	Enterobacteria phage lambda	assigned	none	0	0	0	635	0
+4a9c8303-0a5d-4f4a-b05f-89ca54e4327f	Enterobacteria phage lambda	assigned	none	0	0	0	515	0
+0d0cc7df-491a-439f-bc47-f7096d94b9c9	Escherichia coli K-12	assigned	none	0	0	0	162	0
+9487794b-7e13-4b53-a9fc-3c7a67792cc4	Listeria monocytogenes	assigned	none	0	0	0	6049	0
+88d80142-469f-48c1-90f1-a41782bf0f37	Enterobacteria phage lambda	assigned	none	0	0	0	589	0
+7bd38b06-61f8-437b-a001-0677ea761462	Enterobacteria phage lambda	assigned	none	0	0	0	446	0
+20753a16-f255-4ae4-b51c-71a42ff0fbcb	Enterobacteria phage lambda	assigned	none	0	0	0	523	0
+6146cabd-08a4-4aaf-8ba0-b9c509428ca8	Enterobacteria phage lambda	assigned	none	0	0	0	432	0
+f4d91c66-6ac7-440d-9baf-2af4a2a7aba9	Enterobacteria phage lambda	assigned	none	0	0	0	105	0
+85af6970-27e2-43ad-87a6-8db6e89ecd68	Enterobacteria phage lambda	assigned	none	0	0	0	355	0
+3f37e1a1-c2bc-4550-acbb-f4c40d10874e	Enterobacteria phage lambda	assigned	none	0	0	0	622	0
+0ff21919-3c30-457f-946e-3b93d150a1ad	Listeria monocytogenes	assigned	none	0	0	0	427	0
+96a4d83a-8a29-4376-a9e8-581dc107b1bd	Enterobacteria phage lambda	assigned	none	0	0	0	530	0
+6cc23356-8cbc-4578-901a-74e1ecf700ac	Enterobacteria phage lambda	assigned	none	0	0	0	217	0
+8a27c51c-2f90-45a1-bbfb-a652960dd2a1	Enterobacteria phage lambda	assigned	none	0	0	0	223	0
+03b1b50d-6fb4-4051-bca4-e690dda92ebf	Enterobacteria phage lambda	assigned	none	0	0	0	550	0
+9237f4bb-96e1-4ea9-b4d3-b5c81d76db19	Enterobacteria phage lambda	assigned	none	0	0	0	501	0
+b99457eb-c96c-46f4-81d7-9f354e1ca266	Enterobacteria phage lambda	assigned	none	0	0	0	218	0
+9397c45f-f045-48d9-b298-133f407177f6	Enterobacteria phage lambda	assigned	none	0	0	0	454	0
+421a8963-4c30-4443-b823-096dcd8a3baf	Enterobacteria phage lambda	assigned	none	0	0	0	517	0
+8a339fc0-7fcc-4b2b-abca-40617d50eacb	Enterobacteria phage lambda	assigned	none	0	0	0	528	0
+5004a562-bc8a-405c-a1af-bdb1f158e821	Enterobacteria phage lambda	assigned	none	0	0	0	496	0
+ec7b3311-c52c-4fdf-bce3-a4ca5e44122f	Enterobacteria phage lambda	assigned	none	0	0	0	559	0
+9d3c1e34-ec0c-44fe-b3cd-553c7fc39b97	Enterobacteria phage lambda	assigned	none	0	0	0	260	0
+a41a875e-8f70-4d4b-bd5e-ecf4fad4a150	Enterobacteria phage lambda	assigned	none	0	0	0	389	0
+a4f8191c-3eea-44b1-88dd-8b821ad68d5b	Enterobacteria phage lambda	assigned	none	0	0	0	572	0
+327f2694-9fdb-4e4c-a4c5-7a8b0ea891a3	Listeria monocytogenes	assigned	none	0	0	0	605	0
+e0caf9d1-cc40-4c08-9002-138b2b4fcefe	Enterobacteria phage lambda	assigned	none	0	0	0	445	0
+e553b31a-36aa-4b70-912d-b1de7f7c1ca2	Enterobacteria phage lambda	assigned	none	0	0	0	377	0
+bd8e5661-d0c1-460f-bb1f-8e5859dcbae9	Enterobacteria phage lambda	assigned	none	0	0	0	510	0
+be2dcbe1-b9a0-4e76-85e5-8e4b65b93cf1	Enterobacteria phage lambda	assigned	none	0	0	0	484	0
+74944f13-f5fb-44d4-88bd-8fa5449fa8ea	Enterobacteria phage lambda	assigned	none	0	0	0	440	0
+c390ca48-416b-4917-a193-7eb19be73c83	Enterobacteria phage lambda	assigned	none	0	0	0	602	0
+57dd807c-9d84-4899-bdce-b43bb50f183b	Enterobacteria phage lambda	assigned	none	0	0	0	522	0
+aedd8dcc-b77d-42b0-91a7-0bcc9ca57f5b	Enterobacteria phage lambda	assigned	none	0	0	0	469	0
+011ac409-16eb-45a9-826c-b1c3102873f6	Enterobacteria phage lambda	assigned	none	0	0	0	426	0
+40c463ef-df3c-4b91-a02e-15069bde76ba	Enterobacteria phage lambda	assigned	none	0	0	0	561	0
+ec95979c-f4b6-471f-9d96-1d882d053bc1	Enterobacteria phage lambda	assigned	none	0	0	0	442	0
+be40efed-1170-44cf-a8e3-b7b9daf977ad	Enterobacteria phage lambda	assigned	none	0	0	0	455	0
+5e214258-a417-4470-9ff1-d2ebf743ba07	Enterobacteria phage lambda	assigned	none	0	0	0	435	0
+4569f6c5-0fb1-4e33-bef6-3b96063bffc1	Enterobacteria phage lambda	assigned	none	0	0	0	411	0
+5bc27c14-4667-4b0a-8d7b-49d82c383506	Enterobacteria phage lambda	assigned	none	0	0	0	450	0
+eeee7fe5-c859-4ee6-b7d4-22e1bf77851e	Enterobacteria phage lambda	assigned	none	0	0	0	484	0
+0a71e3c8-2b7f-4319-ba66-4fa57ffc96f7	Enterobacteria phage lambda	assigned	none	0	0	0	483	0
+7a815c6e-c7b0-4628-828e-3535ec3eb2de	Enterobacteria phage lambda	assigned	none	0	0	0	410	0
+08018d93-5427-4ac5-95db-d455518248aa	Enterobacteria phage lambda	assigned	none	0	0	0	459	0
+e9cbbfde-08fb-43e2-b61b-17df86bcdd1c	Enterobacteria phage lambda	assigned	none	0	0	0	180	0
+491a548e-fb87-4567-b2cc-2dd6d5882c2b	Enterobacteria phage lambda	assigned	none	0	0	0	437	0
+33c54b47-daca-476e-b3d6-7c32f011b606	Pseudomonas aeruginosa	assigned	none	0	0	0	201	0
+788a5904-5bcc-4001-94e8-0a95303f7696	Enterobacteria phage lambda	assigned	none	0	0	0	496	0
+1608648a-d694-4671-ae08-6a6b05954727	Enterobacteria phage lambda	assigned	none	0	0	0	527	0
+bb7bbad7-0354-410f-8643-582d68aa16a2	Enterobacteria phage lambda	assigned	none	0	0	0	20607	0
+ba7af3f8-dbc6-4e70-ad19-d9a7eafed13e	Enterobacteria phage lambda	assigned	none	0	0	0	525	0
+23981d46-3e08-455c-a041-2c68768584f0	Enterobacteria phage lambda	assigned	none	0	0	0	740	0
+0aca0294-78b4-4a04-9cb8-015b5b105020	Enterobacteria phage lambda	assigned	none	0	0	0	575	0
+83e6eccd-0e03-438c-90db-7e6f86bb5f2f	Enterobacteria phage lambda	assigned	none	0	0	0	508	0
+c5255c5a-69f2-4ff9-994b-2b7133d24dad	Enterobacteria phage lambda	assigned	none	0	0	0	244	0
+3a68af8f-a159-44d6-85f3-32993ac34793	Enterobacteria phage lambda	assigned	none	0	0	0	457	0
+b5a0e237-7196-4f98-b26d-5727952107fe	Enterobacteria phage lambda	assigned	none	0	0	0	528	0
+f89e4b69-3d31-4f54-bc16-23199d32c1c5	Enterobacteria phage lambda	assigned	none	0	0	0	483	0
+0ee35103-6380-480b-a9bd-407312b7bbc7	Enterobacteria phage lambda	assigned	none	0	0	0	219	0
+838c38fb-b0bd-465e-adf5-42c8f7114328	Enterobacteria phage lambda	assigned	none	0	0	0	470	0
+a33032df-44f2-4ab2-9a56-fa021e4bcd9a	Enterobacteria phage lambda	assigned	none	0	0	0	450	0
+da7898fb-4fa4-4aaa-9ffc-1bf3350d4cfb	Enterobacteria phage lambda	assigned	none	0	0	0	398	0
+4f4fb5af-93c0-42f0-8d4d-0addb07df7bf	Enterobacteria phage lambda	assigned	none	0	0	0	586	0
+7f629d6a-adcd-4685-b62e-a04faeb680fd	Enterobacteria phage lambda	assigned	none	0	0	0	533	0
+379d71bd-9b8b-4fb8-a329-e63ba8052157	Enterobacteria phage lambda	assigned	none	0	0	0	447	0
+0a5a1de6-383b-4a55-887d-3b5fb85c79aa	Enterobacteria phage lambda	assigned	none	0	0	0	487	0
+da5c1c71-6b1c-4b19-bb9b-2970249e4c47	Enterobacteria phage lambda	assigned	none	0	0	0	453	0
+2639caab-017f-4eab-be13-8ce80e1da81c	Enterobacteria phage lambda	assigned	none	0	0	0	485	0
+0eec5e03-2a7f-4ee2-ac46-c377b8e89387	Enterobacteria phage lambda	assigned	none	0	0	0	393	0
+bbf2147d-6e11-4d95-b35d-eb0468eeaa37	Pseudomonas aeruginosa	assigned	none	0	0	0	305	0
+fb414f51-aee4-409f-9633-8431054568bd	Enterobacteria phage lambda	assigned	none	0	0	0	468	0
+ab3af9dc-8a54-41ff-adb4-3c6708831a5e	Enterobacteria phage lambda	assigned	none	0	0	0	370	0
+cf95a3a6-d0b2-47d2-804e-2b347da737db	Listeria monocytogenes	assigned	none	0	0	0	566	0
+a6d0babe-5356-4cf8-9fb6-8ef1767bc303	Enterobacteria phage lambda	assigned	none	0	0	0	522	0
+0914545a-fbb8-4686-bae2-89c2c6c1b0c6	Enterobacteria phage lambda	assigned	none	0	0	0	496	0
+6eb1f388-4ca3-4ce8-88d4-45f798ae1c99	Enterobacteria phage lambda	assigned	none	0	0	0	485	0
+1ab2e2d2-ec2d-4a26-89c5-b8e872604126	Enterobacteria phage lambda	assigned	none	0	0	0	566	0
+8c2ec778-8751-46cb-8764-7e1df8148c4f	Enterobacteria phage lambda	assigned	none	0	0	0	500	0
+789f3836-14e6-42bc-b5ee-3c030ee37a90	Enterobacteria phage lambda	assigned	none	0	0	0	419	0
+b18b7acf-bee6-4a1d-8f67-a75010e493ab	Enterobacteria phage lambda	assigned	none	0	0	0	515	0
+d23f9b85-4bbb-4cff-a857-f9b7a79f8ebc	Enterobacteria phage lambda	assigned	none	0	0	0	434	0
+35806a82-9474-4b17-9da5-54eeb4001dc6	Enterobacteria phage lambda	assigned	none	0	0	0	461	0
+4fe971e9-f617-4e2c-83fd-610d9ad1d99b	Enterobacteria phage lambda	assigned	none	0	0	0	122	0
+4c6d4941-7e7b-4933-b600-635723a67f8c	Enterobacteria phage lambda	assigned	none	0	0	0	528	0
+81776249-17aa-4b36-8ed0-ed79c95c0034	Enterobacteria phage lambda	assigned	none	0	0	0	210	0
+1f98fad5-9cf0-48bb-8f33-07bb619a5568	Enterobacteria phage lambda	assigned	none	0	0	0	556	0
+8e446a95-4837-4a34-8317-ca69281cae8c	Pseudomonas aeruginosa	assigned	none	0	0	0	193	0
+d6dede06-0434-42ca-8b2f-76f983b9088e	Enterobacteria phage lambda	assigned	none	0	0	0	404	0
+99b5985d-8f79-470d-bb38-7d7c1b5dc867	Enterobacteria phage lambda	assigned	none	0	0	0	512	0
+9ab4706e-3125-48de-af6e-3821536f183c	Enterobacteria phage lambda	assigned	none	0	0	0	481	0
+5e68d34e-d0f1-4e91-bafa-9209ef131209	Enterobacteria phage lambda	assigned	none	0	0	0	193	0
+5afb4d3e-83f3-4b8c-a37f-306b99106850	Enterobacteria phage lambda	assigned	none	0	0	0	363	0
+47761fc5-79ad-41b1-bb83-6cfa8f918d75	Enterobacteria phage lambda	assigned	none	0	0	0	449	0
+5609f7a5-80bb-4f25-bce5-8ed986f17c76	Enterobacteria phage lambda	assigned	none	0	0	0	522	0
+f4c1cf6c-4f8b-4467-a5ac-7a17536d1e60	Enterobacteria phage lambda	assigned	none	0	0	0	449	0
+39fc33d5-dfdb-4770-ae99-5502af7ad7b3	Enterobacteria phage lambda	assigned	none	0	0	0	314	0
+f7351709-5455-45e6-8119-0251f5d96e53	Enterobacteria phage lambda	assigned	none	0	0	0	542	0
+d21068f8-25bb-4add-a4df-1d923c976084	Enterobacteria phage lambda	assigned	none	0	0	0	430	0
+23b95693-497e-4196-9b76-c77330610da3	Enterobacteria phage lambda	assigned	none	0	0	0	609	0
+441250ce-1255-48dc-afbb-126fde9811e5	Enterobacteria phage lambda	assigned	none	0	0	0	231	0
+04ccc051-500d-442f-8d3e-cfd60508adb6	Enterobacteria phage lambda	assigned	none	0	0	0	389	0
+d13552d8-037b-4b38-b670-c522789fa83a	Enterobacteria phage lambda	assigned	none	0	0	0	591	0
+0eb51ba5-6f86-40cd-9caf-e04208e8ab53	Listeria monocytogenes	assigned	none	0	0	0	2105	0
+ec545d6f-d21b-420e-b1ee-48c86b13d8b5	Enterobacteria phage lambda	assigned	none	0	0	0	6151	0
+9f80af40-4c5d-4835-be14-589872641f5c	Enterobacteria phage lambda	assigned	none	0	0	0	569	0
+ed0b27df-735d-4f80-9ca3-9bf2133a902d	Enterobacteria phage lambda	assigned	none	0	0	0	370	0
+9a82d81d-7ad0-40d1-bcc4-8b1417fe1081	Enterobacteria phage lambda	assigned	none	0	0	0	480	0
+49a4ab88-037f-46b2-ac49-03ee44ff10d4	Enterobacteria phage lambda	assigned	none	0	0	0	442	0
+28d834e1-5062-450b-aa8e-03e88058b152	Enterobacteria phage lambda	assigned	none	0	0	0	453	0
+2518a46b-8341-4efa-8977-fef40e4824ac	Enterobacteria phage lambda	assigned	none	0	0	0	300	0
+c64221ad-f433-4177-b78f-37e6bb5072e9	Pseudomonas aeruginosa	assigned	none	0	0	0	248	0
+9643112a-364e-487a-96f4-313b90ff0067	Enterobacteria phage lambda	assigned	none	0	0	0	758	0
+6b357969-ed34-4696-87da-1eae90c1e565	Enterobacteria phage lambda	assigned	none	0	0	0	428	0
+02d633e6-484e-43c9-bade-e61987f46dd1	Enterobacteria phage lambda	assigned	none	0	0	0	468	0
+0ea3574b-b3b2-4d03-8a29-4a66da057858	Enterobacteria phage lambda	assigned	none	0	0	0	370	0
+8bc05dd0-73ba-451a-bff5-ee7212954b91	Enterobacteria phage lambda	assigned	none	0	0	0	402	0
+76d2dba1-a347-4948-9a25-61eaf31529fc	Enterobacteria phage lambda	assigned	none	0	0	0	660	0
+aa536cf1-2822-4bdc-9fbd-9fce720bb6d1	Enterobacteria phage lambda	assigned	none	0	0	0	451	0
+7d9999ec-0708-43a8-b893-a08e7b0ec9d0	Enterobacteria phage lambda	assigned	none	0	0	0	491	0
+abd03c0a-f9a5-4f5d-88f7-11828ff125a4	Enterobacteria phage lambda	assigned	none	0	0	0	580	0
+9b764d0c-b3f4-40fb-99d4-c6256bdce131	Enterobacteria phage lambda	assigned	none	0	0	0	423	0
+ecce7aea-643c-42db-b631-7a56c3b54986	Enterobacteria phage lambda	assigned	none	0	0	0	546	0
+21bd72c6-e020-4275-8f37-477bfb429d97	Enterobacteria phage lambda	assigned	none	0	0	0	550	0
+06b5cc4c-4666-41bb-8ba6-89d7f26247e5	Enterobacteria phage lambda	assigned	none	0	0	0	471	0
+b3389a44-0029-406b-8495-1c59a3d8aad4	Enterobacteria phage lambda	assigned	none	0	0	0	527	0
+2d18588b-6a08-4343-91cf-231f9a5ea3fe	Enterobacteria phage lambda	assigned	none	0	0	0	364	0
+e5a0dc3c-bbc6-4ba0-9677-1f67a5923db9	Enterobacteria phage lambda	assigned	none	0	0	0	442	0
+9c8c5bb6-4924-49b5-81b3-6d47f8cf90ad	Enterobacteria phage lambda	assigned	none	0	0	0	543	0
+799e4ad2-0cf4-4d8f-b565-33aec008016a	Enterobacteria phage lambda	assigned	none	0	0	0	408	0
+72d6e92c-7b16-485a-a6e5-a97b43534e24	Enterobacteria phage lambda	assigned	none	0	0	0	423	0
+a5a8f656-37ad-4250-b2c3-688fe5ab6345	Pseudomonas aeruginosa	assigned	none	0	0	0	135	0
+f96d4b94-6c41-4dc8-8c26-66ff79d27849	Enterobacteria phage lambda	assigned	none	0	0	0	801	0
+d02a31d5-23a1-48ba-80b2-ba5f1287a621	Enterobacteria phage lambda	assigned	none	0	0	0	433	0
+d7f442f4-331c-40ae-89f0-371c22ff758a	Enterobacteria phage lambda	assigned	none	0	0	0	653	0
+30e0fc21-8277-4f09-973f-c8ac66bf056f	Enterobacteria phage lambda	assigned	none	0	0	0	478	0
+55412e7f-98aa-487d-815d-e7e7f11042d7	Enterobacteria phage lambda	assigned	none	0	0	0	386	0
+d001c824-3e1d-4879-9c0b-c65602f12fea	Enterobacteria phage lambda	assigned	none	0	0	0	395	0
+f39125a1-07eb-47c3-a584-95150f778869	Enterobacteria phage lambda	assigned	none	0	0	0	434	0
+fb1c9641-77e8-4bc7-bbfc-75a4142437d3	Enterobacteria phage lambda	assigned	none	0	0	0	398	0
+6018a93d-4004-4dec-bfad-6d45ad7de264	Enterobacteria phage lambda	assigned	none	0	0	0	327	0
+7899436b-da84-49e4-8184-64c40bf59669	Enterobacteria phage lambda	assigned	none	0	0	0	504	0
+d8912124-d6a8-405e-abb9-e9ed83d3a469	Enterobacteria phage lambda	assigned	none	0	0	0	272	0
+d04d86a6-ef41-4b2a-a32d-460dc8c7ca7f	Enterobacteria phage lambda	assigned	none	0	0	0	399	0
+b1189928-3e98-417f-b4bd-12604557fbef	Enterobacteria phage lambda	assigned	none	0	0	0	535	0
+30d646c4-9099-4f52-a8f4-a2261f271d27	Enterobacteria phage lambda	assigned	none	0	0	0	468	0
+17961fde-2467-4fc5-a020-ff212a31ccdb	Enterobacteria phage lambda	assigned	none	0	0	0	201	0
+90522b66-c049-4868-a579-6e4c04e0bd11	Enterobacteria phage lambda	assigned	none	0	0	0	539	0
+9ee7ad0c-bad8-4410-a022-612f99381a58	Enterobacteria phage lambda	assigned	none	0	0	0	421	0
+f69550a6-a717-4fc0-bf83-1e46cdf9b7b8	Enterobacteria phage lambda	assigned	none	0	0	0	398	0
+d06f4327-cdc1-4c5a-865c-09c50553f68c	Enterobacteria phage lambda	assigned	none	0	0	0	547	0
+875a73c1-fa1a-494a-b5cd-7015ee428f94	Enterobacteria phage lambda	assigned	none	0	0	0	455	0
+351faba2-6e72-46a7-b703-5f852e07b626	Enterobacteria phage lambda	assigned	none	0	0	0	440	0
+eeae7b69-fb77-4526-95ca-d88c0a6bbc61	Enterobacteria phage lambda	assigned	none	0	0	0	377	0
+e066ff14-d187-4253-ab74-78d3343d18bb	Enterobacteria phage lambda	assigned	none	0	0	0	4374	0
+2d0aa655-8589-4f25-b7db-81f68fc22f5c	Enterobacteria phage lambda	assigned	none	0	0	0	559	0
+1f2bf12e-7d2a-487c-998c-5265b7d225ff	Enterobacteria phage lambda	assigned	none	0	0	0	550	0
+1469bdc7-bd3e-4d24-b762-1321cbffd6a5	Enterobacteria phage lambda	assigned	none	0	0	0	466	0
+27e91ad5-3f21-43bb-b456-7cbb0d4155e8	Enterobacteria phage lambda	assigned	none	0	0	0	633	0
+3df8f29e-125a-4df3-8107-07a85185f58e	Escherichia coli K-12	assigned	none	0	0	0	593	0
+de8221ce-4aa7-42d8-8cdb-7aa24992f759	Enterobacteria phage lambda	assigned	none	0	0	0	516	0
+8972ce60-679e-40aa-b4fe-1c58baf0000d	Enterobacteria phage lambda	assigned	none	0	0	0	614	0
+695fba64-c85f-4d69-9699-eb2ab04a5ca4	Enterobacteria phage lambda	assigned	none	0	0	0	470	0
+430871a2-ef08-446d-80ea-ef61cd12a027	Enterobacteria phage lambda	assigned	none	0	0	0	567	0
+0ccaafdf-2cef-47bc-87ce-c549b1490563	Listeria monocytogenes	assigned	none	0	0	0	420	0
+3c695c44-1991-449c-8436-db07b6502e95	Enterobacteria phage lambda	assigned	none	0	0	0	482	0
+10a85a72-9468-4c11-b66d-24638dcd60c7	Enterobacteria phage lambda	assigned	none	0	0	0	431	0
+07cfd554-0793-4fc3-914f-063fa9b5796a	Enterobacteria phage lambda	assigned	none	0	0	0	411	0
+c8eaee84-0c95-402f-9030-76f78961957d	Enterobacteria phage lambda	assigned	none	0	0	0	552	0
+2f17ef81-d4ef-489b-a03e-4cabc0feefbc	Enterobacteria phage lambda	assigned	none	0	0	0	475	0
+00f3c195-6988-4f08-bd43-6d297689533c	Enterobacteria phage lambda	assigned	none	0	0	0	660	0
+c00d10bb-4ece-4913-86b7-8f67b6d76c06	Enterobacteria phage lambda	assigned	none	0	0	0	107	0
+60778a32-d59c-4300-8c8d-093fe8989e36	Enterobacteria phage lambda	assigned	none	0	0	0	424	0
+d4b057d3-2dbc-44e9-9421-4dae46e6c617	Enterobacteria phage lambda	assigned	none	0	0	0	434	0
+edcb5717-ba69-4aeb-9617-88c378b4f8fe	Enterobacteria phage lambda	assigned	none	0	0	0	485	0
+ad0a2445-eab5-423f-8fb1-39b49c318d0e	Enterobacteria phage lambda	assigned	none	0	0	0	452	0
+ae3d87c7-0d79-4e6a-928b-86540bb82888	Enterobacteria phage lambda	assigned	none	0	0	0	364	0
+ed25163c-7d14-4b59-a568-3787ba4c3d5b	Enterobacteria phage lambda	assigned	none	0	0	0	498	0
+4e88de5c-db2d-4bd1-9dff-aa926ea3d346	Enterobacteria phage lambda	assigned	none	0	0	0	286	0
+85e8fb2a-2caf-4b03-bb71-7db1245cb637	Enterobacteria phage lambda	assigned	none	0	0	0	388	0
+60fe58eb-7287-436c-882e-a42263744f65	Enterobacteria phage lambda	assigned	none	0	0	0	147	0
+3e182e65-4bc7-477c-a54b-2d738492b8de	Enterobacteria phage lambda	assigned	none	0	0	0	468	0
+ebc2e382-fe3f-4b8c-9c5a-88e3362a8833	Enterobacteria phage lambda	assigned	none	0	0	0	486	0
+84255c02-397e-4553-b09f-a76808f9b12c	Enterobacteria phage lambda	assigned	none	0	0	0	446	0
+94865fcf-70a3-4be5-899d-3cf5a29200d3	Enterobacteria phage lambda	assigned	none	0	0	0	475	0
+2a475c40-6232-4d01-a8a4-9ec0e11845f1	Enterobacteria phage lambda	assigned	none	0	0	0	471	0
+f172d6d2-fa39-4899-ae89-3352fddfff3e	Enterobacteria phage lambda	assigned	none	0	0	0	667	0
+828945c0-9d06-4ff8-b11f-4cc1cb9998aa	Enterobacteria phage lambda	assigned	none	0	0	0	446	0
+655b391f-d762-4cee-a380-a613a15430ee	Enterobacteria phage lambda	assigned	none	0	0	0	508	0
+62ae2228-5e96-4e89-9236-2a4e77c46798	Enterobacteria phage lambda	assigned	none	0	0	0	474	0
+2ac87e52-88e2-463e-bce3-cd111d52c637	Enterobacteria phage lambda	assigned	none	0	0	0	473	0
+c9eebcb2-9914-4920-ae80-224d6a26e839	Enterobacteria phage lambda	assigned	none	0	0	0	247	0
+a6d3155b-bae6-45f2-93fd-8883ebd479eb	Enterobacteria phage lambda	assigned	none	0	0	0	520	0
+cee0a0cf-5701-4186-b428-0d97f12d62f7	Enterobacteria phage lambda	assigned	none	0	0	0	466	0
+3b92cb86-00fe-44cc-a082-c2028fda9451	Escherichia coli K-12	assigned	none	0	0	0	6296	0
+c05e6910-e799-4687-9b5b-217fe213095c	Enterobacteria phage lambda	assigned	none	0	0	0	465	0
+dbec55c3-2e55-4aff-baee-7625e7512b0d	Enterobacteria phage lambda	assigned	none	0	0	0	495	0
+774c5ef1-08ad-4ff0-a5b1-32d26cdebdca	Enterobacteria phage lambda	assigned	none	0	0	0	250	0
+989da0a3-f503-416b-a62f-fece5a52dd7d	Enterobacteria phage lambda	assigned	none	0	0	0	543	0
+d95e26ce-3993-4b5f-b117-01d26d6ba069	Enterobacteria phage lambda	assigned	none	0	0	0	517	0
+c07599c7-0fe6-4712-923c-628bc1838b1e	Escherichia coli K-12	assigned	none	0	0	0	225	0
+ac902684-8700-47b4-a486-4ebb4b395a9d	Enterobacteria phage lambda	assigned	none	0	0	0	523	0
+b5aa811b-a868-43ed-bc38-1d16e70ad300	Enterobacteria phage lambda	assigned	none	0	0	0	444	0
+2dd0dc64-687c-4734-bca5-62e787869105	Enterobacteria phage lambda	assigned	none	0	0	0	306	0
+f380597f-635d-48cf-8b4b-138dfd0454e3	Enterobacteria phage lambda	assigned	none	0	0	0	364	0
+5838a835-cf4e-4629-a182-4495611077c2	Enterobacteria phage lambda	assigned	none	0	0	0	625	0
+b629f80d-c57e-4063-8a37-60f50cdb1ccb	Escherichia coli K-12	assigned	none	0	0	0	189	0
+c3b47f6a-a888-4635-bc4e-9022ceffeb59	Enterobacteria phage lambda	assigned	none	0	0	0	178	0
+00d8e8f1-a6ef-40ec-9c90-2f85c999238a	Enterobacteria phage lambda	assigned	none	0	0	0	471	0
+7531525f-2b97-4c3c-bedd-ac396e867ec9	Enterobacteria phage lambda	assigned	none	0	0	0	458	0
+679f39e4-0f85-4688-bebf-a6031404920e	Enterobacteria phage lambda	assigned	none	0	0	0	502	0
+fc6f410f-f167-4bb5-a32c-36826f0c1625	Enterobacteria phage lambda	assigned	none	0	0	0	454	0
+0d8e05ad-7d56-41be-bab5-704d40391c99	Enterobacteria phage lambda	assigned	none	0	0	0	215	0
+4ac2484f-dda0-4ff6-ad20-9130e0b45ce6	Enterobacteria phage lambda	assigned	none	0	0	0	477	0
+f298628c-5b0a-4aa0-8a15-4ec584882697	Listeria monocytogenes	assigned	none	0	0	0	67	0
+73cb83c3-e724-43ce-aaaf-6543ceb8eaa4	Enterobacteria phage lambda	assigned	none	0	0	0	451	0
+3b2d4003-e538-492a-a901-75ded776800e	Enterobacteria phage lambda	assigned	none	0	0	0	459	0
+fc557a5f-1323-4663-9cfd-06a3d2c93cb1	Enterobacteria phage lambda	assigned	none	0	0	0	589	0
+baa43ad5-7cbe-47bb-82d7-acdd75c0a61d	Enterobacteria phage lambda	assigned	none	0	0	0	615	0
+6ee2cb4c-48bb-484f-b17f-4a3c95c84307	Enterobacteria phage lambda	assigned	none	0	0	0	4381	0
+e5009c93-4738-49b1-be3e-9bbc0b5e306d	Listeria monocytogenes	assigned	none	0	0	0	363	0
+f0605780-564a-471f-9d4a-65cae8125c9f	Escherichia coli K-12	assigned	none	0	0	0	52	0
+4bb4ba13-f0f3-40ba-bab8-bea284c18f9d	Enterobacteria phage lambda	assigned	none	0	0	0	445	0
+7adc9c1f-f3b6-4377-862a-86055c5db63b	Enterobacteria phage lambda	assigned	none	0	0	0	242	0
+b61cbcbe-9c6c-472b-b11c-a24d709722dc	Enterobacteria phage lambda	assigned	none	0	0	0	416	0
+49df515c-da44-4769-8ee2-f7d7be9cec4b	Enterobacteria phage lambda	assigned	none	0	0	0	507	0
+01c93ceb-6ddd-45bc-a5a8-2619db9a5876	Enterobacteria phage lambda	assigned	none	0	0	0	491	0
+53ef8c8d-6a95-4f6b-b6a4-84ad36ecfbd0	Enterobacteria phage lambda	assigned	none	0	0	0	457	0
+97fa01fb-cfb3-44b3-a6e5-c9d93e11da85	Enterobacteria phage lambda	assigned	none	0	0	0	569	0
+4620bf5a-ded4-43fb-9fa2-01a2cdd91cbd	Enterobacteria phage lambda	assigned	none	0	0	0	186	0
+bbf889d3-8372-4736-822a-ee38971f6236	Enterobacteria phage lambda	assigned	none	0	0	0	565	0
+19c4d20a-764c-415f-b14c-efa20bc460b6	Enterobacteria phage lambda	assigned	none	0	0	0	531	0
+0523fcd9-2130-447c-b4df-275b3df1178e	Enterobacteria phage lambda	assigned	none	0	0	0	646	0
+0b737ec3-e924-4cbf-af30-98deac1b6919	Enterobacteria phage lambda	assigned	none	0	0	0	485	0
+de6485bf-93ab-459d-b801-b4df62c0da7d	Enterobacteria phage lambda	assigned	none	0	0	0	534	0
+0299b367-78de-405d-8393-f88595ff4971	Enterobacteria phage lambda	assigned	none	0	0	0	438	0
+7ec9b85e-2ddd-4666-8b54-4772b0a76f81	Enterobacteria phage lambda	assigned	none	0	0	0	765	0
+8f3bb619-8d10-4a62-af4b-f0e00ae01b66	Enterobacteria phage lambda	assigned	none	0	0	0	491	0
+3f0cde0d-67d0-47b6-b53d-b9788fbeec02	Enterobacteria phage lambda	assigned	none	0	0	0	470	0
+3398badd-5e06-44a4-a2cd-f57e637b2f42	Enterobacteria phage lambda	assigned	none	0	0	0	521	0
+cd65476a-7de1-469f-87df-02eb1be346c4	Enterobacteria phage lambda	assigned	none	0	0	0	550	0
+60af2ec0-2211-4819-8699-c3ffa6c91e3b	Listeria monocytogenes	assigned	none	0	0	0	528	0
+35bd7c40-db99-459a-bc77-48dc29ede9c1	Enterobacteria phage lambda	assigned	none	0	0	0	218	0
+7167fb45-4d16-4798-bb51-369715f79c3b	Enterobacteria phage lambda	assigned	none	0	0	0	531	0
+7217aab6-1baf-41be-9491-a2eb9bf0b6a3	Enterobacteria phage lambda	assigned	none	0	0	0	527	0
+81bd6c20-164d-415f-b959-6abb643cf7be	Enterobacteria phage lambda	assigned	none	0	0	0	576	0
+9ae43e87-1faf-46e0-8ca6-2e5f7ad3775c	Enterobacteria phage lambda	assigned	none	0	0	0	393	0
+ec5721c4-39ed-4562-86fb-c4cfb967a222	Enterobacteria phage lambda	assigned	none	0	0	0	442	0
+b0faa382-b934-4e11-a76e-df25e19a9826	Enterobacteria phage lambda	assigned	none	0	0	0	614	0
+f07eceaa-c57d-4a9e-92fe-58cef2842d27	Enterobacteria phage lambda	assigned	none	0	0	0	388	0
+b803e432-f484-441d-bb8b-c9c2ccc15b8d	Enterobacteria phage lambda	assigned	none	0	0	0	279	0
+54e030cd-7c87-403d-adc9-e85bb1c07159	Enterobacteria phage lambda	assigned	none	0	0	0	447	0
+b7f77525-a716-4b40-80f0-b733f66d3105	Enterobacteria phage lambda	assigned	none	0	0	0	470	0
+5c913577-e2c0-416b-8cee-0e5bb7e29c48	Enterobacteria phage lambda	assigned	none	0	0	0	538	0
+2bb94555-de63-48f5-a837-7212dfa20b02	Enterobacteria phage lambda	assigned	none	0	0	0	46320	0
+5f6fecab-4a84-42c0-bc5d-6d9156e62ffe	Enterobacteria phage lambda	assigned	none	0	0	0	8993	0
+c4cb591f-8927-4bdc-8f33-a8956eeadb6a	Enterobacteria phage lambda	assigned	none	0	0	0	8351	0
+62bf97ee-fe7e-4813-9d11-0ac1a79bab6c	Enterobacteria phage lambda	assigned	none	0	0	0	18260	0
+30ad7cd7-cd8e-4f49-a4e6-83e1b9ee52c9	Enterobacteria phage lambda	assigned	none	0	0	0	13139	0
+ee1379cb-2845-46d1-bdb8-9bf9336f97a2	Enterobacteria phage lambda	assigned	none	0	0	0	2023	0
+dfa12cd9-470c-4f0a-ba34-cc363bfa6c29	Enterobacteria phage lambda	assigned	none	0	0	0	1024	0
+fd46aa88-6ee5-4267-99c4-dd430c6ae48d	Enterobacteria phage lambda	assigned	none	0	0	0	47214	0
+05f625d3-809c-4222-b714-b844335bd342	Enterobacteria phage lambda	assigned	none	0	0	0	1680	0
+fe3fa72f-7849-43fb-92f3-86ab60b232eb	Enterobacteria phage lambda	assigned	none	0	0	0	26899	0
+fcd0e416-524b-4696-af36-c745fb0f47ce	Enterobacteria phage lambda	assigned	none	0	0	0	35976	0
+5c6a7951-bda9-48c8-a1d5-112092fff853	Enterobacteria phage lambda	assigned	none	0	0	0	21394	0
+9d85e13d-b748-457e-96b3-538b11324104	Enterobacteria phage lambda	assigned	none	0	0	0	174	0
+904a2edc-4fe3-4267-8f87-513bdd9909b2	Enterobacteria phage lambda	assigned	none	0	0	0	43284	0
+c10793df-1bb4-42b0-b92b-b216962a7ba3	Enterobacteria phage lambda	assigned	none	0	0	0	37947	0
+d3b5ade2-50cf-4df7-9a41-bea7ab11055a	Enterobacteria phage lambda	assigned	none	0	0	0	2394	0
+08170e33-5ca7-46a7-a197-f59bea73fbed	Enterobacteria phage lambda	assigned	none	0	0	0	29079	0
+5e453413-0b69-46e3-9378-bbff8aba6762	Enterobacteria phage lambda	assigned	none	0	0	0	11669	0
+242fbf5f-9c40-48c4-a496-a7af70bd0b46	Enterobacteria phage lambda	assigned	none	0	0	0	40458	0
+89dcd2db-1cf9-4e2e-9e24-e228662a32b3	Enterobacteria phage lambda	assigned	none	0	0	0	44654	0
+acc8943a-374e-4401-a0dd-23f7249da676	Enterobacteria phage lambda	assigned	none	0	0	0	29604	0
+66ed61f5-4a5f-45df-8d32-08b9b383f920	Enterobacteria phage lambda	assigned	none	0	0	0	12631	0
+83695e7b-81b5-430c-99b6-b5fc4f71560b	Enterobacteria phage lambda	assigned	none	0	0	0	761	0
+fed21cfc-b7a6-4cf5-a3e7-4581638325ba	Enterobacteria phage lambda	assigned	none	0	0	0	9413	0
+b1ffebd9-5a20-46b9-a39c-44dbc72eedcd	Enterobacteria phage lambda	assigned	none	0	0	0	48917	0
+88e98b7a-9b52-4dac-b19f-9d6a90f1a844	Enterobacteria phage lambda	assigned	none	0	0	0	19185	0
+be1359bf-9cbf-49ae-9baf-b713019f8f33	Enterobacteria phage lambda	assigned	none	0	0	0	23552	0
+f6282f62-ca14-4133-a250-a0a39ed95a0c	Enterobacteria phage lambda	assigned	none	0	0	0	9443	0
+aeaa3f0d-cf39-492d-ad57-7d139b3b936a	Enterobacteria phage lambda	assigned	none	0	0	0	3778	0
+de7b67f3-100b-425a-8a8e-323716e44fcd	Enterobacteria phage lambda	assigned	none	0	0	0	18340	0
+16064db9-e285-4541-a469-04d20c02cef5	Listeria monocytogenes	assigned	none	0	0	0	4312	0
+7db76a54-8045-4cfc-b980-ffb415ab5473	Enterobacteria phage lambda	assigned	none	0	0	0	48628	0
+b5b28271-adfa-4b91-b590-9504139031a7	Enterobacteria phage lambda	assigned	none	0	0	0	38724	0
+f22a89be-693c-43ac-8489-8be9331ec7f1	Enterobacteria phage lambda	assigned	none	0	0	0	18082	0
+154aa541-70a4-49ab-8e05-a2ef74eb2d6a	Enterobacteria phage lambda	assigned	none	0	0	0	31110	0
+7cb1d956-210b-4101-9487-eefe9e88d27c	Enterobacteria phage lambda	assigned	none	0	0	0	390	0
+cce15109-2276-4f08-88e1-4154e1aca715	Enterobacteria phage lambda	assigned	none	0	0	0	28186	0
+8422e395-2fc0-471a-ba20-08bc6b4e78fb	Enterobacteria phage lambda	assigned	none	0	0	0	38249	0
+fc2b973a-af36-4961-afd4-773e000742b3	Enterobacteria phage lambda	assigned	none	0	0	0	1914	0
+f8615c4c-d23c-4430-a666-2549ad9fa7d9	Enterobacteria phage lambda	assigned	none	0	0	0	31323	0
+874bfcd3-e364-4b25-ac3e-868956208c42	Enterobacteria phage lambda	assigned	none	0	0	0	14604	0
+842deb4e-419f-4087-9232-f128fe3dec9c	Enterobacteria phage lambda	assigned	none	0	0	0	28669	0
+6ccd4d3b-d03c-4c4e-b296-b14265cecd8e	Enterobacteria phage lambda	assigned	none	0	0	0	10791	0
+82f759d1-e093-4adc-b503-25557b404520	Enterobacteria phage lambda	assigned	none	0	0	0	7296	0
+59eedc6d-0163-4fd6-9e25-c25bc405048d	Enterobacteria phage lambda	assigned	none	0	0	0	23964	0
+438e019f-516a-41e2-ae96-bfc536d7ea6c	Listeria monocytogenes	assigned	none	0	0	0	3199	0
+ee7de278-d01c-43d6-9489-9749307b998d	Enterobacteria phage lambda	assigned	none	0	0	0	35072	0
+13158b34-d0d7-4a06-87a9-052baf49b111	Enterobacteria phage lambda	assigned	none	0	0	0	48984	0
+55ba2640-fc12-40b6-88f7-d23e9498237a	Enterobacteria phage lambda	assigned	none	0	0	0	1761	0
+1e777c16-15c2-4798-a2c2-75c849a42d6e	Enterobacteria phage lambda	assigned	none	0	0	0	2404	0
+30b1fea4-fbb7-4b0c-8f37-14af827f9aa1	Enterobacteria phage lambda	assigned	none	0	0	0	27117	0
+0f999d26-02b5-4a5d-b02b-eddfa6eef19e	Enterobacteria phage lambda	assigned	none	0	0	0	30881	0
+0c42d792-dee0-414c-825c-7c086eb9cecc	Enterobacteria phage lambda	assigned	none	0	0	0	28856	0
+0b5f3673-f32c-4d96-b912-26f5af680fa6	Enterobacteria phage lambda	assigned	none	0	0	0	14887	0
+4f069461-3dd6-48a9-a096-bccd52b128ef	Escherichia coli K-12	assigned	none	0	0	0	367	0
+66413698-b357-4604-a6a7-378362c349d0	Enterobacteria phage lambda	assigned	none	0	0	0	14771	0
+f4e2b791-44a1-49e0-a525-8ed45a3f2c19	Enterobacteria phage lambda	assigned	none	0	0	0	48702	0
+8d56c5bd-6086-4ec0-b462-3dbea46ff990	Enterobacteria phage lambda	assigned	none	0	0	0	11317	0
+a72d1e7d-3e87-4cac-aac8-b6426cbf3b62	Enterobacteria phage lambda	assigned	none	0	0	0	32148	0
+199998cd-e26d-44a7-aa50-917b256b8177	Enterobacteria phage lambda	assigned	none	0	0	0	3658	0
+9aaf4f5f-f79b-4aca-b715-440ba270b652	Enterobacteria phage lambda	assigned	none	0	0	0	2696	0
+f83741ba-2240-4853-adf6-124e21c1535c	Saccharomyces cerevisiae	assigned	none	0	0	0	1011	0
+6bc246fb-7f49-49f3-90ae-90914badb417	Enterobacteria phage lambda	assigned	none	0	0	0	48802	0
+d9dc5546-b924-43ce-8c1c-97be60b6760f	Enterobacteria phage lambda	assigned	none	0	0	0	11089	0
+41673756-58f5-4b50-9ed9-0144e7a33ee2	Enterobacteria phage lambda	assigned	none	0	0	0	21580	0
+e175ce84-33a3-4647-b118-3baceb1b1924	Enterobacteria phage lambda	assigned	none	0	0	0	14684	0
+5d6b024c-4a96-4e58-9c0a-9dc3834e3e79	Enterobacteria phage lambda	assigned	none	0	0	0	7682	0
+5e7e14ff-6408-410d-91c7-a14baef3df5a	Enterobacteria phage lambda	assigned	none	0	0	0	42030	0
+fc20a72f-9d55-45a9-8396-c69642b3d6a3	Enterobacteria phage lambda	assigned	none	0	0	0	27943	0
+d6b0d411-9aab-4c6c-9597-a473725b9893	Enterobacteria phage lambda	assigned	none	0	0	0	649	0
+640db8d7-b54e-4424-96ac-5098b8e15500	Enterobacteria phage lambda	assigned	none	0	0	0	19014	0
+525d8867-b5aa-4fc2-b8e5-abb8564e993f	Enterobacteria phage lambda	assigned	none	0	0	0	47782	0
+48e110eb-36b4-4370-8650-01b28b1e32cf	Enterobacteria phage lambda	assigned	none	0	0	0	38998	0
+76f7c915-2e67-429c-89f3-cbd483c13ff4	Listeria monocytogenes	assigned	none	0	0	0	22223	0
+7fa60b83-03fd-498c-92e2-8632ecfd7941	Enterobacteria phage lambda	assigned	none	0	0	0	47737	0
+5b9a4fcc-9e94-4732-93b3-560bdb281875	Enterobacteria phage lambda	assigned	none	0	0	0	47119	0
+6873cd7a-4526-4508-b418-992a0037d9f5	Enterobacteria phage lambda	assigned	none	0	0	0	2193	0
+60590e95-36f2-4f63-9b0e-4961ddb0f529	Enterobacteria phage lambda	assigned	none	0	0	0	15492	0
+52466fea-b420-4cbb-a6f6-57f6e20be9d9	Enterobacteria phage lambda	assigned	none	0	0	0	12013	0
+7ac2317e-48d6-4cdb-a568-ff19787b04cf	Enterobacteria phage lambda	assigned	none	0	0	0	49225	0
+581b9fbe-7451-4575-a61c-19ce2238880b	Enterobacteria phage lambda	assigned	none	0	0	0	35492	0
+5bfde32a-389b-4415-8aa5-d560b1031d30	Enterobacteria phage lambda	assigned	none	0	0	0	19393	0
+72a7b1a1-c18a-47a8-b621-69258d2e9909	Enterobacteria phage lambda	assigned	none	0	0	0	15641	0
+2bbc8a4c-07d7-4c84-9236-eae8a4afa890	Enterobacteria phage lambda	assigned	none	0	0	0	21215	0
+689f6de2-38cb-4b82-97de-bf8c80204131	Enterobacteria phage lambda	assigned	none	0	0	0	39605	0
+24729568-a125-4495-9ea3-34abfe916cb1	Enterobacteria phage lambda	assigned	none	0	0	0	47660	0
+f324eaa3-17df-47c7-9419-e8aa607ac8f8	Enterobacteria phage lambda	assigned	none	0	0	0	1319	0
+9a4797a2-4478-4e20-972f-6fae8bedee4e	Enterobacteria phage lambda	assigned	none	0	0	0	28450	0
+8db10e03-34c2-48dd-bc68-efacab29c8c0	Enterobacteria phage lambda	assigned	none	0	0	0	13868	0
+7037afb3-8308-47f4-aade-300c00f99d68	Enterobacteria phage lambda	assigned	none	0	0	0	7023	0
+32b0a7fc-eba6-4249-9558-27809adc6c1c	Enterobacteria phage lambda	assigned	none	0	0	0	8945	0
+718eebe7-2908-4d48-8d99-6b144014c158	Enterobacteria phage lambda	assigned	none	0	0	0	5854	0
+2b8c729b-8adb-4fe0-8746-64f9b459e229	Enterobacteria phage lambda	assigned	none	0	0	0	13332	0
+255d19d6-601c-4675-b24e-03939a9480dd	Enterobacteria phage lambda	assigned	none	0	0	0	966	0
+82a6ac3c-85dc-4e91-b513-7fea39ed987e	Enterobacteria phage lambda	assigned	none	0	0	0	27323	0
+2d174ce0-6f8c-4d14-a8de-933f78db6787	Enterobacteria phage lambda	assigned	none	0	0	0	21119	0
+816ce847-5a43-4d3b-b241-3cbb8243cee2	Enterobacteria phage lambda	assigned	none	0	0	0	12280	0
+730767ab-3ce9-4b85-bf9d-4032dcee6c7c	Listeria monocytogenes	assigned	none	0	0	0	11112	0
+97bd68f7-13e4-4a28-9f66-a404b0922b08	Enterobacteria phage lambda	assigned	none	0	0	0	48875	0
+0453f34f-459f-46c7-b6bb-7ad4a57708e4	Enterobacteria phage lambda	assigned	none	0	0	0	48902	0
+3ebc11c5-41ae-4612-b442-d96c8b8bb079	Enterobacteria phage lambda	assigned	none	0	0	0	38202	0
+f754338f-e3fa-4caf-a78d-def82086c054	Enterobacteria phage lambda	assigned	none	0	0	0	31952	0
+daba9677-d5dd-484d-abd1-cd3c4d6fd4fc	Enterobacteria phage lambda	assigned	none	0	0	0	974	0
+eba2c2ba-c92e-4984-891d-1618dd798a0c	Enterobacteria phage lambda	assigned	none	0	0	0	15067	0
+82c7461d-a1ec-4155-b3da-ddb7a67e435f	Enterobacteria phage lambda	assigned	none	0	0	0	11579	0
+7df74d7e-68cb-42e1-a189-a0c01672bb71	Enterobacteria phage lambda	assigned	none	0	0	0	26715	0
+73e481d5-254f-45f8-9ad6-cb5a5a8433e6	Enterobacteria phage lambda	assigned	none	0	0	0	49188	0
+4ac9a8a8-bfed-4882-aa3a-75c97ccfb547	Enterobacteria phage lambda	assigned	none	0	0	0	3186	0
+3b657743-7771-4a92-bfb7-afb03794f101	Enterobacteria phage lambda	assigned	none	0	0	0	31488	0
+baf7653e-97a2-4914-ad6d-1621d3cf3a18	Escherichia coli K-12	assigned	none	0	0	0	367	0
+ecf0d906-bba2-4f55-abca-de90e90e2120	Enterobacteria phage lambda	assigned	none	0	0	0	32140	0
+9930dd39-a85d-4c3b-a083-88f8e63dfac4	Enterobacteria phage lambda	assigned	none	0	0	0	47657	0
+182fa704-86f4-4ccc-8f0e-9b76cd505ded	Enterobacteria phage lambda	assigned	none	0	0	0	9044	0
+980543a6-8045-4afc-aa0a-ff3afb67fcf3	Enterobacteria phage lambda	assigned	none	0	0	0	29027	0
+9019e15c-e252-4dcc-86ec-b0f1d8aedd4e	Enterobacteria phage lambda	assigned	none	0	0	0	47570	0
+96c89623-daa6-4381-915a-0d5889fe278b	Enterobacteria phage lambda	assigned	none	0	0	0	13228	0
+5305ffdd-dff8-417e-a046-6c6e31c49c2f	Enterobacteria phage lambda	assigned	none	0	0	0	994	0
+612b10df-3159-427b-abca-f562e4713cf7	Enterobacteria phage lambda	assigned	none	0	0	0	13382	0
+4cfb531d-3b7e-4746-9225-bb0041810f9a	Enterobacteria phage lambda	assigned	none	0	0	0	6272	0
+fde75b7c-34da-4b0a-88de-64fd323790cd	Enterobacteria phage lambda	assigned	none	0	0	0	6151	0
+98616625-73aa-4e29-b91a-ecc1bdc11990	Escherichia coli K-12	assigned	none	0	0	0	13653	0
+c666ff14-ec2f-497e-b3c3-77d1b45c94a7	Enterobacteria phage lambda	assigned	none	0	0	0	24071	0
+11423a1b-a89f-4e7f-a17f-378ded93aa3e	Enterobacteria phage lambda	assigned	none	0	0	0	8626	0
+1eee7670-5bce-4533-bab0-a58380c9f97d	Enterobacteria phage lambda	assigned	none	0	0	0	48734	0
+e6a4c353-6fb9-4be6-b6e4-367b446aab5f	Enterobacteria phage lambda	assigned	none	0	0	0	8078	0
+341d2971-4e30-471c-8765-f378259a487c	Enterobacteria phage lambda	assigned	none	0	0	0	2949	0
+be5c3b89-e851-4d4b-881a-b928252b1d5a	Enterobacteria phage lambda	assigned	none	0	0	0	22172	0
+b5cdaddf-cf35-4a46-b0ac-ab57133d94c2	Enterobacteria phage lambda	assigned	none	0	0	0	14733	0
+7f98fb28-6ba7-4bbd-833c-0cebbca5b9fc	Enterobacteria phage lambda	assigned	none	0	0	0	1189	0
+005578e6-bee9-46c2-8329-298193558f47	Enterobacteria phage lambda	assigned	none	0	0	0	1300	0
+2a1447ae-c894-42db-9aa1-5462d625c0c5	Enterobacteria phage lambda	assigned	none	0	0	0	10309	0
+2bae9530-91e4-4875-8fa1-ad61552f840c	Enterobacteria phage lambda	assigned	none	0	0	0	13255	0
+3274f433-712b-4c65-8723-dce3626e7447	Enterobacteria phage lambda	assigned	none	0	0	0	20648	0
+059244a8-2c39-4fa8-8c73-4f5c493b94a7	Enterobacteria phage lambda	assigned	none	0	0	0	2864	0
+cddffbef-45a6-4ac0-8860-da0af110af98	Enterobacteria phage lambda	assigned	none	0	0	0	5950	0
+1a2b6ca9-6250-415c-a6dd-89357f069635	Enterobacteria phage lambda	assigned	none	0	0	0	1187	0
+3d7e7079-2958-4322-b2cb-c6be2c768284	Enterobacteria phage lambda	assigned	none	0	0	0	17618	0
+4546bc6c-6060-4e84-9ad4-8f182cfa1df7	Enterobacteria phage lambda	assigned	none	0	0	0	47784	0
+9922b31c-80d6-45a4-85e3-9c7ab1a0c577	Enterobacteria phage lambda	assigned	none	0	0	0	47487	0
+e3083a71-81a0-4727-ab6c-e43cfc0bace9	Enterobacteria phage lambda	assigned	none	0	0	0	11496	0
+c872bc40-e32f-4225-b910-747fb79c7c14	Enterobacteria phage lambda	assigned	none	0	0	0	46862	0
+cf2e9307-9e2a-4091-a920-b7908a8ca1c1	Enterobacteria phage lambda	assigned	none	0	0	0	9289	0
+fb3c4372-29fb-4df5-b2c0-e340f64ba238	Enterobacteria phage lambda	assigned	none	0	0	0	506	0
+322586a4-fa64-4095-b503-e2ec6ae3b492	Enterobacteria phage lambda	assigned	none	0	0	0	14278	0
+f87fa26e-4409-4f7b-814c-712755c562bc	Listeria monocytogenes	assigned	none	0	0	0	13412	0
+2e2dacd6-ff90-4e5d-a042-5be2a577e333	Enterobacteria phage lambda	assigned	none	0	0	0	36914	0
+b9002d2a-50f8-4483-bd45-748e8e44fb49	Enterobacteria phage lambda	assigned	none	0	0	0	16832	0
+cc776b32-a4bd-41b5-adea-351636322660	Enterobacteria phage lambda	assigned	none	0	0	0	6714	0
+84bdebae-0a67-401b-b577-be6b8e5084ba	Enterobacteria phage lambda	assigned	none	0	0	0	24842	0
+0f297068-94fe-4770-b111-d0965feec5d7	Enterobacteria phage lambda	assigned	none	0	0	0	20040	0
+4432281a-1075-4809-91d6-f90fa077da96	Enterobacteria phage lambda	assigned	none	0	0	0	2258	0
+03d9b61e-c11b-4ed2-a5dc-ae1e85adab8c	Enterobacteria phage lambda	assigned	none	0	0	0	20855	0
+bece060f-3e9d-4044-84c9-a6b911ab114b	Enterobacteria phage lambda	assigned	none	0	0	0	22730	0
+bf0e18c0-444c-4e7b-8982-b9dc952d5a52	Enterobacteria phage lambda	assigned	none	0	0	0	20880	0
+0363dc30-dda5-429c-a9bf-2cceb7e03397	Enterobacteria phage lambda	assigned	none	0	0	0	11592	0
+4e843eb3-ac57-43ff-a5e2-a4a8191f2fcb	Enterobacteria phage lambda	assigned	none	0	0	0	36926	0
+a9718086-871e-4fc7-ac27-741da99b9510	Enterobacteria phage lambda	assigned	none	0	0	0	9673	0
+1a930a4a-caf4-4840-b25d-04e41ebb8f83	Enterobacteria phage lambda	assigned	none	0	0	0	1463	0
+d023a80a-4b8d-430a-9a52-7f1cb44539f8	Enterobacteria phage lambda	assigned	none	0	0	0	9042	0
+20c93ae5-c7d6-4ecb-96f3-5586f5fd3527	Enterobacteria phage lambda	assigned	none	0	0	0	1743	0
+42dd98c3-e48b-4032-b885-6778a84e60b3	Enterobacteria phage lambda	assigned	none	0	0	0	2077	0
+2c12b603-e78e-4e65-8274-43f8fb4e0ec6	Enterobacteria phage lambda	assigned	none	0	0	0	48801	0
+5332cb2a-f42f-4cd8-9c6e-614010f6643b	Enterobacteria phage lambda	assigned	none	0	0	0	693	0
+7c0859b6-36c2-4cd2-b429-5ea9d8d9868f	Enterobacteria phage lambda	assigned	none	0	0	0	15637	0
+221adecd-8798-42a8-8008-39e830266d9c	Enterobacteria phage lambda	assigned	none	0	0	0	13350	0
+96e81064-923b-484b-af86-69744812b8bc	Enterobacteria phage lambda	assigned	none	0	0	0	19713	0
+fac5503c-9226-485a-a368-a75a51193ff0	Enterobacteria phage lambda	assigned	none	0	0	0	32655	0
+d3318e60-dc5e-49bc-a80c-633b9de069f4	Enterobacteria phage lambda	assigned	none	0	0	0	30738	0
+54837ab4-ad61-4b84-a6a6-614c7d09b697	Enterobacteria phage lambda	assigned	none	0	0	0	12885	0
+5c5bf510-be67-44a9-9679-fa29436100e2	Enterobacteria phage lambda	assigned	none	0	0	0	17180	0
+3c73e6b3-3cc7-46f1-a463-18dd63670e1b	Enterobacteria phage lambda	assigned	none	0	0	0	36336	0
+cc4a24ff-b118-45fc-b317-6fe31530d8e0	Enterobacteria phage lambda	assigned	none	0	0	0	917	0
+1e33d758-6881-47e3-938d-53500db9124d	Enterobacteria phage lambda	assigned	none	0	0	0	8995	0
+0a165a5d-28d8-44c9-81bd-fd7af743517a	Enterobacteria phage lambda	assigned	none	0	0	0	16415	0
+a03f2ef1-76fa-49c9-891d-9ec81839bf09	Enterobacteria phage lambda	assigned	none	0	0	0	686	0
+94edc9eb-0ae5-465d-b846-ccf0385a6107	Enterobacteria phage lambda	assigned	none	0	0	0	33691	0
+4bad5de9-1b2f-40fa-b7ba-077824e7a068	Enterobacteria phage lambda	assigned	none	0	0	0	40019	0
+e59cee1e-eab1-4bac-82f3-b320d5f8a2b7	Enterobacteria phage lambda	assigned	none	0	0	0	12657	0
+7d8e68e6-1464-42e8-b190-8ed4a048bfd7	Enterobacteria phage lambda	assigned	none	0	0	0	8029	0
+fcdb5bfa-f114-4686-a71e-6d8b5f1e5f5c	Enterobacteria phage lambda	assigned	none	0	0	0	3015	0
+268aa807-3794-4948-9817-134a850bd166	Enterobacteria phage lambda	assigned	none	0	0	0	13933	0
+5bf748bf-6496-4aaa-b06c-2325e985e8b4	Enterobacteria phage lambda	assigned	none	0	0	0	6511	0
+baabbc34-fa2f-4ab2-870a-a1db1c7d2bf5	Saccharomyces cerevisiae	assigned	none	0	0	0	617	0
+5f478c0f-03ad-459a-b722-d520957ea592	Enterobacteria phage lambda	assigned	none	0	0	0	14113	0
+ab5d3b4e-9b9c-4466-8713-3aae6a3e0735	Enterobacteria phage lambda	assigned	none	0	0	0	14229	0
+b398330d-5dc1-4973-aa18-ba9061d281cc	Enterobacteria phage lambda	assigned	none	0	0	0	6091	0
+6a1cf72e-4483-45f6-9c1e-a0b0bb7e0ba3	Enterobacteria phage lambda	assigned	none	0	0	0	21499	0
+b868e69f-9e6a-4a7e-a96d-df1545e5c8e4	Enterobacteria phage lambda	assigned	none	0	0	0	31042	0
+87ee3465-f4e6-44a1-b5f8-90300fca5598	Listeria monocytogenes	assigned	none	0	0	0	8229	0
+a34831cb-9094-4bdb-943b-d826b63c8121	Enterobacteria phage lambda	assigned	none	0	0	0	22894	0
+f17a3cb1-4680-4d8b-ad5e-d916d8e9fffa	Enterobacteria phage lambda	assigned	none	0	0	0	4206	0
+95a754cf-a1aa-4f35-8d12-e1d3fa8d0845	Enterobacteria phage lambda	assigned	none	0	0	0	29300	0
+6b486e93-4789-4639-8d82-3fc7273c62ef	Enterobacteria phage lambda	assigned	none	0	0	0	1130	0
+3661789f-aa23-4448-9e80-92f5fac85fdc	Enterobacteria phage lambda	assigned	none	0	0	0	828	0
+chimera_000_6a91b1b5_a276efb9	Enterobacteria phage lambda	assigned	none	0	0	0	1955	0
+chimera_001_f4b4a1c3_13fc6138	Enterobacteria phage lambda	assigned	none	0	0	0	2074	0
+chimera_002_5d565353_3f438d44	Enterobacteria phage lambda	assigned	none	0	0	0	1820	0
+chimera_003_7d759910_11e38dc8	Enterobacteria phage lambda	assigned	none	0	0	0	1644	0
+chimera_004_1b0c3326_c71fc621	Enterobacteria phage lambda	assigned	none	0	0	0	2505	0
+chimera_005_b6003f98_46cd1fd4	Enterobacteria phage lambda	assigned	none	0	0	0	1879	0
+chimera_006_64e56426_5b53c9b8	Enterobacteria phage lambda	assigned	none	0	0	0	1958	0
+chimera_007_38cdca90_d5cee021	Escherichia coli K-12	assigned	none	0	0	0	1733	0
+chimera_008_492b8304_b8b747c0	Enterobacteria phage lambda	assigned	none	0	0	0	1514	0
+chimera_009_ae9b8660_c6a9f4c8	Enterobacteria phage lambda	assigned	none	0	0	0	1755	0
+chimera_010_7ecb178a_7844639d	Enterobacteria phage lambda	assigned	none	0	0	0	2019	0
+chimera_011_82a94c33_e3bd1648	Enterobacteria phage lambda	assigned	none	0	0	0	1912	0
+chimera_012_b942dfad_e08b46c4	Enterobacteria phage lambda	assigned	none	0	0	0	1979	0
+chimera_013_3a60f213_6866c6c6	Enterobacteria phage lambda	assigned	none	0	0	0	1362	0
+chimera_014_05bb198f_fb801c71	Enterobacteria phage lambda	assigned	none	0	0	0	1925	0
+chimera_015_b260281d_69061af6	Enterobacteria phage lambda	assigned	none	0	0	0	1960	0
+chimera_016_18b9c9a0_025f8e5d	Enterobacteria phage lambda	assigned	none	0	0	0	1955	0
+chimera_017_ee72aeda_d93d0123	Enterobacteria phage lambda	assigned	none	0	0	0	1924	0
+chimera_018_a2caace6_5a4c6861	Escherichia coli K-12	assigned	none	0	0	0	1803	0
+chimera_019_5bff941a_8e809c1d	Enterobacteria phage lambda	assigned	none	0	0	0	1549	0
+junk_000	unassigned	no_survivor	none	0	0	0	1209	0
+junk_001	unassigned	no_survivor	none	0	0	0	1265	0
+junk_002	unassigned	no_survivor	none	0	0	0	435	0
+junk_003	unassigned	no_survivor	none	0	0	0	1838	0
+junk_004	unassigned	no_survivor	none	0	0	0	1667	0
+junk_005	unassigned	no_survivor	none	0	0	0	1541	0
+junk_006	unassigned	no_survivor	none	0	0	0	1268	0
+junk_007	unassigned	no_survivor	none	0	0	0	1390	0
+junk_008	unassigned	no_survivor	none	0	0	0	820	0
+junk_009	unassigned	no_survivor	none	0	0	0	562	0
+junk_010	unassigned	no_survivor	none	0	0	0	1254	0
+junk_011	unassigned	no_survivor	none	0	0	0	1056	0
+junk_012	unassigned	no_survivor	none	0	0	0	1285	0
+junk_013	unassigned	no_survivor	none	0	0	0	1431	0
+junk_014	unassigned	no_survivor	none	0	0	0	442	0
+junk_015	unassigned	no_survivor	none	0	0	0	1736	0
+junk_016	unassigned	no_survivor	none	0	0	0	1295	0
+junk_017	unassigned	no_survivor	none	0	0	0	696	0
+junk_018	unassigned	no_survivor	none	0	0	0	1538	0
+junk_019	unassigned	no_survivor	none	0	0	0	1187	0
+junk_020	unassigned	no_survivor	none	0	0	0	1520	0
+junk_021	unassigned	no_survivor	none	0	0	0	1977	0
+junk_022	unassigned	no_survivor	none	0	0	0	1632	0
+junk_023	unassigned	no_survivor	none	0	0	0	940	0
+junk_024	unassigned	no_survivor	none	0	0	0	1193	0
+junk_025	unassigned	no_survivor	none	0	0	0	1914	0
+junk_026	unassigned	no_survivor	none	0	0	0	700	0
+junk_027	unassigned	no_survivor	none	0	0	0	683	0
+junk_028	unassigned	no_survivor	none	0	0	0	1523	0
+junk_029	unassigned	no_survivor	none	0	0	0	1024	0
+junk_030	unassigned	no_survivor	none	0	0	0	373	0
+junk_031	unassigned	no_survivor	none	0	0	0	824	0
+junk_032	unassigned	no_survivor	none	0	0	0	1316	0
+junk_033	unassigned	no_survivor	none	0	0	0	1102	0
+junk_034	unassigned	no_survivor	none	0	0	0	1647	0
+junk_035	unassigned	no_survivor	none	0	0	0	1951	0
+junk_036	unassigned	no_survivor	none	0	0	0	401	0
+junk_037	unassigned	no_survivor	none	0	0	0	387	0
+junk_038	unassigned	no_survivor	none	0	0	0	370	0
+junk_039	unassigned	no_survivor	none	0	0	0	1172	0
+junk_040	unassigned	no_survivor	none	0	0	0	1694	0
+junk_041	unassigned	no_survivor	none	0	0	0	660	0
+junk_042	unassigned	no_survivor	none	0	0	0	578	0
+junk_043	unassigned	no_survivor	none	0	0	0	1378	0
+junk_044	unassigned	no_survivor	none	0	0	0	1512	0
+junk_045	unassigned	no_survivor	none	0	0	0	1956	0
+junk_046	unassigned	no_survivor	none	0	0	0	1563	0
+junk_047	unassigned	no_survivor	none	0	0	0	1386	0
+junk_048	unassigned	no_survivor	none	0	0	0	1213	0
+junk_049	unassigned	no_survivor	none	0	0	0	309	0
+junk_050	unassigned	no_survivor	none	0	0	0	1378	0
+junk_051	unassigned	no_survivor	none	0	0	0	1094	0
+junk_052	unassigned	no_survivor	none	0	0	0	1429	0
+junk_053	unassigned	no_survivor	none	0	0	0	1896	0
+junk_054	unassigned	no_survivor	none	0	0	0	379	0
+junk_055	unassigned	no_survivor	none	0	0	0	1491	0
+junk_056	unassigned	no_survivor	none	0	0	0	595	0
+junk_057	unassigned	no_survivor	none	0	0	0	1580	0
+junk_058	unassigned	no_survivor	none	0	0	0	472	0
+junk_059	unassigned	no_survivor	none	0	0	0	1351	0
+junk_060	unassigned	no_survivor	none	0	0	0	1113	0
+junk_061	unassigned	no_survivor	none	0	0	0	1289	0
+junk_062	unassigned	no_survivor	none	0	0	0	991	0
+junk_063	unassigned	no_survivor	none	0	0	0	1677	0
+junk_064	unassigned	no_survivor	none	0	0	0	568	0
+junk_065	unassigned	no_survivor	none	0	0	0	1262	0
+junk_066	unassigned	no_survivor	none	0	0	0	695	0
+junk_067	unassigned	no_survivor	none	0	0	0	1875	0
+junk_068	unassigned	no_survivor	none	0	0	0	1196	0
+junk_069	unassigned	no_survivor	none	0	0	0	1053	0
+junk_070	unassigned	no_survivor	none	0	0	0	1294	0
+junk_071	unassigned	no_survivor	none	0	0	0	1888	0
+junk_072	unassigned	no_survivor	none	0	0	0	1393	0
+junk_073	unassigned	no_survivor	none	0	0	0	1883	0
+junk_074	unassigned	no_survivor	none	0	0	0	1994	0
+junk_075	unassigned	no_survivor	none	0	0	0	1243	0
+junk_076	unassigned	no_survivor	none	0	0	0	1037	0
+junk_077	unassigned	no_survivor	none	0	0	0	572	0
+junk_078	unassigned	no_survivor	none	0	0	0	1230	0
+junk_079	unassigned	no_survivor	none	0	0	0	1048	0
+junk_080	unassigned	no_survivor	none	0	0	0	1700	0
+junk_081	unassigned	no_survivor	none	0	0	0	430	0
+junk_082	unassigned	no_survivor	none	0	0	0	1634	0
+junk_083	unassigned	no_survivor	none	0	0	0	904	0
+junk_084	unassigned	no_survivor	none	0	0	0	650	0
+junk_085	unassigned	no_survivor	none	0	0	0	1921	0
+junk_086	unassigned	no_survivor	none	0	0	0	1440	0
+junk_087	unassigned	no_survivor	none	0	0	0	877	0
+junk_088	unassigned	no_survivor	none	0	0	0	1045	0
+junk_089	unassigned	no_survivor	none	0	0	0	391	0
+junk_090	unassigned	no_survivor	none	0	0	0	1758	0
+junk_091	unassigned	no_survivor	none	0	0	0	566	0
+junk_092	unassigned	no_survivor	none	0	0	0	1507	0
+junk_093	unassigned	no_survivor	none	0	0	0	1847	0
+junk_094	unassigned	no_survivor	none	0	0	0	1703	0
+junk_095	unassigned	no_survivor	none	0	0	0	1763	0
+junk_096	unassigned	no_survivor	none	0	0	0	1554	0
+junk_097	unassigned	no_survivor	none	0	0	0	326	0
+junk_098	unassigned	no_survivor	none	0	0	0	1745	0
+junk_099	unassigned	no_survivor	none	0	0	0	511	0
