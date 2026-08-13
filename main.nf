@@ -33,6 +33,8 @@ def helpMessage() {
       --breseq_consensus  build a reference-guided consensus of the contaminant
                           actually present in the carrier prep [${params.breseq_consensus}]
       --min_mapq        MAPQ floor before scoring         [${params.min_mapq}]
+      --min_aln_frac    fraction of a read an organism must align before the
+                        read is attributed to it         [${params.min_aln_frac}]
       --coverage_window coverage bin size in bp           [${params.coverage_window}]
       --keep_bams       retain alignment BAMs             [${params.keep_bams}]
       --mask_human      screen with NCBI HRRT and mask human sequence that no
@@ -225,10 +227,11 @@ process ASSIGN_READS {
                       ? "--consensus-hits ${consensus_hits}" : ''
     """
     python3 ${script} ${bam} \\
-        --contig-map ${contig_map} \\
-        --prefix     ${meta.sample_id} \\
-        --min-mapq   ${params.min_mapq} \\
-        --mode       ${mode} ${consensus_arg}
+        --contig-map    ${contig_map} \\
+        --prefix        ${meta.sample_id} \\
+        --min-mapq      ${params.min_mapq} \\
+        --min-aln-frac  ${params.min_aln_frac} \\
+        --mode          ${mode} ${consensus_arg}
     """
 }
 

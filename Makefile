@@ -21,6 +21,9 @@ TOOLS_IMAGE    ?= low-input-nanopore/tools:0.1.0
 ANALYSIS_IMAGE ?= low-input-nanopore/analysis:0.1.0
 SCRUBBER_IMAGE ?= low-input-nanopore/scrubber:0.1.0
 
+# Attribution floor; keep in step with params.min_aln_frac in nextflow.config.
+MIN_ALN_FRAC ?= 0.10
+
 # Container engine profile passed to Nextflow; override with `make s2 PROFILE=singularity`.
 PROFILE ?= docker
 # Extra arguments appended to every pipeline run, e.g. `make test NF_ARGS=-resume`.
@@ -33,7 +36,7 @@ DEMO_READS  ?= 40000
 
 .DEFAULT_GOAL := help
 
-.PHONY: help images test check verify measurements masksummary seqsummary versions runmeta poolcov attribution comparison coverage modedelta estcontrol assigneddepth divergence s1 s2 all raghavendra q10 demo-data clean
+.PHONY: help images test check verify measurements masksummary threshold seqsummary versions runmeta poolcov attribution comparison coverage modedelta estcontrol assigneddepth divergence s1 s2 all raghavendra q10 demo-data clean
 
 help: ## Show this help
 	@printf 'low-input-nanopore -- make targets\n\n'
@@ -153,6 +156,16 @@ check: ## Assert consensus accounting and human masking (needs `make test` first
 
 # Exit 2 means "pendings, no errors" and is tolerated; exit 1 (a real
 # inconsistency) still fails the target.
+# The evidence behind params.min_aln_frac. Reads a finished run's per-read
+# assignments, so it needs no BAM pass and no re-mapping. Regenerate this rather
+# than quoting the numbers from memory if the threshold is ever questioned.
+threshold: ## Coverage distribution behind the attribution floor (--min_aln_frac)
+	@docker run --rm -u "$$(id -u):$$(id -g)" \
+	    -v "$(ROOT)":/repo -w /repo "$(ANALYSIS_IMAGE)" \
+	    python3 bin/attribution_threshold.py \
+	        --assignments 'results/*/competitive/*.assignments.tsv.gz' \
+	        --outdir results/summary --chosen $(MIN_ALN_FRAC)
+
 # Only meaningful after a run with --mask_human true, which is what writes the
 # per-sample human_stats.json files this reads.
 masksummary: ## Per-replicate human masking statistics (Supplementary table)

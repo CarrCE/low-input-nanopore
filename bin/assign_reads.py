@@ -67,6 +67,10 @@ def parse_args():
                    help="minimum absolute AS margin over the runner-up organism")
     p.add_argument("--min-margin-frac", type=float, default=0.01,
                    help="minimum AS margin as a fraction of the winning AS")
+    p.add_argument("--min-aln-frac", type=float, default=0.10,
+                   help="minimum fraction of the read an organism must align "
+                        "before the read can be attributed to it; below this "
+                        "the read is unassigned (call=low_coverage)")
     p.add_argument("--min-mapq", type=int, default=0,
                    help="discard alignments below this MAPQ before scoring")
     p.add_argument("--mode", choices=["competitive", "sequential"],
@@ -227,6 +231,35 @@ def main():
             return
 
         ranked = sorted(per_org.items(), key=lambda kv: kv[1]["as"], reverse=True)
+
+        # ---- attribution floor ------------------------------------------
+        # A read is credited to an organism with its FULL length (read_bases),
+        # not with the part that aligned. Without a floor, an organism that
+        # explains a sliver of a long read carries all of it: measured across
+        # this study's own data, 2,523 reads whose best alignment covered under
+        # 10% of the read carried 8.1% of all sample-role bases, at a mean read
+        # length of 60 kb. Nearly all of them were long, repeat-rich reads
+        # touching a eukaryotic genome over a few hundred bases.
+        #
+        # The floor is applied HERE, before the mode branch, so competitive and
+        # sequential see the same population of attributable reads and any
+        # difference between them remains attributable to the decision rule
+        # alone -- which is the whole reason both are computed from one mapping
+        # pass.
+        #
+        # It is deliberately a fraction of the read and not an absolute number
+        # of aligned bases: the failure mode is long reads, and an absolute
+        # floor would let a 70 kb read through on the same 200 bp that it
+        # rejects on a 300 bp read. See bin/attribution_threshold.py for the
+        # distribution the value comes from; anything from 1% to 30% removes
+        # the same reads, so the exact value is not load-bearing.
+        if max(v["aligned"] for _, v in ranked) < args.min_aln_frac * rlen:
+            counts["unassigned"]["reads"] += 1
+            counts["unassigned"]["read_bases"] += rlen
+            assign_fh.write(f"{qname}\tunassigned\tlow_coverage\tnone\t0\t0\t0\t"
+                            f"{rlen}\t0\n")
+            len_fh.write(f"{qname}\tlow_coverage\tunassigned\tnone\t{rlen}\n")
+            return
 
         if args.mode == "sequential":
             # Reproduce the classic subtraction chain -- "remove everything that
