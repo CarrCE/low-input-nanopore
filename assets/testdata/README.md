@@ -1,0 +1,72 @@
+# Human-masking test set
+
+1,529 reads that `tests/human_masking.py` runs `bin/mask_human.py` over,
+asserting every read against `human_masking_manifest.tsv`. No network, no
+mapping, no reference download: the fixture ships the alignment records the
+masker consumes, so `make check` runs it in well under a second.
+
+Regenerate with `tests/make_masking_testset.py` (see its docstring for the
+inputs). The output is committed so the fixture's provenance is reproducible
+rather than asserted.
+
+## Composition
+
+| category | n | expected | what it tests |
+|---|---:|---|---|
+| `human_high_identity` | 500 | fully masked | sensitivity: unattributed human must not survive |
+| `human_divergent` | 200 | fully masked | sensitivity where identity to CHM13 is poor — which is **not** the same as poor read quality |
+| `human_grazing_organism` | 9 | not released intact | real human reads that incidentally hit an organism; if the rescue is too permissive, these are what it wrongly keeps |
+| `community` | 500 | untouched | the masker must not touch attributed reads |
+| `conserved_region` | 200 | not destroyed; ≥90% untouched | **the false-positive test** |
+| `chimera` | 20 | human half masked, organism-aligned bases kept | exact, recomputed boundaries |
+| `unalignable_junk` | 100 | fully masked | nothing claims it, so nothing protects it |
+
+## Provenance
+
+Every read is real sequence except the junk.
+
+- **Human** — Giab HG002/NA24385 (Ashkenazim son), UCSC ultralong ONT
+  PromethION, `GM24385_1.fastq.gz`, from the leading 120 MB of
+  `ftp-trace.ncbi.nlm.nih.gov/ReferenceSamples/giab/data/AshkenazimTrio/HG002_NA24385_son/UCSC_Ultralong_OxfordNanopore_Promethion/`.
+  Public and consented for exactly this purpose. Reads were kept at
+  300–12,000 bp to bound the fixture's size, then split at 0.90 identity to
+  T2T-CHM13v2.0 (`GCF_009914755.1`), measured with `minimap2 -c` and the
+  `de:f` tag.
+- **Community and conserved-region** — this study's own `lowinput_s1_r1`
+  reads, from the first 500,000 of that file, run through the real pipeline
+  with `--mask_human`. The conserved-region reads are the actual false
+  positives a real HRRT run produced, not an imagining of what one looks like.
+- **Chimeras** — a real community read spliced to a real GIAB read at a
+  recorded offset, so the expected boundary is exact rather than inferred.
+- **Junk** — the only synthetic component: random sequence, seeded, so nothing
+  should ever claim it.
+
+## Two selection rules that matter
+
+**Attributed reads need a coverage floor.** `bin/assign_reads.py` will attribute
+a read to an organism on a very small footprint — a 8,118 bp read on a 55 bp
+yeast hit — and such reads are frequently *human* reads with an incidental
+organism match. Community and conserved-region reads therefore require ≥50% of
+the read to be covered by its organism. Without that floor the fixture would
+encode the wrong expected outcome for exactly the reads that discriminate.
+
+**`conserved_region` is not asserted to be untouched.** A minority of these are
+genuine chimeras — attributed over half their length *and* carrying human
+sequence no organism accounts for — and are correctly masked in part. The
+assertions are that none is ever destroyed, and that ≥90% survive intact. If
+most were being partially blanked, the human intervals would be too permissive.
+
+## A note on the alignment records
+
+`human_masking.target.sam` carries **real query intervals** extracted from real
+alignments, with `SEQ`/`QUAL` set to `*` and reference coordinates not
+preserved. The masker consumes query intervals only, pysam recovers them from
+the CIGAR alone (verified on every record), and storing the sequence twice would
+double the fixture for nothing. Keeping it as text rather than BAM means the
+expected intervals can be read directly. Chimera records are recomputed from the
+splice offset, which is what makes their expected outcome exact.
+
+Identity in `human_masking.human.paf` is recorded in the `de:f` tag. Do not
+compute identity from PAF columns 10 and 11: they tie when minimap2 runs without
+`-c`, and on this study's own data they scored alignments at 0.15–0.57 that
+`-c` scores at 0.67–0.98.

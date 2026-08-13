@@ -35,6 +35,11 @@ def helpMessage() {
       --min_mapq        MAPQ floor before scoring         [${params.min_mapq}]
       --coverage_window coverage bin size in bp           [${params.coverage_window}]
       --keep_bams       retain alignment BAMs             [${params.keep_bams}]
+      --mask_human      screen with NCBI HRRT and mask human sequence that no
+                        organism accounts for, writing the FASTQs intended for
+                        public deposition [${params.mask_human}]
+      --chimera_min_bp  human-exclusive bp before a read counts as chimeric
+                        [${params.chimera_min_bp}]
       --max_cpus        cap on CPUs per process           [${params.max_cpus}]
     """.stripIndent()
 }
@@ -208,7 +213,9 @@ process ASSIGN_READS {
     output:
     tuple val(meta), val(mode), path("${meta.sample_id}.counts.tsv"),        emit: counts
     tuple val(meta), val(mode), path("${meta.sample_id}.readlengths.tsv.gz"), emit: readlengths
-    path "${meta.sample_id}.assignments.tsv.gz",                              emit: assignments
+    // Keyed by meta and mode so the human masker can join the competitive
+    // assignments to their sample. Nothing else consumes this channel.
+    tuple val(meta), val(mode), path("${meta.sample_id}.assignments.tsv.gz"), emit: assignments
 
     script:
     // Nextflow has no optional path inputs, so the no-consensus case stages a
@@ -222,6 +229,179 @@ process ASSIGN_READS {
         --prefix     ${meta.sample_id} \\
         --min-mapq   ${params.min_mapq} \\
         --mode       ${mode} ${consensus_arg}
+    """
+}
+
+// ---------------------------------------------------------------------------
+// Human read masking. Off unless --mask_human. Three steps: screen with NCBI's
+// HRRT, map only what it flagged against the human reference, then decide what
+// to blank using the competitive assignment this study already relies on.
+//
+// HRRT is used ONLY for its flag list. Its own masking is left on the floor:
+// it masks k-mer-matched spots, a different scope from ours, and on its own it
+// would destroy roughly half this study's S. cerevisiae reads.
+// ---------------------------------------------------------------------------
+
+process FETCH_HUMAN_REFERENCE {
+    label 'tools'
+    label 'process_low'
+    // storeDir, not publishDir: the index is ~7 GiB and derived purely from a
+    // pinned accession, so it is a cache, not a result. An existing copy short-
+    // circuits the process entirely.
+    storeDir "${params.refdir}/human"
+
+    output:
+    path "chm13v2.0.map-ont.mmi", emit: index
+    path "chm13v2.0.sha256",      emit: checksum
+
+    script:
+    // Deliberately curl rather than the datasets CLI used by FETCH_GENOMES:
+    // this is a ~900 MB single file, and datasets cannot resume. It died at
+    // 116 MB on an HTTP/2 stream reset. -C - resumes, and the SHA-256 below
+    // pins what we actually got rather than trusting the transport.
+    """
+    set -o pipefail
+    ACC=${params.human_accession}
+    URL=https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/009/914/755/GCF_009914755.1_T2T-CHM13v2.0/GCF_009914755.1_T2T-CHM13v2.0_genomic.fna.gz
+
+    curl -fL -C - --retry 20 --retry-delay 5 --retry-all-errors -o chm13v2.0.fna.gz "\$URL"
+    gzip -dc chm13v2.0.fna.gz > chm13v2.0.fna
+
+    minimap2 -t ${task.cpus} -x ${params.minimap2_preset} \\
+        -d chm13v2.0.map-ont.mmi chm13v2.0.fna
+
+    sha256sum chm13v2.0.fna chm13v2.0.map-ont.mmi > chm13v2.0.sha256
+
+    # The FASTA is 3.1 GB and nothing downstream reads it; only the index is
+    # kept. The checksum above records what the index was built from.
+    rm -f chm13v2.0.fna chm13v2.0.fna.gz
+    """
+}
+
+process HRRT_SCREEN {
+    tag   { meta.sample_id }
+    label 'scrubber'
+    label 'process_medium'
+    publishDir "${params.outdir}/${meta.sample_id}/human", mode: 'copy',
+               pattern: '*.hrrt.log'
+
+    input:
+    tuple val(meta), path(fastq)
+
+    output:
+    tuple val(meta), path("${meta.sample_id}.flagged_ids.txt"), emit: flagged
+    path "${meta.sample_id}.hrrt.log",                          emit: log
+
+    script:
+    // -o /dev/null discards HRRT's own masked output. We want the flag list in
+    // the -u file and nothing else, and the masked copy would otherwise be a
+    // full-size duplicate of the input in the work directory.
+    //
+    // NR % 4 == 1 selects headers BY POSITION. Do not rewrite this as a test
+    // for a leading '@': a quality string may legitimately begin with '@'
+    // (Phred 31), and counting sequence, '+' and quality lines as read IDs
+    // inflated a prior implementation's human counts roughly fourfold.
+    """
+    set -o pipefail
+    /opt/scrubber/scripts/scrub.sh \\
+        -p ${task.cpus} \\
+        -i ${fastq} \\
+        -o /dev/null \\
+        -u ${meta.sample_id}.flagged.fastq \\
+        > ${meta.sample_id}.hrrt.log 2>&1
+
+    if [ ! -f ${meta.sample_id}.flagged.fastq ]; then
+        echo "error: HRRT wrote no removed-spots file" >&2
+        cat ${meta.sample_id}.hrrt.log >&2
+        exit 1
+    fi
+
+    awk 'NR % 4 == 1 { sub(/^@/, "", \$0); print \$1 }' \\
+        ${meta.sample_id}.flagged.fastq > ${meta.sample_id}.flagged_ids.txt
+
+    n=\$(wc -l < ${meta.sample_id}.flagged_ids.txt | tr -d ' ')
+    echo "[hrrt] ${meta.sample_id}: \$n reads flagged" >> ${meta.sample_id}.hrrt.log
+
+    # The flagged FASTQ can be large and its sequences may already carry HRRT's
+    # own masking; we re-extract from the original in MAP_HUMAN instead.
+    rm -f ${meta.sample_id}.flagged.fastq
+    """
+}
+
+process MAP_HUMAN {
+    tag   { meta.sample_id }
+    label 'tools'
+    label 'process_medium'
+
+    input:
+    tuple val(meta), path(fastq), path(flagged_ids)
+    path human_index
+
+    output:
+    tuple val(meta), path("${meta.sample_id}.human.paf"), emit: paf
+
+    script:
+    // Only the flagged reads are mapped. A full pass against the 7 GiB human
+    // index would dominate runtime and memory for no gain: a read HRRT did not
+    // flag is not a candidate, so its human alignment would never be consulted.
+    // This is also why CHM13 is deliberately NOT part of the combined index.
+    """
+    set -o pipefail
+    seqkit grep -f ${flagged_ids} ${fastq} > flagged.fastq
+
+    n_in=\$(wc -l < ${flagged_ids} | tr -d ' ')
+    n_got=\$(( \$(wc -l < flagged.fastq | tr -d ' ') / 4 ))
+    if [ "\$n_in" -gt 0 ] && [ "\$n_got" -eq 0 ]; then
+        echo "error: none of the \$n_in flagged IDs matched a read in ${fastq}" >&2
+        exit 1
+    fi
+    echo "[map_human] ${meta.sample_id}: extracted \$n_got of \$n_in flagged reads" >&2
+
+    # No -x here: the preset is baked into the prebuilt .mmi, and passing it
+    # again makes minimap2 warn that indexing parameters differ.
+    minimap2 -t ${task.cpus} -N 10 --secondary=yes \\
+        ${human_index} flagged.fastq > ${meta.sample_id}.human.paf
+
+    rm -f flagged.fastq
+    """
+}
+
+process MASK_HUMAN {
+    tag   { meta.sample_id }
+    label 'analysis'
+    label 'process_medium'
+    publishDir "${params.outdir}/${meta.sample_id}/human", mode: 'copy'
+
+    input:
+    tuple val(meta), path(fastq), path(flagged_ids), path(assignments),
+          path(human_paf), path(bam)
+    path script
+
+    output:
+    tuple val(meta), path("${meta.sample_id}.masked.fastq.gz"), emit: masked
+    path "${meta.sample_id}.human_mask.tsv.gz",                 emit: manifest
+    path "${meta.sample_id}.human_stats.json",                  emit: stats
+    path "${meta.sample_id}.human_masked_ids.txt",              emit: masked_ids
+
+    script:
+    // pipefail matters here: without it gzip's exit status would mask a
+    // Python failure and publish a truncated FASTQ that looks fine.
+    """
+    set -o pipefail
+    python3 ${script} \\
+        --fastq        ${fastq} \\
+        --flagged      ${flagged_ids} \\
+        --assignments  ${assignments} \\
+        --human-paf    ${human_paf} \\
+        --bam          ${bam} \\
+        --sample-id    ${meta.sample_id} \\
+        --chimera-min-bp ${params.chimera_min_bp} \\
+        --human-reference ${params.human_accession} \\
+        --out-fastq      - \\
+        --out-manifest   ${meta.sample_id}.human_mask.tsv.gz \\
+        --out-stats      ${meta.sample_id}.human_stats.json \\
+        --out-masked-ids ${meta.sample_id}.human_masked_ids.txt \\
+      | gzip -c > ${meta.sample_id}.masked.fastq.gz
     """
 }
 
@@ -737,6 +917,7 @@ workflow {
     ch_script_agg     = file("${projectDir}/bin/aggregate_results.py",   checkIfExists: true)
     ch_script_cov     = file("${projectDir}/bin/coverage_summary.py",    checkIfExists: true)
     ch_script_qfilt   = file("${projectDir}/bin/filter_by_qscore.awk",   checkIfExists: true)
+    ch_script_mask    = file("${projectDir}/bin/mask_human.py",          checkIfExists: true)
 
     // Placeholder for the optional consensus-hits input. Nextflow process
     // inputs are positional and non-optional, so the absence of a real file has
@@ -832,6 +1013,50 @@ workflow {
     }
 
     ASSIGN_READS(ch_to_assign, ch_script_assign)
+
+    // ---- optional human read masking ---------------------------------------
+    // Produces the FASTQs that get deposited. Runs on the ORIGINAL reads, using
+    // the competitive assignment computed from those same reads as the rescue
+    // signal -- so the masked files are a downstream product of a normal run,
+    // not an input to one. The published numbers are then confirmed by a second
+    // run over the masked output.
+    //
+    // params.mask_human is read here and nowhere near `meta`: putting it in the
+    // meta map would make it part of MAP_COMPETITIVE's task hash and invalidate
+    // every replicate's cached mapping.
+    if (params.mask_human) {
+        FETCH_HUMAN_REFERENCE()
+
+        HRRT_SCREEN(ch_reads)
+
+        MAP_HUMAN(
+            ch_reads
+                .map { meta, fq -> tuple(meta.sample_id, meta, fq) }
+                .join(HRRT_SCREEN.out.flagged
+                          .map { meta, ids -> tuple(meta.sample_id, ids) })
+                .map { sid, meta, fq, ids -> tuple(meta, fq, ids) },
+            FETCH_HUMAN_REFERENCE.out.index
+        )
+
+        // Rescue reads the COMPETITIVE assignment specifically. Sequential
+        // subtraction destroys the community's own E. coli, so using it here
+        // would mask reads this study exists to argue are recoverable.
+        ch_mask_assign = ASSIGN_READS.out.assignments
+            .filter { meta, mode, assign -> mode == 'competitive' }
+            .map { meta, mode, assign -> tuple(meta.sample_id, assign) }
+
+        MASK_HUMAN(
+            ch_reads
+                .map { meta, fq -> tuple(meta.sample_id, meta, fq) }
+                .join(HRRT_SCREEN.out.flagged.map { meta, ids -> tuple(meta.sample_id, ids) })
+                .join(ch_mask_assign)
+                .join(MAP_HUMAN.out.paf.map { meta, paf -> tuple(meta.sample_id, paf) })
+                .join(MAP_COMPETITIVE.out.bam.map { meta, bam -> tuple(meta.sample_id, bam) })
+                .map { sid, meta, fq, ids, assign, paf, bam ->
+                       tuple(meta, fq, ids, assign, paf, bam) },
+            ch_script_mask
+        )
+    }
 
     // combine(by:0) rather than join(): with --mode both there are two rows per
     // sample_id, and join() does not handle duplicate keys on one side.

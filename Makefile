@@ -19,6 +19,7 @@ ROOT := $(CURDIR)
 
 TOOLS_IMAGE    ?= low-input-nanopore/tools:0.1.0
 ANALYSIS_IMAGE ?= low-input-nanopore/analysis:0.1.0
+SCRUBBER_IMAGE ?= low-input-nanopore/scrubber:0.1.0
 
 # Container engine profile passed to Nextflow; override with `make s2 PROFILE=singularity`.
 PROFILE ?= docker
@@ -41,12 +42,16 @@ help: ## Show this help
 	@printf '\nVariables: PROFILE=%s  NF_ARGS=%s\n' '$(PROFILE)' '$(NF_ARGS)'
 	@printf 'Images:    %s  %s\n' '$(TOOLS_IMAGE)' '$(ANALYSIS_IMAGE)'
 
-images: ## Build the two local Docker images (tools + analysis)
+images: ## Build the local Docker images (tools + analysis + scrubber)
 	@echo "==> building $(TOOLS_IMAGE)"
 	@docker build -t "$(TOOLS_IMAGE)" "$(ROOT)/docker/tools"
 	@echo "==> building $(ANALYSIS_IMAGE)"
 	@docker build -t "$(ANALYSIS_IMAGE)" "$(ROOT)/docker/analysis"
-	@echo "==> done: $(TOOLS_IMAGE) $(ANALYSIS_IMAGE)"
+	@echo "==> building $(SCRUBBER_IMAGE)"
+	@# amd64 explicitly: HRRT has no arm64 build, so on Apple Silicon this
+	@# image is emulated. Only --mask_human runs need it.
+	@docker build --platform linux/amd64 -t "$(SCRUBBER_IMAGE)" "$(ROOT)/docker/scrubber"
+	@echo "==> done: $(TOOLS_IMAGE) $(ANALYSIS_IMAGE) $(SCRUBBER_IMAGE)"
 
 test: ## Run the smoke test (40k reads, test profile)
 	@"$(ROOT)/run.sh" -profile $(PROFILE),test $(NF_ARGS)
@@ -129,13 +134,22 @@ demo-data: ## Regenerate the smoke-test subsample into data/test/
 TEST_BAM        ?= results/test_s2/alignments/test_s2.qname.bam
 TEST_CONTIG_MAP ?= results/references/lowinput_s2/contig_map.tsv
 
-check: ## Assert consensus subtraction preserves read accounting (needs `make test` first)
+check: ## Assert consensus accounting and human masking (needs `make test` first)
 	@test -f "$(ROOT)/$(TEST_BAM)" \
 	  || { echo "error: $(TEST_BAM) not found. Run 'make test' first." >&2; exit 1; }
 	@docker run --rm -u "$$(id -u):$$(id -g)" \
 	    -v "$(ROOT)":/repo -w /repo "$(ANALYSIS_IMAGE)" \
 	    python3 tests/consensus_accounting.py \
 	        --bam "$(TEST_BAM)" --contig-map "$(TEST_CONTIG_MAP)"
+	@echo "==> human masking: decision logic"
+	@docker run --rm -u "$$(id -u):$$(id -g)" \
+	    -v "$(ROOT)":/repo -w /repo "$(ANALYSIS_IMAGE)" \
+	    python3 tests/mask_human_logic.py
+	@echo "==> human masking: committed read-level fixture"
+	@# Needs no mapping and no network; see assets/testdata/README.md.
+	@docker run --rm -u "$$(id -u):$$(id -g)" \
+	    -v "$(ROOT)":/repo -w /repo "$(ANALYSIS_IMAGE)" \
+	    python3 tests/human_masking.py
 
 # Exit 2 means "pendings, no errors" and is tolerated; exit 1 (a real
 # inconsistency) still fails the target.
