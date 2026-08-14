@@ -442,10 +442,13 @@ It is **off by default**, so any run without it is bit-identical to one from
 before the feature existed.
 
 **The screen is not the decision.** NCBI's Human Read Removal Tool (HRRT) flags
-candidates, and HRRT alone is far too blunt for a microbial community: on this
-study's reads it flags 49.4% of all *S. cerevisiae* and 92.0% of all
-*C. neoformans*, because a conserved region is a conserved region whichever
-genome it sits in. So a flagged read is released intact only when this
+candidates, and HRRT alone is far too blunt for a microbial community. Its
+false-positive rate tracks evolutionary distance from human: across the seven
+replicates it flags **18.6%** of reads assigned to *S. cerevisiae* (663 of
+3,567) and **14 of the 20** assigned to *C. neoformans*, against **0.20%** of
+those assigned to any bacterial community member (1,441 of 706,347) — a
+hundred-fold difference, because a conserved region is a conserved region
+whichever genome it sits in. So a flagged read is released intact only when this
 pipeline's own competitive assignment **positively attributes** it to a
 community organism. The inverse rule — "mask unless it failed to look human" —
 reads almost identically and is backwards for a privacy filter; do not

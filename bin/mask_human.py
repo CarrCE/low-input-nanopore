@@ -5,11 +5,13 @@ attributes to a non-human organism.
 Two stages, deliberately separated:
 
   1. SCREEN.  NCBI's Human Read Removal Tool (HRRT) flags candidate reads by
-     k-mer match.  HRRT is sensitive but blunt: used on its own it would have
-     destroyed 49.4% of this study's *S. cerevisiae* reads and 92.0% of its
-     *C. neoformans* reads, because a conserved region is a conserved region
-     whichever genome it sits in.  We therefore use HRRT ONLY for its flag
-     list and never for its own masking.
+     k-mer match.  HRRT is sensitive but blunt, and its false positives are
+     strongly taxon-dependent: across the seven replicates it flags 18.6% of
+     the reads assigned to *S. cerevisiae* (663 of 3,567) and 14 of the 20
+     assigned to *C. neoformans*, against 0.20% of those assigned to any
+     bacterial community member (1,441 of 706,347).  A conserved region is a
+     conserved region whichever genome it sits in.  We therefore use HRRT ONLY
+     for its flag list and never for its own masking.
 
   2. RESCUE.  A flagged read is kept when `assignments.tsv.gz` -- the
      competitive attribution this whole study already rests on -- assigns it
