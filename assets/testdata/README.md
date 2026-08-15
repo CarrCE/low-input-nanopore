@@ -1,6 +1,6 @@
 # Human-masking test set
 
-1,529 reads that `tests/human_masking.py` runs `bin/mask_human.py` over,
+1,520 reads that `tests/human_masking.py` runs `bin/mask_human.py` over,
 asserting every read against `human_masking_manifest.tsv`. No network, no
 mapping, no reference download: the fixture ships the alignment records the
 masker consumes, so `make check` runs it in well under a second.
@@ -14,12 +14,66 @@ rather than asserted.
 | category | n | expected | what it tests |
 |---|---:|---|---|
 | `human_high_identity` | 500 | fully masked | sensitivity: unattributed human must not survive |
-| `human_divergent` | 200 | fully masked | sensitivity where identity to CHM13 is poor — which is **not** the same as poor read quality |
+| `human_divergent` | 197 | fully masked | sensitivity where identity to CHM13 is poor — which is **not** the same as poor read quality |
 | `human_grazing_organism` | 9 | not released intact | real human reads that incidentally hit an organism; if the rescue is too permissive, these are what it wrongly keeps |
 | `community` | 500 | untouched | the masker must not touch attributed reads |
-| `conserved_region` | 200 | not destroyed; ≥90% untouched | **the false-positive test** |
+| `conserved_region` | 194 | not destroyed; ≥90% untouched | **the false-positive test** |
 | `chimera` | 20 | human half masked, organism-aligned bases kept | exact, recomputed boundaries |
 | `unalignable_junk` | 100 | fully masked | nothing claims it, so nothing protects it |
+
+## The fixture may not hold what the deposit withholds
+
+The study reads here come from the file **before** masking, because that is what
+the masker has to be fed. So a fixture read whose released form is masked would
+publish, inside this repository, sequence that SRA deliberately does not — and
+no test of the masker can notice, because the masker is asserted against the
+fixture's own frozen records. It agrees with itself while disagreeing with what
+was actually released.
+
+That is not hypothetical, and the way it happened is worth understanding,
+because nothing misbehaved.
+
+Six `conserved_region` reads were selected here by the two rules below — an
+`assigned` call and ≥50% organism coverage — and emitted with `expect=rescued`.
+Both rules are about **attribution**. Neither asks the question that actually
+decides release: does the read carry at least `--chimera_min_bp` (150) of
+sequence that no organism accounts for? The chimera rule is an independent path
+to masking, and the selection logic never modelled it. All six carried 160–2,211
+human-exclusive bp, so the real run masked 25,900 of their 96,117 bases — and so
+did `tests/human_masking.py`, correctly, every time it ran. It did not fail
+because the ≥90% allowance below exists precisely to tolerate a minority of
+genuine chimeras among these reads. That allowance is right. What was missing is
+that a read the masker masks is a read whose unmasked form must not be committed.
+
+So this was never a behaviour bug or a drift: the fixture's expectation for those
+six was wrong from the day it was written, and the leak is structural. The
+fixture has to hold the **pre-masking** read in order to test masking, and
+nothing asked whether that read was safe to publish. The generator had a floor
+to keep its *expectations* honest and nothing at all to keep its *contents*
+releasable. The six were removed on 15 Aug 2026, which is why
+`conserved_region` is 194 rather than 200.
+
+Two things now prevent a recurrence. `tests/make_masking_testset.py` requires
+`--deposited-masked-ids` and excludes every listed read from every pool, so a
+regeneration cannot reintroduce them. `tests/fixture_deposit_agreement.py`,
+wired into `make check`, asserts the result: base for base against the deposited
+reads when they are present, and against `deposited_masked_ids.txt` when they
+are not.
+
+Three GIAB reads were collapsed at the same time. `human_grazing_organism` was
+filtered out of the high-identity pool but not the divergent one, so those three
+carried two manifest rows with contradicting expectations — and because every
+consumer builds a dict keyed on read id, the conflict resolved silently to
+whichever row came last. `human_divergent` is 197 rather than 200 for that
+reason, and `test_each_read_appears_once` now asserts it cannot recur. This one
+was a stale test rather than a leak: GIAB reads are public and consented.
+
+`deposited_masked_ids.txt` holds the 1,147 reads the deposit masks within the
+leading 500,000 records of `lowinput_s1_r1` — the window the generator draws
+from. It is derived from the submitted file itself (a read is masked iff its
+released sequence contains an `N`), not from the masking run's own bookkeeping,
+and the deposit is immutable once submitted. Regenerating it would mean a new
+submission, at which point the fixture has to be rebuilt anyway.
 
 ## Provenance
 
@@ -49,6 +103,14 @@ yeast hit — and such reads are frequently *human* reads with an incidental
 organism match. Community and conserved-region reads therefore require ≥50% of
 the read to be covered by its organism. Without that floor the fixture would
 encode the wrong expected outcome for exactly the reads that discriminate.
+
+Note what this floor does **not** cover: it reasons about attribution, and
+attribution is not the only thing that decides an outcome. A well-covered,
+confidently attributed read is still masked if ≥`--chimera_min_bp` of it is
+human-exclusive. That gap is what put six reads in here with the wrong
+expectation, and it is why `--deposited-masked-ids` is a required argument
+rather than another rule of this kind — it is stated in terms of the released
+outcome, so it holds no matter which path to masking a read takes.
 
 **`conserved_region` is not asserted to be untouched.** A minority of these are
 genuine chimeras — attributed over half their length *and* carrying human

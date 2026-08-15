@@ -165,6 +165,20 @@ check: ## Assert consensus accounting and human masking (needs `make test` first
 	@docker run --rm -u "$$(id -u):$$(id -g)" \
 	    -v "$(ROOT)":/repo -w /repo "$(ANALYSIS_IMAGE)" \
 	    python3 tests/human_masking.py
+	@echo "==> fixture holds nothing the deposit withholds"
+	@# The fixture is built from PRE-masking reads, so it can publish sequence
+	@# SRA does not -- and no test of the masker can see that, because the
+	@# masker is checked against the fixture's own records. This is the check
+	@# that looks outward. It compares base for base when the deposited reads
+	@# are present and falls back to a committed id list when they are not.
+	@# DEPOSIT=/abs/path/to/lowinput_s1_r1.fastq.gz forces the full comparison;
+	@# its directory is mounted read-only, so the path may live anywhere.
+	@docker run --rm -u "$$(id -u):$$(id -g)" \
+	    -v "$(ROOT)":/repo \
+	    $(if $(DEPOSIT),-v "$(dir $(DEPOSIT))":/deposit:ro) \
+	    -w /repo "$(ANALYSIS_IMAGE)" \
+	    python3 tests/fixture_deposit_agreement.py \
+	        $(if $(DEPOSIT),--require-deposit --deposit "/deposit/$(notdir $(DEPOSIT))")
 
 # Exit 2 means "pendings, no errors" and is tolerated; exit 1 (a real
 # inconsistency) still fails the target.

@@ -97,6 +97,33 @@ class HumanMasking(unittest.TestCase):
 
     # ---- invariants ----------------------------------------------------
 
+    def test_each_read_appears_once(self):
+        # Everything downstream builds dicts, so a read in two categories does
+        # not fail -- it silently adopts whichever row was written last, and one
+        # of the two expectations stops being tested. Three GIAB reads sat in
+        # both `human_divergent` and `human_grazing_organism` this way.
+        records, ids = 0, set()
+        with gzip.open(os.path.join(DATA, "human_masking.fastq.gz"), "rt") as fh:
+            while True:
+                h = fh.readline()
+                if not h:
+                    break
+                fh.readline(); fh.readline(); fh.readline()
+                records += 1
+                ids.add(h[1:].split()[0])
+        self.assertEqual(records, len(ids),
+                         f"{records - len(ids)} duplicate read(s) in the fixture")
+
+        rows = []
+        with open(os.path.join(DATA, "human_masking_manifest.tsv")) as fh:
+            fh.readline()
+            rows = [l.split("\t")[0] for l in fh if l.strip()]
+        dupes = sorted({r for r in rows if rows.count(r) > 1})
+        self.assertEqual(dupes, [],
+                         f"read(s) claimed by two categories: {dupes[:5]}")
+        self.assertEqual(set(rows), ids,
+                         "the manifest and the FASTQ describe different reads")
+
     def test_no_read_is_lost_or_gained(self):
         self.assertEqual(set(self.before), set(self.after))
 

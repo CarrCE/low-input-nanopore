@@ -479,10 +479,18 @@ Three further properties are worth knowing before reading the outputs:
   flagged reads against T2T-CHM13v2.0 (`--human_accession`, cached in
   `refs/human/`).
 
-`make check` covers the rule with 18 logic assertions and 11 more against a
-committed 1,529-read fixture (`assets/testdata/`) that includes GIAB HG002
+`make check` covers the rule with 18 logic assertions and 12 more against a
+committed 1,520-read fixture (`assets/testdata/`) that includes GIAB HG002
 reads, conserved-region reads a real HRRT run flagged, and synthetic chimeras
 spliced at recorded offsets. Neither suite needs the network or a mapping pass.
+
+A third check looks the other way. The fixture is built from reads **before**
+masking, so it can hold sequence the deposit withholds — and nothing that tests
+the masker can see that, because the masker is asserted against the fixture's
+own records. `tests/fixture_deposit_agreement.py` compares every study-derived
+fixture read against its released form: base for base when the deposited reads
+are present (`make check DEPOSIT=/path/to/lowinput_s1_r1.fastq.gz`), and against
+a committed list of the ids the deposit masks when they are not.
 
 **What may and may not be claimed.** Reads confidently assignable to human were
 masked. That is not the same as "no human sequence remains" — recall is roughly

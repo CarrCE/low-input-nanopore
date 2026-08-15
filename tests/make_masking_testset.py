@@ -22,6 +22,13 @@ reference downloads. Those records carry REAL query intervals extracted from
 real alignments; reference coordinates are not preserved, because the masker
 consumes query intervals only. Chimera records are recomputed from the splice
 offset, which is what makes their expected outcome exact rather than inferred.
+
+The study reads come from the file BEFORE masking, because that is what the
+masker has to be fed. So `--deposited-masked-ids` is required, not optional: any
+read the deposit masks is excluded from every pool here. Without that filter the
+fixture publishes, in the repository, sequence that SRA deliberately withholds
+-- which is what happened when the attribution floor landed a day after the
+first fixture was built. `tests/fixture_deposit_agreement.py` asserts the result.
 """
 
 import argparse
@@ -133,6 +140,12 @@ def main():
     p.add_argument("--study-flagged", required=True)
     p.add_argument("--study-bam", required=True)
     p.add_argument("--study-human-paf", required=True)
+    p.add_argument("--deposited-masked-ids", required=True,
+                   help="ids the DEPOSIT masks, for the same replicate as "
+                        "--study-fastq. Every one is excluded from the fixture. "
+                        "Derive it from the submitted file itself (a read is "
+                        "masked iff its released sequence contains an N) rather "
+                        "than from a masking run's own bookkeeping.")
     p.add_argument("--outdir", required=True)
     p.add_argument("--n-human-high", type=int, default=500)
     p.add_argument("--n-human-divergent", type=int, default=200)
@@ -157,12 +170,23 @@ def main():
             calls[f[0]] = (f[2], f[1])           # call, organism
     study_h, _ = paf_intervals(a.study_human_paf)
 
+    # Reads the deposit masks may not enter the fixture at ANY point -- not as a
+    # community read, not as a conserved-region read, not as a chimera's
+    # organism half. Filtering the candidate set once, here, is what makes that
+    # true everywhere downstream: every pool below is a subset of `cand`.
+    withheld = {l.split()[0] for l in open(a.deposited_masked_ids) if l.strip()}
+    if not withheld:
+        sys.exit(f"error: {a.deposited_masked_ids} is empty. It is the only "
+                 f"thing keeping withheld sequence out of the fixture; an empty "
+                 f"file is a filter that silently does nothing.")
+
     # Study reads worth including: positively attributed AND actually covered by
     # that organism. The coverage floor matters -- assign_reads will attribute a
     # read on a very small footprint, and such reads are frequently human reads
     # with an incidental organism hit. Including them would bake a wrong
     # expectation into the fixture.
-    cand = {r for r, (c, _o) in calls.items() if c == "assigned"}
+    cand = {r for r, (c, _o) in calls.items()
+            if c == "assigned" and r not in withheld}
     study_t = bam_query_intervals(a.study_bam, cand)
     study_seq = {}
     for rid, s, q in read_fastq(a.study_fastq):
@@ -186,8 +210,13 @@ def main():
     lo = [r for r, i in giab_ident.items() if i < 0.90 and r in giab_seq]
     # The 9 human reads that graze an organism are the sharpest cases in the
     # set: if the rescue is too permissive, these are what it wrongly releases.
+    # They get their own category and must leave BOTH the pools they came from --
+    # filtering only `hi` put three of them in `human_divergent` as well, with
+    # the contradicting expectation `masked_fully`, and every consumer silently
+    # resolved it by keeping whichever row came last.
     grazers = [r for r in giab_t if r in giab_seq]
     hi = [r for r in hi if r not in grazers]
+    lo = [r for r in lo if r not in grazers]
     RNG.shuffle(hi)
     RNG.shuffle(lo)
 
