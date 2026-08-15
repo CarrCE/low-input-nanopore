@@ -89,13 +89,22 @@ if [ "$n_rows" -lt 1 ]; then
     cat >&2 <<EOF
 error: ENA returned no runs for ${ACCESSION} (${SAMPLE_ID}).
 
-  The two causes are indistinguishable from here:
-    - the submission is not yet released, so no public record exists; or
+  Three causes are indistinguishable from here:
+    - ENA has not yet mirrored the record, though it is public at NCBI;
+    - the submission is not yet released anywhere; or
     - the accession is wrong.
 
-  Reads for this study are deposited under BioProject PRJNA1513130 and become
-  public on release. Until then, run without --fetch_from_sra and point the
-  samplesheet at local FASTQs.
+  For this study the first is the one to expect. BioProject PRJNA1513130 was
+  released at NCBI on 15 Aug 2026 as runs SRR40180147-SRR40180153, and ENA
+  receives INSDC submissions on a delay of a few days. Check which case you are
+  in before assuming the accession is bad:
+
+      curl -s 'https://www.ebi.ac.uk/ena/portal/api/filereport?accession=${ACCESSION}&result=read_run&fields=run_accession&format=tsv'
+
+  An empty result with a header row means ENA does not have it yet. Meanwhile,
+  download the FASTQs from NCBI and point the samplesheet's fastq column at
+  them; note that reads regenerated from the SRA archive differ byte-wise from
+  the deposited files and will not match assets/deposited_files.tsv.
 EOF
     exit 1
 fi

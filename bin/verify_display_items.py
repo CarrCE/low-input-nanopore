@@ -38,7 +38,8 @@ def parse_args():
     # "comparison/figures" was the pre-move path. It has not existed since the
     # comparison module was split into bin/ and assets/, so this scan printed
     # "[skip] comparison/figures does not exist" and still reported conformance
-    # -- main-text Figure 3 was never checked by the gate written to check it.
+    # -- the per-femtogram comparison figure was never checked by the gate
+    # written to check it.
     p.add_argument("--dirs", nargs="+", default=["results/summary", "results/comparison"],
                    help="directories to scan for display items")
     # A directory named explicitly is one the caller expects to exist; skipping
