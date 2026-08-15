@@ -14,6 +14,28 @@ Community DNA Standard II, log distribution, D6311; 3 replicates) and
 `lowinput_s2` (ZymoBIOMICS Spike-in Control II, low microbial load, D6321, whole
 cells; 4 replicates, r0–r3).
 
+### "Sub-picogram" means per organism, not per library
+
+Worth stating up front, because the two scales are three orders of magnitude
+apart and easy to conflate. The **libraries** are sub-nanogram: about 1.21 ng of
+sample DNA for `lowinput_s1`. The **detections** are sub-picogram, and that is
+the claim: in a log-distributed community, the rarest members enter library prep
+at femtogram masses and are still recovered.
+
+Both figures below are computed from `results/summary/per_organism.tsv`, not
+asserted:
+
+| organism | design fraction | mass into library prep | reads recovered |
+|---|---|---|---|
+| *Staphylococcus aureus* | 1×10⁻⁶ | **1.21 fg** | 3, 3, 4 — all three `lowinput_s1` replicates |
+| *Cryptococcus neoformans* | 9×10⁻⁶ | **10.9 fg** | 4, 0, 9 — two of three |
+
+*C. neoformans* is absent from one replicate, which is what detection at ten
+femtograms looks like: a handful of reads, and Poisson sampling doing the rest.
+Reporting it as detected in all three would overstate what these data show. The
+per-organism yields these rest on are in
+[Metric definitions](#metric-definitions).
+
 ---
 
 ## Quickstart
@@ -650,3 +672,11 @@ Corresponding author: Christopher E. Carr.
 
 MIT — see [`LICENSE`](LICENSE). Copyright (c) 2026 Christopher E. Carr / Georgia
 Institute of Technology.
+
+Nothing third-party is vendored here: every tool is pulled at build or run time
+by pinned digest, and no reference genome is redistributed.
+[`THIRD_PARTY.md`](THIRD_PARTY.md) lists what is used and under what terms,
+explains why breseq being GPL-2.0 does not reach this MIT code, and carries the
+required notices for the two datasets that **are** redistributed — the GIAB
+HG002 reads in `assets/testdata/` (CC0, with a statement of how they were
+modified) and the prior-study values in `assets/comparison/`.

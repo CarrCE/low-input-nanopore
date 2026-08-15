@@ -10,9 +10,15 @@ abstract: >-
   carried over from lambda production, so that every read is accounted for
   exactly once and enrichment is computed against an exact denominator.
 version: 0.1.0
+date-released: 2026-08-17
 license: MIT
 repository-code: "https://github.com/CarrCE/low-input-nanopore"
 url: "https://github.com/CarrCE/low-input-nanopore"
+# Add the Zenodo DOI here once the release is archived, as:
+#   doi: "10.5281/zenodo.XXXXXXX"
+# and add the same to `identifiers:` below with description "Archived release".
+# Leave both out until the DOI exists -- a placeholder that resolves to nothing
+# is worse than no field at all, because tooling will happily cite it.
 keywords:
   - nanopore
   - adaptive sampling
@@ -27,6 +33,7 @@ authors:
     affiliation: "School of Earth and Atmospheric Sciences; Daniel Guggenheim School of Aerospace Engineering, Georgia Institute of Technology"
   - family-names: Sailor
     given-names: Jenna
+    orcid: "https://orcid.org/0009-0005-1655-5005"
     affiliation: "Wallace H. Coulter Department of Biomedical Engineering, Georgia Institute of Technology"
   - family-names: Carr
     given-names: Christopher E.
@@ -37,3 +44,25 @@ contact:
     given-names: Christopher E.
     orcid: "https://orcid.org/0000-0002-6980-9276"
     affiliation: "Daniel Guggenheim School of Aerospace Engineering; School of Earth and Atmospheric Sciences, Georgia Institute of Technology"
+
+# The software above is what this repository is. The work it supports is the
+# paper below; cite that for the science and the software for the code. Journal,
+# volume and DOI are deliberately absent until the paper is accepted -- see the
+# note on placeholders above.
+preferred-citation:
+  type: article
+  title: "Sub-Picogram Biosignature Detection Using Nanopore Adaptive Sampling and Sequencing"
+  year: 2026
+  authors:
+    - family-names: McKaig
+      given-names: Jordan
+      orcid: "https://orcid.org/0000-0003-3796-6274"
+      affiliation: "School of Earth and Atmospheric Sciences; Daniel Guggenheim School of Aerospace Engineering, Georgia Institute of Technology"
+    - family-names: Sailor
+      given-names: Jenna
+      orcid: "https://orcid.org/0009-0005-1655-5005"
+      affiliation: "Wallace H. Coulter Department of Biomedical Engineering, Georgia Institute of Technology"
+    - family-names: Carr
+      given-names: Christopher E.
+      orcid: "https://orcid.org/0000-0002-6980-9276"
+      affiliation: "Daniel Guggenheim School of Aerospace Engineering; School of Earth and Atmospheric Sciences, Georgia Institute of Technology"
