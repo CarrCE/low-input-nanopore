@@ -547,6 +547,12 @@ build) and about 9 GB of memory for `MAP_HUMAN`, whose footprint is set by the
 
 Pinned in `conf/base.config`. Nothing runs on host-installed software.
 
+The `:0.1.0` on the image names is the **image** version and moves only when
+an image's contents change; it is deliberately independent of the pipeline
+version in `nextflow.config` and `CITATION.cff`. A v1.0.0 pipeline running
+`tools:0.1.0` means the tools image has not needed a rebuild, not that
+something is out of step.
+
 | Label | Image | Source | Used by |
 |---|---|---|---|
 | `tools` | `low-input-nanopore/tools:0.1.0` | `docker/tools/Dockerfile` — built locally by `make images`; minimap2 2.28, htslib 1.21, samtools 1.21, seqkit 2.8.2, NCBI `datasets` v2, on `debian:bookworm-20241111-slim` | `FETCH_GENOMES`, `FETCH_READS`, `MAP_COMPETITIVE`, `COVERAGE_PROFILE` |

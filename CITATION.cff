@@ -9,7 +9,7 @@ abstract: >-
   reference holding the community, the carrier, and the E. coli contaminant
   carried over from lambda production, so that every read is accounted for
   exactly once and enrichment is computed against an exact denominator.
-version: 0.1.0
+version: 0.9.0
 date-released: 2026-08-17
 license: MIT
 repository-code: "https://github.com/CarrCE/low-input-nanopore"
