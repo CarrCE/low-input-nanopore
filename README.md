@@ -1,5 +1,7 @@
 # low-input-nanopore
 
+[![DOI](https://zenodo.org/badge/1335418827.svg)](https://doi.org/10.5281/zenodo.21959294)
+
 Depletion-mode adaptive sampling lets an Oxford Nanopore flow cell eject reads
 that match a known carrier, so a tiny amount of sample DNA can be carried into
 library prep on a large mass of cheap genomic carrier (here, lambda) and still
@@ -601,6 +603,12 @@ analysis, and cached in the gitignored `refs/`.
 If you use this pipeline, please cite it using the metadata in
 [`CITATION.cff`](CITATION.cff) (GitHub renders a formatted citation from it via
 "Cite this repository").
+
+Each release is archived on Zenodo. **Cite the concept DOI,
+[10.5281/zenodo.21959294](https://doi.org/10.5281/zenodo.21959294)** — it always
+resolves to the latest version, so a citation written today stays correct when
+this is bumped to 1.0.0 at publication. To pin a specific version instead, v0.9.0
+is [10.5281/zenodo.21959295](https://doi.org/10.5281/zenodo.21959295).
 
 Authors: Jordan McKaig (School of Earth and Atmospheric Sciences; Daniel
 Guggenheim School of Aerospace Engineering, Georgia Institute of Technology),
