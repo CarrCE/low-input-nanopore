@@ -52,23 +52,44 @@ second.
 3. `tests/make_masking_testset.py` now requires `--deposited-masked-ids` and
    filters the candidate set once, so a regeneration cannot reintroduce them.
 4. The history was rewritten with `git filter-repo`, replacing the fixture blobs
-   at the single commit that introduced them. Every commit, message, author and
-   date was preserved.
+   at the single commit that introduced them. Every commit, author and date was
+   preserved; five commit messages were normalised in a second pass, described
+   below.
+
+## A second pass, on the messages
+
+Immediately before publication the messages were rewritten too. Nothing about
+the content changed — the tree at every commit is identical — but three things
+in the messages were wrong for a public repository:
+
+- Three subjects used internal planning vocabulary (`Phase 2:`, `Phase 3:`) that
+  means nothing to a reader, and one was phrased as a note to self.
+- **One commit body quoted the very path it had just removed from five files** —
+  an absolute path from a developer's machine — which would have published, and
+  made searchable, the exact string that commit existed to delete.
+- Thirty-nine commits carried a trailer linking to a private authoring session.
+  The link resolves to nothing for anyone else; it was noise.
+
+`Co-Authored-By:` trailers were kept. The work was done with AI assistance and
+that is worth recording accurately rather than quietly dropping.
 
 ## What the SHAs do and do not tell you
 
-Of the 107 commits, **75 kept their original hashes** — everything up to 29 July
-2026. From `Merge pull request #27` onward they changed, and not only because of
-the fixture: thirteen merge commits had been **GPG-signed by GitHub's web
-interface**, and a signature cannot survive the content it signs being rewritten,
-so `filter-repo` strips them. Removing a signature changes the commit object,
-which changes its hash, which changes every descendant's parent pointer. The
-cascade reaches commits whose own content never changed at all.
+**Only 19 of the 114 commits kept their original hashes** — everything before
+25 July 2026. Two separate effects cascade through the rest:
 
-The consequence worth stating plainly: **those merges no longer carry a verified
-signature**, and any hash cited elsewhere for a commit after 29 July 2026 will
-not resolve here. This is unavoidable in any history rewrite; the alternative was
-to leave the withheld reads in place.
+- The message pass touched a commit dated 25 July, and changing any commit
+  changes every descendant's parent pointer.
+- Thirteen merge commits had been **GPG-signed by GitHub's web interface**. A
+  signature cannot survive the content it signs being rewritten, so
+  `filter-repo` strips them, which changes those objects too.
+
+Two consequences worth stating plainly. **Those merges no longer carry a
+verified signature.** And **any commit hash cited elsewhere for this repository
+before publication will not resolve here** — including hashes that appear in
+older notes, in the manuscript's earlier drafts, and in this project's own
+archived run directories. Both are unavoidable in a history rewrite; the
+alternative was to publish the withheld reads.
 
 Verified afterwards by scanning every blob of every commit in the rewritten
 history for the six read ids and for 60-base probes taken from inside the
