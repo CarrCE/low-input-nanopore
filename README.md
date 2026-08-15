@@ -33,8 +33,8 @@ the contaminant-divergence check is done **1 h 24 m** after a cold start. Only
 
 ### Pointing a clone at reads you already have
 
-Until the deposit is released, `data/` is populated by hand; once it is,
-`--fetch_from_sra` does this for you (see [Data
+`data/` is populated by hand until ENA mirrors the deposit, after which
+`--fetch_from_sra` does it for you (see [Data
 availability](#data-availability)). **Hard-link or
 copy them — do not symlink to a directory outside the repository.** The Nextflow
 processes resolve symlinks and stage the real file, so `make all` works either
@@ -56,12 +56,13 @@ mkdir -p data/test && ln "$SRC/test_s2.fastq" data/test/
 Hard links cost nothing and require the reads to be on the same filesystem as
 the clone. If they are not, copy them.
 
-> **Read this before step 2.** The sequencing reads are deposited
-> (BioProject `PRJNA1513130`) but **not yet public**, and the smoke-test FASTQ is
-> derived from them, so *steps 2 and 3 cannot be run from a fresh clone today* —
-> `--fetch_from_sra` has nothing to resolve until the submission is released. See
-> [Data availability](#data-availability). What **is** reproducible from the
-> repository alone is main-text Figure 3, which is built from committed tables:
+> **Read this before step 2.** The sequencing reads are public — BioProject
+> `PRJNA1513130`, runs `SRR40180147`–`SRR40180153`, released 15 Aug 2026 — but
+> **ENA has not mirrored them yet**, and `--fetch_from_sra` resolves through ENA.
+> Until it does, download the seven FASTQs from NCBI and point `data/` at them as
+> above; steps 2 and 3 then run from a fresh clone. See
+> [Data availability](#data-availability). What needs no reads at all is the
+> per-femtogram comparison figure, built from committed tables:
 > `make images && make comparison`.
 
 ```bash
@@ -87,7 +88,7 @@ make measurements verify
 ### Reproducing the whole paper
 
 Step 3 is **the** analysis: one Nextflow run, both experiments, both assignment
-modes. It produces main-text Figures 1 and 2 and the study-level summary tables
+modes. It produces the abundance and read-length figures and the study-level tables
 directly. Everything in step 4 is either a plotter that reads
 `results/summary/`, or a check — no second pipeline is involved.
 
@@ -101,60 +102,71 @@ All times below are measured on a complete cold run from a fresh clone (M3 Max,
 
 | step | target | produces | cost |
 |---|---|---|---|
-| 3 | `all` | Figs 1 & 2, `results/summary/` tables | **1 h 17 m** |
-| 4 | `attribution` → `coverage` | Fig. S2, Table S5 | 4 s |
-| 4 | `modedelta` | Fig. S1 | 3 s |
-| 4 | `comparison` | Fig. 3 | 2 s |
+| 3 | `all` | abundance and read-length figures, `results/summary/` tables | **1 h 32 m** |
+| 4 | `attribution` → `coverage` | coverage-uniformity figure, coverage table | 4 s |
+| 4 | `modedelta` | mode-comparison figure | 3 s |
+| 4 | `comparison` | per-femtogram comparison figure | 2 s |
 | 4 | `estcontrol` | estimated no-AS control | 2 s |
-| 4 | `assigneddepth` → `poolcov` | Fig. S3 | 5 m |
-| 4 | `seqsummary`, `runmeta`, `versions` | Tables S8, S9, software table | 5 m (`runmeta` reads all ~110 GB) |
-| 4 | `q10` | **Table S11** and the main text's quality-filter section | **1 h 12 m** |
-| 4 | `raghavendra` | the committed prior-study rows behind Fig. 3 | 38 s |
-| 4 | `divergence` | the Section S3 divergence table | **1 h 33 m** (breseq under amd64 emulation) |
+| 4 | `assigneddepth` → `poolcov` | pooled-coverage figure | 5 m |
+| 4 | `seqsummary`, `runmeta`, `versions` | sequencing-summary, runs and software tables | 5 m (`runmeta` reads all ~110 GB) |
+| 4 | `q10` | the **quality-matched rerun** table and the main text's quality-filter section | **1 h 27 m** |
+| 4 | `raghavendra` | the committed prior-study rows behind the comparison figure | 38 s |
+| 4 | `divergence` | the contaminant-divergence table | **1 h 33 m** (breseq under amd64 emulation) |
 | 4 | `measurements`, `verify` | the two checks | seconds |
-| | | **total** | **4 h 14 m** |
+| | | **total** | **4 h 44 m** |
 
 Two of these are easy to leave out and both are published results. **`make q10`**
 is a second complete pass over all seven replicates in both modes — it costs
-about as much as `make all` and produces Supplementary Table S11.
+about as much as `make all` and produces the quality-matched rerun table.
 **`make divergence`** is over a third of the total on its own. A reproduction
 that skips either is incomplete, which is why they are in the table rather than
 in a footnote.
 
 `divergence` is the only step outside the Nextflow DAG — it runs breseq over the
-contaminant reads of a finished run, in its own container. It is what
-Supplementary Section S3's "is the stock reference close enough?" argument rests
-on, so a reproduction that stops at `make verify` is missing it.
+contaminant reads of a finished run, in its own container. It is what the
+paper's "is the stock reference close enough?" argument rests on — the
+contaminant-divergence table, `results/contaminant_divergence/summary.tsv` — so
+a reproduction that stops at `make verify` is missing it.
 
 **`make verify` belongs last, not after step 3.** It asserts that every display
-item satisfies `docs/display-items.md`, and Figures S1, S2, S3 and Figure 3 are
-built in step 4 — so running it straight after the pipeline reports the figures
-it has not been given the chance to build yet.
+item satisfies `docs/display-items.md`, and the mode-comparison, coverage and
+per-femtogram figures are built in step 4 — so running it straight after the
+pipeline reports the figures it has not been given the chance to build yet.
 
 ### Verified
 
-On 3 August 2026 the sequence above was run end to end from a fresh `git clone`
+On 15 August 2026 the sequence above was run end to end from a fresh `git clone`
 with containers rebuilt from `docker/`, on a machine holding no prior state from
-this project. Every reported value reproduced:
+this project, **reading the seven deposited masked FASTQs** — each md5-verified
+against `assets/deposited_files.tsv` before the run. Every reported value
+reproduced:
 
 - `results/summary/experiment_summary.tsv` byte-identical to the published
   tables; `per_organism.tsv` and `coverage_attribution.tsv` identical
-- all twelve values of Supplementary Table S11 (the Q10 analysis) to printed
-  precision, and its quoted retention ranges — 89.76–98.38% of reads and
-  77.20–91.16% of bases against the stated 89.8–98.4% and 77.2–91.2%
-- all seven rows of the Section S3 contaminant-divergence table, including the
-  per-replicate SNP counts
+- all twelve values of the Q10 analysis to printed precision, and its quoted
+  retention ranges — 89.76–98.38% of reads and 77.20–91.16% of bases against the
+  stated 89.8–98.4% and 77.2–91.2%
+- all seven rows of the contaminant-divergence table, including the per-replicate
+  SNP counts, every variant call identical
 - all fourteen prior-study rows in `assets/comparison/prior_studies.tsv`
   re-derived from the deposited Basapathi Raghavendra reads
+- `make verify` 7/7 and `make check` clean
+
+The two pipeline invocations took 1.54 h and 1.45 h of wall time on the
+reference platform (54 and 52 tasks; see `results/pipeline_info/`), the
+downstream targets minutes more.
 
 This is stated because "the code is available" and "the code reproduces the
-paper" are different claims, and only the second is worth much. Note the
-prerequisite the reader cannot yet satisfy: the run above used local FASTQs,
-because the deposited records were not yet public. Until they are released, an
-outside reader can reproduce main-text Figure 3 — which is built from committed
-tables — and nothing else. Repeating this run through `--fetch_from_sra` is what
-converts that into a claim a reader can check, and is item 1 in
-[`docs/TODO.md`](docs/TODO.md).
+paper" are different claims, and only the second is worth much.
+
+**What a reader can and cannot yet check.** The run above read the deposited
+files from local disk. The deposit is public — runs `SRR40180147`–`SRR40180153`,
+released 15 Aug 2026 — but ENA has not yet mirrored it, so `--fetch_from_sra`
+cannot resolve them today. Downloading the seven FASTQs by hand from NCBI and
+supplying them through the samplesheet reproduces everything above; the one-command
+path becomes available when ENA catches up. When it does, expect the archive's
+regenerated copy rather than the submitted bytes — see
+[Data availability](#data-availability) for what that does and does not change.
 
 **Use `make all`, not `make s1` plus `make s2`.** `AGGREGATE` only sees the
 samples of the run that invokes it, and both write to the same
@@ -172,8 +184,8 @@ of `results/`, so a clone has exactly one output tree:
 
 | target | writes to | is it a published result? |
 |---|---|---|
-| `make q10` | `results/q10` | **Yes.** Quality-matched rerun at Q10, reported in the main text ("The result is robust to a quality filter") and in Supplementary Table~S11. Reproducing the paper means running this. |
-| `make raghavendra` | `results/raghavendra` | Indirectly. It is the *provenance* of the Basapathi Raghavendra rows committed to `assets/comparison/prior_studies.tsv`. Figure 3 is drawn from that committed table, so the figure reproduces without this; running it re-derives those numbers from the reads. |
+| `make q10` | `results/q10` | **Yes.** Quality-matched rerun at Q10, reported in the main text ("The result is robust to a quality filter") and in the quality-matched rerun table. Reproducing the paper means running this. |
+| `make raghavendra` | `results/raghavendra` | Indirectly. It is the *provenance* of the Basapathi Raghavendra rows committed to `assets/comparison/prior_studies.tsv`. The comparison figure is drawn from that committed table, so it reproduces without this; running this re-derives those numbers from the reads. |
 
 `make q10` is a second full pass over all seven replicates in both modes and
 costs about as much as `make all`. `make raghavendra` is cheap — the deposited
@@ -185,8 +197,8 @@ chunks under `data/raghavendra_2023/` total ~1.3 MB.
 straight through. It exists for one reason: **Nextflow cannot run from a project
 path that contains spaces.** Nextflow writes an `export PATH=...` line and an
 inner `bash <path>` into each task wrapper without quoting them, so a project
-directory such as `.../My Research Data/...` breaks the wrapper
-before any command executes. That is a Nextflow limitation, not something the
+directory such as `.../My Research Data/...` breaks the wrapper before any
+command executes. That is a Nextflow limitation, not something the
 pipeline can fix internally.
 
 When the repository sits at a path containing spaces, `run.sh` creates a stable,
@@ -272,6 +284,8 @@ These mirror the conventions used across the lab's analysis repositories.
 | `docs/benchmarks.md` | Native arm64 vs emulated amd64 timing, projected run cost, `breseq` notes |
 | `docs/ecoli-partitioning.md` | Why the community's *E. coli* must not be subtracted with the contaminant, and how competitive assignment handles it |
 | `docs/TODO.md` | Honest list of known gaps |
+| `docs/paper-crosswalk.md` | Which output backs which figure and table in the paper |
+| `docs/history-rewrite.md` | The 15 Aug 2026 history rewrite: what was removed and why |
 | `bin/comparison/` | The prior-work comparison: figure generator, the loader, the Kraken2/Raghavendra fetch and reanalysis scripts, and `seed_this_study.py` |
 | `assets/comparison/` | Its inputs: `prior_studies.tsv` (one row per prior-study sample per classifier variant, each citing its published source), `this_study.tsv` (a committed snapshot of pipeline output), `kraken2_db.manifest.tsv` (the pinned database) |
 | `docs/comparison.md` | How that comparison is built, and the four data defects it repairs |
@@ -377,7 +391,11 @@ exactly once, so this denominator is exact.
 the output exceeds its share of the input. Reported both base-weighted and
 read-weighted. An earlier preliminary analysis of `lowinput_s1` reported this as
 ">100x"; correcting the carrier mass and removing carrier-derived *E. coli* from
-the community lowers it to **70.7x** (manuscript, Supplementary Section S2).
+the community lowers it to **53.6x** (manuscript, Supplementary Section S2).
+That figure moved once more, from 70.7x, when the attribution floor
+(`--min_aln_frac`) stopped an organism claiming a whole read on a sliver of
+alignment; see [Metric definitions](#metric-definitions) above and
+`bin/attribution_threshold.py` for the distribution behind the threshold.
 
 **`reads_per_fg` / `bases_per_fg`**
 reads (or bases) assigned to an organism, divided by the femtograms of that
@@ -549,10 +567,18 @@ how the result was verified are recorded in
 affected; the rewrite touched only `assets/testdata/`, which no part of the
 pipeline reads.
 
-> **The records are not public until the submission is released.** `--fetch_from_sra`
-> is implemented and wired, but until release ENA has nothing to resolve and the
-> run stops with a message saying exactly that. Run without the flag in the
-> meantime.
+The deposit was **released on 15 August 2026**. The seven runs are
+`SRR40180147`–`SRR40180153`, carried per row in the samplesheets'
+`sra_accession` column; each run's read and base counts were checked against
+[`assets/deposited_files.tsv`](assets/deposited_files.tsv) and agree exactly,
+totalling 60,416,747 reads and 54,642,391,422 bases.
+
+> **ENA has not yet mirrored the project, so `--fetch_from_sra` cannot resolve
+> these accessions yet.** The records are public at NCBI; ENA, which this
+> repository fetches from, receives INSDC submissions on a delay of a few days.
+> Until it does, run without the flag and supply the FASTQs through the
+> samplesheet's `fastq` column. `bin/fetch_ena_reads.sh` says which of the two
+> situations it is in rather than reporting both as "not released".
 
 ### Fetching the reads by accession
 
@@ -568,9 +594,9 @@ a network is then the whole input.
 
 Resolution goes through ENA's portal API rather than the SRA toolkit, for two
 reasons: the toolkit publishes no `linux/arm64` build, and this study's
-reference platform is Apple Silicon; and ENA serves the **submitted** file — the
-exact bytes uploaded — alongside the archive's regenerated copy. Only the
-submitted copy can be checked against
+reference platform is Apple Silicon; and ENA *can* serve the **submitted**
+file — the exact bytes uploaded — alongside the archive's regenerated copy.
+Only the submitted copy can be checked against
 [`assets/deposited_files.tsv`](assets/deposited_files.tsv), which records the
 md5, size, read count and base count of each deposited file. `bin/fetch_ena_reads.sh`
 prefers it, verifies both the archive's own checksum and ours, and says which
@@ -578,11 +604,21 @@ copy it used. If only the regenerated copy exists it falls back with a warning
 and skips our checksum, because SRA rebuilds `fastq_ftp` from its own archive:
 the same sequence, different bytes, and possibly different read names.
 
-Accessions are resolved at fetch time, so **nothing here needs editing when the
-run accessions are issued** — the samplesheets carry BioSample accessions, and
-ENA maps each to its run. The `sra_accession` column takes a run accession
-(`SRR`/`ERR`) and wins when present, which is the escape hatch if a BioSample
-ever resolves to more than one run.
+**Expect that fallback here.** This submission was made to NCBI, and NCBI
+serves only the `.sra` archive format for these runs — no original submitted
+file — so the regenerated copy is likely the only one either archive will ever
+offer. A public download therefore reproduces the *sequence* but not the
+*bytes*, and the md5s in `deposited_files.tsv` record what was uploaded rather
+than what can be downloaded. The reads themselves are unaffected: read and base
+counts were verified against NCBI's own records per run. One consequence worth
+anticipating is that SRA does not preserve ONT header tags, so `qs:f:` is
+absent from a fetched FASTQ and `bin/sequencing_summary.py` will report an
+empty `median_qscore`.
+
+The samplesheets carry both a BioSample accession and, since the 15 Aug 2026
+release, the run accession itself. `sra_accession` wins when present, so
+resolution is now unambiguous rather than relying on a BioSample mapping to
+exactly one run.
 
 `tests/sra_fetch.sh` asserts every branch of that logic against saved portal
 responses, with no network: which copy is chosen, that a checksum mismatch

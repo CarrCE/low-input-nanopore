@@ -79,10 +79,10 @@ submission, at which point the fixture has to be rebuilt anyway.
 
 Every read is real sequence except the junk.
 
-- **Human** — Giab HG002/NA24385 (Ashkenazim son), UCSC ultralong ONT
+- **Human** — GIAB HG002/NA24385 (Ashkenazim son), UCSC ultralong ONT
   PromethION, `GM24385_1.fastq.gz`, from the leading 120 MB of
   `ftp-trace.ncbi.nlm.nih.gov/ReferenceSamples/giab/data/AshkenazimTrio/HG002_NA24385_son/UCSC_Ultralong_OxfordNanopore_Promethion/`.
-  Public and consented for exactly this purpose. Reads were kept at
+  See the redistribution notice below. Reads were kept at
   300–12,000 bp to bound the fixture's size, then split at 0.90 identity to
   T2T-CHM13v2.0 (`GCF_009914755.1`), measured with `minimap2 -c` and the
   `de:f` tag.
@@ -94,6 +94,40 @@ Every read is real sequence except the junk.
   recorded offset, so the expected boundary is exact rather than inferred.
 - **Junk** — the only synthetic component: random sequence, seeded, so nothing
   should ever claim it.
+
+## Redistribution notice for the GIAB reads
+
+The human reads here are redistributed from a **CC0** dataset, under the NIST
+Data Use Policy, which permits copying and distributing derivative works
+royalty-free worldwide. Two conditions come with it, and both are met here
+explicitly rather than by implication.
+
+**Source acknowledgement.** This fixture contains data from the **National
+Institute of Standards and Technology (NIST)**, acknowledged as the source. The
+dataset is the Genome in a Bottle ultra-long Oxford Nanopore PromethION
+sequencing of HG002/NA24385, collected January 2019 and released 8 May 2020;
+principal investigators Justin Zook and Nate Olson (NIST), and Miten Jain,
+Hugh E. Olsen, Karen Miga, Mark Akeson and Benedict Paten (UC Santa Cruz).
+
+**Notice of modification.** The data in this repository **has been changed** from
+the source dataset. On 12 August 2026 (`human_masking.fastq.gz` and its sidecar
+records) the reads were, in this order: subsampled from the leading 120 MB of
+`GM24385_1.fastq.gz`; filtered to 300–12,000 bp; partitioned by identity to
+T2T-CHM13v2.0 at a 0.90 threshold; and, for the 20 reads in the `chimera`
+category, **truncated and concatenated with sequence from this study's own
+reads** at a recorded offset, producing records that are not present in the
+source dataset and do not represent a real molecule. Three duplicated records
+were collapsed on 15 August 2026. No base of any retained GIAB read was altered.
+
+NIST makes no warranty of any kind, express, implied or statutory, regarding
+this data, and neither the modifications nor this repository are endorsed by
+NIST or UC Santa Cruz.
+
+**Consent.** HG002/NA24385 is a Personal Genome Project participant. GIAB
+selected the Ashkenazim trio precisely because PGP consent is broad — explicitly
+including commercial redistribution — which is why these reads may be
+redistributed here at all, and why no equivalent could be built from this
+study's own human-derived reads.
 
 ## Two selection rules that matter
 

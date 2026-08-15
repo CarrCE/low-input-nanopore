@@ -4,8 +4,8 @@
 #
 # Why this exists: Nextflow cannot run from a project path containing spaces.
 # It emits `export PATH=...` and an inner `bash <path>` without quoting, so a
-# path like ".../My Research Data/..." breaks the task wrapper
-# before any command runs. That is a Nextflow limitation, not something the
+# path like ".../My Research Data/..." breaks the task wrapper before any
+# command runs. That is a Nextflow limitation, not something the
 # pipeline can fix internally.
 #
 # When the repository sits at a path with spaces, this script transparently
@@ -43,10 +43,10 @@ if [[ "$REPO_REAL" == *" "* ]]; then
     echo "note: project path contains spaces; launching via ${LINK}"
     echo "      (Nextflow cannot handle spaces in the project path)"
 
-    # The work directory deliberately defaults OUTSIDE the repository. This repo
-    # commonly lives in a cloud-synced folder, and Nextflow's work/
-    # holds tens of GB of intermediate BAMs -- putting it in the repo would push
-    # all of that through the sync client. Override with NXF_WORK if you want it
+    # The work directory deliberately defaults OUTSIDE the repository. A clone
+    # often lives in a cloud-synced folder, and Nextflow's work/ holds tens of
+    # GB of intermediate BAMs -- putting it in the repo would push all of that
+    # through the sync client. Override with NXF_WORK if you want it
     # somewhere specific (e.g. a large external scratch disk).
     WORKDIR="${NXF_WORK:-${LINK}-work}"
     mkdir -p "$WORKDIR"

@@ -52,9 +52,23 @@ second.
 3. `tests/make_masking_testset.py` now requires `--deposited-masked-ids` and
    filters the candidate set once, so a regeneration cannot reintroduce them.
 4. The history was rewritten with `git filter-repo`, replacing the fixture blobs
-   at the single commit that introduced them. All 107 commits, their messages,
-   authors and dates were preserved; the 93 commits predating the fixture kept
-   their original SHAs.
+   at the single commit that introduced them. Every commit, message, author and
+   date was preserved.
+
+## What the SHAs do and do not tell you
+
+Of the 107 commits, **75 kept their original hashes** — everything up to 29 July
+2026. From `Merge pull request #27` onward they changed, and not only because of
+the fixture: thirteen merge commits had been **GPG-signed by GitHub's web
+interface**, and a signature cannot survive the content it signs being rewritten,
+so `filter-repo` strips them. Removing a signature changes the commit object,
+which changes its hash, which changes every descendant's parent pointer. The
+cascade reaches commits whose own content never changed at all.
+
+The consequence worth stating plainly: **those merges no longer carry a verified
+signature**, and any hash cited elsewhere for a commit after 29 July 2026 will
+not resolve here. This is unavoidable in any history rewrite; the alternative was
+to leave the withheld reads in place.
 
 Verified afterwards by scanning every blob of every commit in the rewritten
 history for the six read ids and for 60-base probes taken from inside the

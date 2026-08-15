@@ -11,12 +11,12 @@ For a display item named `<id>`:
 
 | File | Contents |
 |---|---|
-| `<id>.pdf` | The figure, **vector** format. This is the only artifact copied into the manuscript repository. |
+| `<id>.pdf` | The figure, **vector** format. This is the only artifact a manuscript needs; the sidecars stay here. |
 | `<id>.csv` | **The precise data points the figure draws** — not summary statistics. One row per plotted element. |
 | `<id>.json` | Metadata: `id`, `title`, publication-ready `caption`, `source_files`, `software` versions, and a `metrics` block of the derived quantities quoted in the text. |
 
 A 600-dpi `<id>.png` is also written for quick viewing and for slide decks. It is
-not used by the manuscript and is not committed to the manuscript repository.
+not the publication artifact — the PDF is.
 
 Where a figure's summary statistics are useful in their own right — read-length
 quantiles, per-organism coverage statistics — they go in a separate
@@ -37,16 +37,16 @@ the CSV alone?* If not, the CSV is wrong.
 
 ## Where the files live
 
-| | |
-|---|---|
-| Code repository (this one) | `<id>.pdf`, `<id>.png`, `<id>.csv`, `<id>_summary.csv`, `<id>.json` |
-| Manuscript repository | `figures/<id>.pdf` only |
+Everything lives here, in the run's output tree: `<id>.pdf`, `<id>.png`,
+`<id>.csv`, `<id>_summary.csv` and `<id>.json`, written beside each other by the
+script that produces them.
 
-The manuscript repository carries Overleaf sources and vector figures, nothing
-else. Sidecars deliberately are **not** duplicated there: they belong next to the
-script that produces them, and two copies would drift. `.gitignore` in the
-manuscript repository blocks `figures/data/` and raster figures so this cannot
-happen by accident.
+A document that uses these figures should take **the PDF and nothing else**. The
+sidecars are deliberately not duplicated into a manuscript: they belong next to
+the script that generates them, and a second copy is a copy that drifts. That is
+also why this repository, and not any manuscript, is the place to audit a number
+— see [`paper-crosswalk.md`](paper-crosswalk.md) for which output backs which
+display item in the paper.
 
 ## Current display items
 
@@ -93,11 +93,9 @@ docker run --rm -u $(id -u):$(id -g) -v "$PWD":/w -w /w -e MPLCONFIGDIR=/tmp/mpl
 # here: the manuscript describes the mapping-based variant, so the default is
 # what must reproduce the published figure.
 
-# copy vector figures into the manuscript repository
-cp results/summary/{abundance,readlengths,coverage,mode_delta,pooled_coverage}.pdf \
-   ../low-input-nanopore-manuscript/figures/
-cp results/comparison/low_input_comparison.pdf \
-   ../low-input-nanopore-manuscript/figures/
+# the vector figures a manuscript would use are now at:
+#   results/summary/{abundance,readlengths,coverage,mode_delta,pooled_coverage}.pdf
+#   results/comparison/low_input_comparison.pdf
 ```
 
 ## Enforcement
