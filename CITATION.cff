@@ -14,11 +14,17 @@ date-released: 2026-08-17
 license: MIT
 repository-code: "https://github.com/CarrCE/low-input-nanopore"
 url: "https://github.com/CarrCE/low-input-nanopore"
-# Add the Zenodo DOI here once the release is archived, as:
-#   doi: "10.5281/zenodo.XXXXXXX"
-# and add the same to `identifiers:` below with description "Archived release".
-# Leave both out until the DOI exists -- a placeholder that resolves to nothing
-# is worse than no field at all, because tooling will happily cite it.
+# `doi` is the VERSION DOI, pinned to v0.9.0, so it matches `version:` above.
+# The concept DOI below always resolves to the latest version and is the one to
+# cite in a paper -- it stays correct when this bumps to 1.0.0 at publication.
+doi: "10.5281/zenodo.21959295"
+identifiers:
+  - type: doi
+    value: "10.5281/zenodo.21959294"
+    description: "Concept DOI — resolves to the latest version"
+  - type: doi
+    value: "10.5281/zenodo.21959295"
+    description: "Archived release v0.9.0"
 keywords:
   - nanopore
   - adaptive sampling
