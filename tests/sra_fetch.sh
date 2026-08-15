@@ -138,8 +138,24 @@ check "no two samples share a BioSample accession" $?
 # fed an accession to bin/assigned_depth.sh as a directory name -- no error, just
 # a lookup for a reference set that cannot exist. The helper below is what makes
 # that impossible; assert it is still in use.
-grep -q 'sheet_col ()' "${HERE}/../bin/assigned_depth.sh"
-check "assigned_depth.sh looks samplesheet columns up by name" $?
+for s in assigned_depth contaminant_divergence; do
+    grep -q 'sheet_col ()' "${HERE}/../bin/${s}.sh"
+    check "${s}.sh looks samplesheet columns up by name" $?
+done
+# Run the real helper out of each script and check what it returns. A lint on
+# the source cannot do this job: `-v want="$2"` is a shell positional parameter,
+# not an awk field, and no regex distinguishes those reliably. Calling it does.
+for s in assigned_depth contaminant_divergence; do
+    ( REPO="${HERE}/.."
+      eval "$(sed -n '/^sheet_col ()/,/^}/p' "${HERE}/../bin/${s}.sh")"
+      got="$(sheet_col lowinput_s1_r1 reference_set)"
+      [ "$got" = "assets/references/lowinput_s1.tsv" ] || {
+          echo "     ${s}.sh resolved reference_set to '${got}'"; exit 1; }
+      got="$(sheet_col lowinput_s2_r3 biosample_accession)"
+      [ "$got" = "SAMN62407371" ] || {
+          echo "     ${s}.sh resolved biosample_accession to '${got}'"; exit 1; } )
+    check "${s}.sh resolves samplesheet columns to the right values" $?
+done
 
 refsets="$(awk -F, '!/^#/ && $1 != "sample_id" && NF > 1 {
              for (i = 1; i <= NF; i++) if (i == rs) print $i }
