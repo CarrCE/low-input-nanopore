@@ -197,8 +197,8 @@ chunks under `data/raghavendra_2023/` total ~1.3 MB.
 straight through. It exists for one reason: **Nextflow cannot run from a project
 path that contains spaces.** Nextflow writes an `export PATH=...` line and an
 inner `bash <path>` into each task wrapper without quoting them, so a project
-directory such as `.../My Research Data/...` breaks the wrapper
-before any command executes. That is a Nextflow limitation, not something the
+directory such as `.../My Research Data/...` breaks the wrapper before any
+command executes. That is a Nextflow limitation, not something the
 pipeline can fix internally.
 
 When the repository sits at a path containing spaces, `run.sh` creates a stable,

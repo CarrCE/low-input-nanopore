@@ -5,8 +5,8 @@
 # README.md for why that indirection exists) and the two local container builds.
 #
 # Everything is quoted because this repository is routinely cloned into a path
-# containing spaces (".../My Research Data/..."). Target names
-# never contain paths, so make itself stays happy; the recipes quote $(ROOT).
+# containing spaces (".../My Research Data/..."). Target names never contain
+# paths, so make itself stays happy; the recipes quote $(ROOT).
 #
 # Kept compatible with the GNU Make 3.81 that ships with macOS: no .ONESHELL,
 # so every recipe line stands alone as its own shell command.

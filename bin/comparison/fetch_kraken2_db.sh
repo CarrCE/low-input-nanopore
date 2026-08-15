@@ -19,8 +19,8 @@
 #
 # The default destination is data/kraken2_db/, matching where the read data and
 # fetch_raghavendra.sh already put their downloads. That is ~7.5 GiB unpacked;
-# if this clone lives in a cloud-synced folder, point DEST
-# somewhere unsynced and pass the same path to run_kraken2_reanalysis.sh --db.
+# if this clone lives in a cloud-synced folder, point DEST somewhere unsynced
+# and pass the same path to run_kraken2_reanalysis.sh --db.
 #
 # Idempotent: re-running once everything is present and verified touches neither
 # the network nor the unpacked files.
