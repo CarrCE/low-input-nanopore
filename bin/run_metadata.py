@@ -53,8 +53,13 @@ def parse_args():
     return p.parse_args()
 
 
-def samples(sheet_dir):
-    """sample_id -> fastq path, from the samplesheets rather than a guess."""
+def samples(sheet_dir, sradir="sra"):
+    """sample_id -> fastq path, from the samplesheets rather than a guess.
+
+    Falls back to the --fetch_from_sra download cache (`<sample_id>.fastq.gz`),
+    so this works from a clone whose reads came from the archive rather than
+    from the samplesheet's local `fastq` column.
+    """
     out = {}
     for p in sorted(Path(sheet_dir).glob("*.csv")):
         if p.name in ("test.csv", "raghavendra_2023.csv", "all.csv"):
@@ -64,8 +69,17 @@ def samples(sheet_dir):
         cols = rows[0].split(",")
         for line in rows[1:]:
             f = dict(zip(cols, line.split(",")))
-            if f.get("sample_id") and f.get("fastq"):
-                out[f["sample_id"]] = Path(f["fastq"])
+            sid = f.get("sample_id")
+            if not sid:
+                continue
+            local = Path(f["fastq"]) if f.get("fastq") else None
+            cached = Path(sradir) / f"{sid}.fastq.gz"
+            if local and local.is_file():
+                out[sid] = local
+            elif cached.is_file():
+                out[sid] = cached
+            elif local:
+                out[sid] = local
     return out
 
 

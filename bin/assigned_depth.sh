@@ -75,17 +75,39 @@ fi
 [ "${#REPLICATES[@]}" -gt 0 ] || die "no finished replicates under ${RESULTS}"
 log "replicates: ${REPLICATES[*]}"
 
+# Look a column up BY NAME. These used to be positional ($6 for reference_set,
+# $4 for fastq), which broke the moment a column was inserted before them:
+# adding `biosample_accession` shifted reference_set from 6 to 7, and the
+# positional read then returned an accession, which `set_name` happily used as a
+# directory name. Nothing errored -- it looked for a reference set that could not
+# exist. Header-driven lookup cannot fail that way.
+sheet_col () {  # sheet_col <sample_id> <column_name>
+    awk -F, -v r="$1" -v want="$2" '
+        /^#/                { next }
+        $1 == "sample_id"   { for (i = 1; i <= NF; i++) col[$i] = i; next }
+        $1 == r             { if (want in col) print $(col[want]); exit }
+    ' "${REPO}"/assets/samplesheets/*.csv 2>/dev/null | head -1
+}
+
 for rep in "${REPLICATES[@]}"; do
     # Reference set from the samplesheet, not from the sample name: they can
     # disagree, and guessing silently looks up the wrong reference.
-    set_name="$(awk -F, -v r="${rep}" '
-        $1 == r { n = split($6, p, "/"); sub(/\.tsv$/, "", p[n]); print p[n]; exit }
-    ' "${REPO}"/assets/samplesheets/*.csv 2>/dev/null | head -1)"
+    set_name="$(sheet_col "${rep}" reference_set)"
+    set_name="$(basename "${set_name%.tsv}")"
     set_name="${set_name:-${rep%_r*}}"
 
-    fastq="$(awk -F, -v r="${rep}" '$1 == r { print $4; exit }' \
-             "${REPO}"/assets/samplesheets/*.csv 2>/dev/null | head -1)"
-    [ -n "${fastq}" ] || die "${rep}: no fastq path in any samplesheet"
+    fastq="$(sheet_col "${rep}" fastq)"
+    # Under --fetch_from_sra the samplesheet's local path is unused and may be
+    # blank; the reads live in the download cache under the sample id. Fall back
+    # to it so this step works from a clone that never had local FASTQs.
+    if [ -z "${fastq}" ] || [ ! -f "${REPO}/${fastq}" ]; then
+        cached="${NXF_SRADIR:-sra}/${rep}.fastq.gz"
+        if [ -f "${REPO}/${cached}" ]; then
+            log "${rep}: no local FASTQ; using the download cache ${cached}"
+            fastq="${cached}"
+        fi
+    fi
+    [ -n "${fastq}" ] || die "${rep}: no fastq in any samplesheet and none in the download cache"
 
     outdir="${RESULTS}/${rep}/coverage"
     out="${outdir}/${rep}.assigned_depth.tsv.gz"

@@ -133,6 +133,22 @@ check "every row carries a well-formed BioSample accession" $?
 [ "$(printf '%s\n' "$bios" | sort -u | grep -c .)" -eq 7 ]
 check "no two samples share a BioSample accession" $?
 
+# Samplesheet columns must be read BY NAME, never by position. Inserting
+# `biosample_accession` shifted reference_set from column 6 to 7 and silently
+# fed an accession to bin/assigned_depth.sh as a directory name -- no error, just
+# a lookup for a reference set that cannot exist. The helper below is what makes
+# that impossible; assert it is still in use.
+grep -q 'sheet_col ()' "${HERE}/../bin/assigned_depth.sh"
+check "assigned_depth.sh looks samplesheet columns up by name" $?
+
+refsets="$(awk -F, '!/^#/ && $1 != "sample_id" && NF > 1 {
+             for (i = 1; i <= NF; i++) if (i == rs) print $i }
+           $1 == "sample_id" { for (i = 1; i <= NF; i++) if ($i == "reference_set") rs = i }' "$SHEET")"
+missing=0
+for r in $refsets; do [ -f "${HERE}/../$r" ] || missing=$((missing + 1)); done
+[ "$missing" -eq 0 ] && [ "$(printf '%s\n' "$refsets" | grep -c .)" -eq 7 ]
+check "every reference_set named in all.csv resolves to a real file" $?
+
 md5s="$(awk -F'\t' '!/^#/ && $1 != "sample_id" && NF > 1 {print $4}' "$DEP")"
 [ "$(printf '%s\n' "$md5s" | grep -c '^[0-9a-f]\{32\}$')" -eq 7 ]
 check "every deposited file has a well-formed md5" $?
