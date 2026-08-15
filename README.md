@@ -47,45 +47,32 @@ Hardware, for the shipped defaults: **48 GB of memory available to Docker and 14
 cores**, because `MAP_COMPETITIVE` asks for them (`conf/base.config`). On a
 smaller machine pass `--max_memory 16.GB --max_cpus 8`; the mapping is slower
 but nothing else changes. Budget **~110 GB** for the seven FASTQs and a further
-**~65 GB** for Nextflow's `work/` and `results/`. Measured on an M3 Max with 14
-cores to Docker: `make all` takes **1 h 13 m**, and every display item except
-the contaminant-divergence check is done **1 h 24 m** after a cold start. Only
-`make divergence` is slower, because breseq runs under amd64 emulation. See
-`docs/benchmarks.md`.
+**~65 GB** for Nextflow's `work/` and `results/`.
 
-### Pointing a clone at reads you already have
+Measured on an M3 Max with 14 cores to Docker: the analysis itself
+(`make all`) takes **1 h 32 m**, and the plotting and check targets add about
+ten minutes. Two further targets cost roughly an hour and a half each — `q10`,
+a second full pass over every replicate, and `divergence`, which runs breseq
+under amd64 emulation. **A complete reproduction is 4 h 44 m**; the per-target
+breakdown is [below](#reproducing-the-published-analysis).
 
-`data/` is populated by hand until ENA mirrors the deposit, after which
-`--fetch_from_sra` does it for you (see [Data
-availability](#data-availability)). **Hard-link or
-copy them — do not symlink to a directory outside the repository.** The Nextflow
-processes resolve symlinks and stage the real file, so `make all` works either
-way; but `assigneddepth`, `poolcov`, `seqsummary`, `runmeta` and `divergence`
-run `docker run -v "$REPO":/repo`, and inside that container a symlink pointing
-outside the repo is a dangling link. Those five steps then fail with
-`no such file or directory` after the pipeline has already succeeded.
+### Getting the reads
 
-Note that `data/readme.md` is tracked, so `data/` already exists in a fresh
-clone — `ln -s <dir> data` therefore creates `data/data`, not `data`. Link the
-contents:
+The sequencing reads are public: BioProject `PRJNA1513130`, runs
+`SRR40180147`–`SRR40180153`, released 15 August 2026.
 
-```bash
-SRC=/path/to/your/fastqs
-ln "$SRC"/*.fastq data/                       # hard links: no copy, no extra disk
-mkdir -p data/test && ln "$SRC/test_s2.fastq" data/test/
-```
+**ENA has not mirrored them yet, and `--fetch_from_sra` resolves through ENA**,
+so for now download the seven FASTQs from NCBI and place them in `data/` —
+hard-link or copy, never symlink to a directory outside the repository, for the
+reason in [`docs/operating-notes.md`](docs/operating-notes.md#getting-reads-into-data-link-or-copy-never-symlink-outward).
+Steps 2 and 3 then run from a fresh clone. Once ENA catches up,
+`--fetch_from_sra` does this for you; see [Data
+availability](#data-availability).
 
-Hard links cost nothing and require the reads to be on the same filesystem as
-the clone. If they are not, copy them.
+One result needs no reads at all — the per-femtogram comparison figure is built
+from committed tables: `make images && make comparison`.
 
-> **Read this before step 2.** The sequencing reads are public — BioProject
-> `PRJNA1513130`, runs `SRR40180147`–`SRR40180153`, released 15 Aug 2026 — but
-> **ENA has not mirrored them yet**, and `--fetch_from_sra` resolves through ENA.
-> Until it does, download the seven FASTQs from NCBI and point `data/` at them as
-> above; steps 2 and 3 then run from a fresh clone. See
-> [Data availability](#data-availability). What needs no reads at all is the
-> per-femtogram comparison figure, built from committed tables:
-> `make images && make comparison`.
+### The four commands
 
 ```bash
 # 1. Build the two local images (minimap2/samtools/seqkit/datasets, and python)
@@ -105,19 +92,20 @@ make seqsummary runmeta versions divergence
 make measurements verify
 ```
 
-`make test` and `make all` are shorthands for steps 2 and 3.
+`make test` and `make all` are shorthands for steps 2 and 3. Before a long run,
+read [`docs/operating-notes.md`](docs/operating-notes.md) — a short list of
+things that each cost somebody an hour.
 
-### Reproducing the whole paper
+### Reproducing the published analysis
 
 Step 3 is **the** analysis: one Nextflow run, both experiments, both assignment
 modes. It produces the abundance and read-length figures and the study-level tables
 directly. Everything in step 4 is either a plotter that reads
 `results/summary/`, or a check — no second pipeline is involved.
 
-Two of them are ordered, and the Makefile now enforces it rather than leaving it
-to the reader: `coverage` requires `attribution`, and `poolcov` requires
-`assigneddepth`. Both prerequisites are declared, so `make coverage` on a fresh
-tree builds what it needs instead of failing on a missing input.
+Two are ordered — `coverage` requires `attribution`, and `poolcov` requires
+`assigneddepth` — and the Makefile declares both, so `make coverage` on a fresh
+tree builds what it needs rather than failing on a missing input.
 
 All times below are measured on a complete cold run from a fresh clone (M3 Max,
 14 cores to Docker), not estimated.
@@ -131,29 +119,23 @@ All times below are measured on a complete cold run from a fresh clone (M3 Max,
 | 4 | `estcontrol` | estimated no-AS control | 2 s |
 | 4 | `assigneddepth` → `poolcov` | pooled-coverage figure | 5 m |
 | 4 | `seqsummary`, `runmeta`, `versions` | sequencing-summary, runs and software tables | 5 m (`runmeta` reads all ~110 GB) |
-| 4 | `q10` | the **quality-matched rerun** table and the main text's quality-filter section | **1 h 27 m** |
+| 4 | `q10` | the **quality-matched rerun** table, at Q10 | **1 h 27 m** |
 | 4 | `raghavendra` | the committed prior-study rows behind the comparison figure | 38 s |
 | 4 | `divergence` | the contaminant-divergence table | **1 h 33 m** (breseq under amd64 emulation) |
 | 4 | `measurements`, `verify` | the two checks | seconds |
 | | | **total** | **4 h 44 m** |
 
-Two of these are easy to leave out and both are published results. **`make q10`**
-is a second complete pass over all seven replicates in both modes — it costs
-about as much as `make all` and produces the quality-matched rerun table.
-**`make divergence`** is over a third of the total on its own. A reproduction
-that skips either is incomplete, which is why they are in the table rather than
-in a footnote.
+Two of these are easy to skip and both are published results. **`make q10`** is
+a second complete pass over all seven replicates in both modes, costing about as
+much as `make all`. **`make divergence`** is over a third of the total on its
+own; it is the only step outside the Nextflow DAG, running breseq over the
+contaminant reads of a finished run in its own container, and it produces
+`results/contaminant_divergence/summary.tsv` — the evidence that the stock
+reference is close enough to the carrier-derived contaminant to be used as one.
+A reproduction that skips either is incomplete.
 
-`divergence` is the only step outside the Nextflow DAG — it runs breseq over the
-contaminant reads of a finished run, in its own container. It is what the
-paper's "is the stock reference close enough?" argument rests on — the
-contaminant-divergence table, `results/contaminant_divergence/summary.tsv` — so
-a reproduction that stops at `make verify` is missing it.
-
-**`make verify` belongs last, not after step 3.** It asserts that every display
-item satisfies `docs/display-items.md`, and the mode-comparison, coverage and
-per-femtogram figures are built in step 4 — so running it straight after the
-pipeline reports the figures it has not been given the chance to build yet.
+`make verify` goes last: it checks display items that step 4 builds. See
+[`docs/operating-notes.md`](docs/operating-notes.md#make-verify-goes-last).
 
 ### Verified
 
@@ -190,60 +172,15 @@ path becomes available when ENA catches up. When it does, expect the archive's
 regenerated copy rather than the submitted bytes — see
 [Data availability](#data-availability) for what that does and does not change.
 
-**Use `make all`, not `make s1` plus `make s2`.** `AGGREGATE` only sees the
-samples of the run that invokes it, and both write to the same
-`results/summary/`. Running one experiment after the other therefore leaves the
-study-level tables and Figures 1, 2 and S1 describing whichever ran last.
-`make test` no longer does this — the test profile publishes to
-`results/smoke/`, because `make check` requires `make test` and a smoke test was
-otherwise one command away from silently replacing every published table and
-figure with 40,000 reads' worth of output. `--mode both` is
-required for Figure S1, which compares the two assignment rules. `make s1` and
-`make s2` remain available for working on one dataset, with that caveat.
+Each target writes to its own subdirectory of `results/`, so a clone has exactly
+one output tree and no run can overwrite another's tables. Which target produces
+what, and why `make all` rather than `make s1` plus `make s2`, are in
+[`docs/operating-notes.md`](docs/operating-notes.md#where-each-target-writes).
 
-Runs that must not overwrite the main tables publish into their own subdirectory
-of `results/`, so a clone has exactly one output tree:
-
-| target | writes to | is it a published result? |
-|---|---|---|
-| `make q10` | `results/q10` | **Yes.** Quality-matched rerun at Q10, reported in the main text ("The result is robust to a quality filter") and in the quality-matched rerun table. Reproducing the paper means running this. |
-| `make raghavendra` | `results/raghavendra` | Indirectly. It is the *provenance* of the Basapathi Raghavendra rows committed to `assets/comparison/prior_studies.tsv`. The comparison figure is drawn from that committed table, so it reproduces without this; running this re-derives those numbers from the reads. |
-
-`make q10` is a second full pass over all seven replicates in both modes and
-costs about as much as `make all`. `make raghavendra` is cheap — the deposited
-chunks under `data/raghavendra_2023/` total ~1.3 MB.
-
-### Why `./run.sh` instead of `nextflow run`
-
-`./run.sh` is a thin wrapper around `nextflow run` and passes every argument
-straight through. It exists for one reason: **Nextflow cannot run from a project
-path that contains spaces.** Nextflow writes an `export PATH=...` line and an
-inner `bash <path>` into each task wrapper without quoting them, so a project
-directory such as `.../My Research Data/...` breaks the wrapper before any
-command executes. That is a Nextflow limitation, not something the
-pipeline can fix internally.
-
-When the repository sits at a path containing spaces, `run.sh` creates a stable,
-space-free symlink to the repo under `$TMPDIR` (named from a hash of the real
-path, so repeated runs reuse it and `-resume` keeps working) and launches
-Nextflow through that link. Nextflow then generates space-free `PATH` and
-work-directory references, while still bind-mounting the real (spaced) location
-for staged inputs — a path it does escape correctly. If `TMPDIR` itself contains
-spaces, `run.sh` stops with an instruction to set a space-free `TMPDIR`.
-
-If your clone path has **no** spaces, `run.sh` simply execs `nextflow run` in
-place, and a direct
-
-```bash
-nextflow run . -profile docker --samplesheet assets/samplesheets/lowinput_s2.csv
-```
-
-works identically. Use `run.sh` anyway if you want the same command to be
-portable between both situations.
-
-Related: the workflow stages `bin/*.py` as explicit process inputs rather than
-relying on Nextflow's `bin/` PATH injection, which is the other thing that breaks
-under a spaced project path.
+`./run.sh` is a thin wrapper around `nextflow run` that passes every argument
+through; it exists because Nextflow cannot run from a project path containing
+spaces. If your clone path has none, `nextflow run .` works identically. See
+[`docs/operating-notes.md`](docs/operating-notes.md#why-runsh-instead-of-nextflow-run).
 
 ---
 
@@ -292,7 +229,7 @@ These mirror the conventions used across the lab's analysis repositories.
 | `bin/coverage_attribution.py` | `make attribution` — per-replicate alignment depth beside the depth attributable to awarded reads. The 1x interpretability threshold is applied to the latter: a pair whose awarded reads cover 0.83x has not been sequenced deeply enough to characterise, whatever its 65x alignment depth reads. Also excludes the smoke test, which the coverage globs otherwise sweep in |
 | `bin/assigned_depth.sh` | `make assigneddepth` — per-base depth of the reads assignment *awarded* to each organism, recovered from a finished run without re-mapping the full FASTQ. `COVERAGE_PROFILE` measures every primary alignment instead, which for a member sharing sequence with an abundant relative is largely that relative's reads |
 | `bin/pool_coverage.py` | `make poolcov` — sums per-base depth across the replicates of an experiment, so every community member can be assessed rather than only those deep enough in a single library. Reports alignment depth **and** the depth attributable to reads assignment awarded, because for a member sharing sequence with an abundant relative these differ by orders of magnitude |
-| `bin/plot_pooled_coverage.py` | Figure S3 — uniformity across every member, pooled; marks the members whose depth is not attributable |
+| `bin/plot_pooled_coverage.py` | The pooled-coverage figure — uniformity across every member, pooled; marks the members whose depth is not attributable |
 | `bin/coverage_dropouts.py` | Locates low-coverage regions in a depth profile and annotates them against a GFF3; answers *where* and *what*, where the coverage summary answers only *how uneven* |
 | `assets/references/lowinput_s1.tsv` | Reference set A: D6311 community (10 organisms) + lambda carrier + K-12 contaminant |
 | `assets/references/lowinput_s2.tsv` | Reference set B: D6321 spike-in (3 organisms) + lambda carrier + K-12 contaminant |
@@ -584,7 +521,7 @@ The seven replicates are deposited in the NCBI Sequence Read Archive under
 **BioProject [PRJNA1513130](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA1513130)**,
 one BioSample per replicate (`SAMN62407365`–`SAMN62407371`, listed per row in
 the samplesheets). The deposited FASTQs are the **human-masked** files described
-above, which is what the manuscript's numbers were computed from — see
+above, and every published value was computed from them — see
 [Human read masking](#human-read-masking).
 
 **This repository's git history was rewritten once, on 15 Aug 2026 and before it
