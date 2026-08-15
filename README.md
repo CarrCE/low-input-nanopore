@@ -541,6 +541,14 @@ the samplesheets). The deposited FASTQs are the **human-masked** files described
 above, which is what the manuscript's numbers were computed from — see
 [Human read masking](#human-read-masking).
 
+**This repository's git history was rewritten once, on 15 Aug 2026 and before it
+was ever public**, to remove six reads whose deposited form is masked — the test
+fixture had been holding them unmasked. What was removed, how it happened, and
+how the result was verified are recorded in
+[`docs/history-rewrite.md`](docs/history-rewrite.md). No published result is
+affected; the rewrite touched only `assets/testdata/`, which no part of the
+pipeline reads.
+
 > **The records are not public until the submission is released.** `--fetch_from_sra`
 > is implemented and wired, but until release ENA has nothing to resolve and the
 > run stops with a message saying exactly that. Run without the flag in the
