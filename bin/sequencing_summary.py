@@ -74,14 +74,23 @@ def parse_args():
     return p.parse_args()
 
 
-def fastq_path(sample_id, sheet_dir):
-    """Resolve the FASTQ from the samplesheets rather than guessing a name."""
+def fastq_path(sample_id, sheet_dir, sradir="sra"):
+    """Resolve the FASTQ from the samplesheets rather than guessing a name.
+
+    Falls back to the --fetch_from_sra download cache, where reads are named
+    `<sample_id>.fastq.gz`. Without that fallback this step is unusable from a
+    clone that fetched its reads from the archive: the samplesheet's local
+    `fastq` column is ignored by such a run and may be blank.
+    """
     for p in sorted(Path(sheet_dir).glob("*.csv")):
         for line in p.read_text().splitlines():
             if line.startswith(sample_id + ","):
                 f = line.split(",")
-                if len(f) > 3 and f[3]:
+                if len(f) > 3 and f[3] and Path(f[3]).is_file():
                     return Path(f[3])
+    cached = Path(sradir) / f"{sample_id}.fastq.gz"
+    if cached.is_file():
+        return cached
     return Path("data") / f"{sample_id}.fastq"
 
 

@@ -134,8 +134,8 @@ demo-data: ## Regenerate the smoke-test subsample into data/test/
 	    -e SRC="$(DEMO_SOURCE)" -e OUT="$(DEMO_OUT)" -e NREADS="$(DEMO_READS)" \
 	    "$(ANALYSIS_IMAGE)" python3 -
 
-TEST_BAM        ?= results/test_s2/alignments/test_s2.qname.bam
-TEST_CONTIG_MAP ?= results/references/lowinput_s2/contig_map.tsv
+TEST_BAM        ?= results/smoke/test_s2/alignments/test_s2.qname.bam
+TEST_CONTIG_MAP ?= results/smoke/references/lowinput_s2/contig_map.tsv
 
 check: ## Assert consensus accounting and human masking (needs `make test` first)
 	@test -f "$(ROOT)/$(TEST_BAM)" \

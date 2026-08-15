@@ -83,15 +83,34 @@ fi
 mkdir -p "${OUTDIR}"
 log "replicates: ${REPLICATES[*]}"
 
+# Look a samplesheet column up BY NAME. This was positional ($6 for
+# reference_set) and broke when `biosample_accession` was inserted before it:
+# the lookup returned an accession, which became a directory name that cannot
+# exist. Same fix, and same reason, as bin/assigned_depth.sh.
+sheet_col () {  # sheet_col <sample_id> <column_name>
+    awk -F, -v r="$1" -v want="$2" '
+        /^#/                { next }
+        $1 == "sample_id"   { for (i = 1; i <= NF; i++) col[$i] = i; next }
+        $1 == r             { if (want in col) print $(col[want]); exit }
+    ' "${REPO}"/assets/samplesheets/*.csv 2>/dev/null | head -1
+}
+
 for rep in "${REPLICATES[@]}"; do
     # The reference set comes from the samplesheet rather than from the sample
     # name. They usually agree, but not always -- the smoke-test sample
     # `test_s2` runs against the lowinput_s2 reference set -- and guessing from
     # the name silently looks up the wrong reference or none at all.
-    set_name="$(awk -F, -v r="${rep}" '
-        $1 == r { n = split($6, p, "/"); sub(/\.tsv$/, "", p[n]); print p[n]; exit }
-    ' "${REPO}"/assets/samplesheets/*.csv 2>/dev/null | head -1)"
+    set_name="$(sheet_col "${rep}" reference_set)"
+    set_name="$(basename "${set_name%.tsv}")"
     set_name="${set_name:-${rep%_r*}}"
+
+    # Under --fetch_from_sra the samplesheet's local path is unused and may be
+    # blank; the reads are in the download cache under the sample id.
+    rep_fastq="$(sheet_col "${rep}" fastq)"
+    if [ -z "${rep_fastq}" ] || [ ! -f "${REPO}/${rep_fastq}" ]; then
+        cached="${NXF_SRADIR:-sra}/${rep}.fastq.gz"
+        [ -f "${REPO}/${cached}" ] && rep_fastq="${cached}"
+    fi
 
     out="${OUTDIR}/${rep}"
     assignments="${RESULTS}/${rep}/competitive/${rep}.assignments.tsv.gz"
@@ -148,12 +167,12 @@ PY
     log "${rep}: pulling reads and contaminant reference"
     docker run --rm -v "${REPO}":/repo -v "${OUTDIR}":/out -w /repo "${TOOLS_IMAGE}" bash -c "
         set -e
-        # Column 4 is fastq; column 2 is experiment. Reading \$2 here made the
-        # test below compare a non-empty experiment name against a file that
-        # cannot exist, so the data/<rep>.fastq fallback never fired and this
-        # script could not find any FASTQ at all.
-        fq=\$(awk -F, -v r='${rep}' '\$1 == r {print \$4}' /repo/assets/samplesheets/*.csv | head -1)
-        [ -n \"\$fq\" ] || { echo 'error: ${rep} not found in any samplesheet' >&2; exit 1; }
+        # Resolved OUTSIDE the container, by column name, with the download-cache
+        # fallback applied -- rather than re-parsing the samplesheet here. The
+        # previous in-container parse was positional and had already been wrong
+        # once (it read column 2, the experiment, as the FASTQ path).
+        fq='${rep_fastq}'
+        [ -n \"\$fq\" ] || { echo 'error: no FASTQ for ${rep} in any samplesheet or the download cache' >&2; exit 1; }
         [ -f \"\$fq\" ] || { echo \"error: FASTQ not found for ${rep}: \$fq\" >&2; exit 1; }
         seqkit grep -f /out/${rep}/ids.txt \"\$fq\" > /out/${rep}/contam.fastq 2>/dev/null
         awk -F'\t' 'NR>1 && \$3==\"contaminant\" {print \$1}' \

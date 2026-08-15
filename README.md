@@ -157,10 +157,13 @@ converts that into a claim a reader can check, and is item 1 in
 [`docs/TODO.md`](docs/TODO.md).
 
 **Use `make all`, not `make s1` plus `make s2`.** `AGGREGATE` only sees the
-samples of the run that invokes it, and every target writes to the same
+samples of the run that invokes it, and both write to the same
 `results/summary/`. Running one experiment after the other therefore leaves the
-study-level tables and Figures 1, 2 and S1 describing whichever ran last — and
-`make test` leaves them describing 40,000 smoke-test reads. `--mode both` is
+study-level tables and Figures 1, 2 and S1 describing whichever ran last.
+`make test` no longer does this — the test profile publishes to
+`results/smoke/`, because `make check` requires `make test` and a smoke test was
+otherwise one command away from silently replacing every published table and
+figure with 40,000 reads' worth of output. `--mode both` is
 required for Figure S1, which compares the two assignment rules. `make s1` and
 `make s2` remain available for working on one dataset, with that caveat.
 
