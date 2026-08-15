@@ -10,25 +10,39 @@ trust.
 
 ---
 
-## 1. Reads are not deposited, and `--fetch_from_sra` is not implemented
+## 1. The deposited reads are not public yet, so the fetch path is untested against live records
 
-The FASTQs for `lowinput_s1` (r1–r3) and `lowinput_s2` (r0–r3) have not been
-submitted to SRA/ENA. Until they are, nothing here is clone-and-run for anyone
-outside the lab. Consequences today:
+The masked FASTQs for `lowinput_s1` (r1–r3) and `lowinput_s2` (r0–r3) are
+deposited under BioProject **PRJNA1513130**, BioSamples
+`SAMN62407365`–`SAMN62407371`. Until the submission is released, nothing here is
+clone-and-run for anyone outside the lab.
 
-- Every samplesheet row must carry a local `fastq` path. `parseSamplesheet` in
-  `main.nf` errors if that column is blank, and again if the file does not
-  exist.
-- The `sra_accession` column in `assets/samplesheets/*.csv` is reserved but
-  empty in every row.
-- `params.fetch_from_sra` exists in `nextflow.config` but is a placeholder:
-  setting it exits immediately with
-  `--fetch_from_sra is not implemented yet`.
+Done: `FETCH_READS` in `main.nf` and `bin/fetch_ena_reads.sh` implement
+`--fetch_from_sra` end to end — resolve the accession through ENA's portal,
+prefer the *submitted* copy, verify it against both the archive's checksum and
+`assets/deposited_files.tsv`, cache in `sra/`. The samplesheets carry the
+BioSample accessions, so ENA resolves each to its run at fetch time and no edit
+is needed when run accessions are issued. `tests/sra_fetch.sh` covers every
+branch of that logic offline, in `make check`.
 
-To close: deposit the reads, populate `sra_accession`, then add a `FETCH_READS`
-process (`fasterq-dump`/ENA FTP, pinned in a container) and switch the
-samplesheet parser to prefer the accession when `--fetch_from_sra` is set. The
-container does not exist yet either — `docker/tools` has no SRA toolkit.
+No SRA toolkit was added. It publishes no `linux/arm64` build, and going through
+ENA over `curl` — already in `docker/tools` — both avoids a second emulated
+image and gets access to the submitted bytes, which is the only copy whose md5
+can be checked against the file we analysed.
+
+**What is not done.** Every path here has been exercised against saved portal
+responses and against the live portal's *empty* answer for our accessions; none
+of it has fetched a real file of ours, because none exists publicly. Two things
+close this:
+
+1. Release, then run `--fetch_from_sra` for all seven and confirm the checksums
+   in `assets/deposited_files.tsv` match. If ENA serves only the regenerated
+   `fastq_ftp` copy, that check is skipped by design and the run is no longer
+   byte-verifiable — worth knowing before it is claimed in the manuscript.
+2. Repeat the full reproduction run from those files. The manuscript's Code
+   availability section says the verified run read local copies and deliberately
+   does not claim a reader can reproduce it today; that caveat comes out only
+   after this is done.
 
 ## 2. The prior-study reanalysis is pinned but has not been re-run through the scripted path
 

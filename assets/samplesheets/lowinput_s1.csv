@@ -11,11 +11,17 @@
 #   sample_id            unique id, also the results/ subdirectory name
 #   experiment           groups replicates for aggregate statistics
 #   replicate            replicate index as reported
-#   fastq                path to basecalled reads; relative paths resolve under repo root
-#   sra_accession        reserved; populated once reads are deposited (see docs/TODO.md)
+#   fastq                path to basecalled reads; relative paths resolve under repo root.
+#                        Ignored under --fetch_from_sra, which reads the archive instead.
+#   sra_accession        run accession (SRR/ERR). Blank until the submission is
+#                        processed; --fetch_from_sra falls back to the BioSample.
+#   biosample_accession  BioSample under BioProject PRJNA1513130. This is what the
+#                        repository ships, because run accessions do not exist until
+#                        release: ENA resolves the sample to its run at fetch time, so
+#                        no edit here is needed once they are issued.
 #   reference_set        TSV under assets/references/
 #   notes
-sample_id,experiment,replicate,fastq,sra_accession,reference_set,notes
-lowinput_s1_r1,lowinput_s1,1,data/lowinput_s1_r1.fastq,,assets/references/lowinput_s1.tsv,
-lowinput_s1_r2,lowinput_s1,2,data/lowinput_s1_r2.fastq,,assets/references/lowinput_s1.tsv,
-lowinput_s1_r3,lowinput_s1,3,data/lowinput_s1_r3.fastq,,assets/references/lowinput_s1.tsv,
+sample_id,experiment,replicate,fastq,sra_accession,biosample_accession,reference_set,notes
+lowinput_s1_r1,lowinput_s1,1,data/lowinput_s1_r1.fastq,,SAMN62407365,assets/references/lowinput_s1.tsv,
+lowinput_s1_r2,lowinput_s1,2,data/lowinput_s1_r2.fastq,,SAMN62407366,assets/references/lowinput_s1.tsv,
+lowinput_s1_r3,lowinput_s1,3,data/lowinput_s1_r3.fastq,,SAMN62407367,assets/references/lowinput_s1.tsv,

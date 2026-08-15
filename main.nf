@@ -30,6 +30,10 @@ def helpMessage() {
       --mode            competitive | sequential | both   [${params.mode}]
       --outdir          results directory                 [${params.outdir}]
       --refdir          reference cache directory         [${params.refdir}]
+      --fetch_from_sra  fetch reads from the public archive by accession instead
+                        of reading the samplesheet's fastq column; cached in
+                        --sradir [${params.fetch_from_sra}]
+      --sradir          downloaded-read cache directory   [${params.sradir}]
       --breseq_consensus  build a reference-guided consensus of the contaminant
                           actually present in the carrier prep [${params.breseq_consensus}]
       --min_mapq        MAPQ floor before scoring         [${params.min_mapq}]
@@ -134,6 +138,39 @@ process BUILD_REFERENCE {
         --out-contig-map   contig_map.tsv \\
         --out-genome-sizes genome_sizes.tsv \\
         --out-provenance   reference_provenance.json
+    """
+}
+
+process FETCH_READS {
+    tag   { sample_id }
+    label 'tools'
+    label 'process_low'
+    // storeDir, not publishDir: these are multi-GB inputs derived entirely from
+    // an accession, so they are a cache like the reference genomes. An existing
+    // copy short-circuits the process and nothing is downloaded twice.
+    storeDir "${params.sradir}"
+
+    input:
+    tuple val(sample_id), val(accession)
+    path script
+    path md5_table
+
+    output:
+    tuple val(sample_id), path("${sample_id}.fastq.gz"), emit: reads
+
+    script:
+    // The `meta` map is deliberately NOT an input here. meta carries the DNA
+    // masses, and anything holding it inherits their task hash -- which is how
+    // a mass edit once invalidated every mapping task. A download must not be
+    // re-run because a number in measurements.tsv changed, so this process sees
+    // the two values it actually needs and nothing else.
+    """
+    bash ${script} \\
+        --accession ${accession} \\
+        --sample-id ${sample_id} \\
+        --out       ${sample_id}.fastq.gz \\
+        --md5-table ${md5_table} \\
+        --portal    ${params.ena_portal}
     """
 }
 
@@ -826,11 +863,15 @@ def parseSamplesheet(path) {
     def rows = readTable(path, ',' as char)
     if (!rows) error "${path} contains no data rows"
 
-    if (params.fetch_from_sra) {
-        error "--fetch_from_sra is not implemented yet; see docs/TODO.md"
-    }
-
     def measured = loadMeasurements(params.measurements)
+
+    // Under --fetch_from_sra the reads come from the archive and the samplesheet's
+    // local `fastq` column is ignored. Nextflow tuples cannot hold a null path, so
+    // a committed placeholder stands in until FETCH_READS replaces it in the
+    // workflow body -- the same device as assets/NO_CONSENSUS_HITS.
+    def placeholder = params.fetch_from_sra
+        ? file("${projectDir}/assets/NO_LOCAL_FASTQ", checkIfExists: true)
+        : null
 
     // Validation happens HERE, in the function body, and not inside a channel
     // operator. `error "message"` raised from inside a `.map{}` closure runs on
@@ -867,6 +908,7 @@ def parseSamplesheet(path) {
             include_in_headline: m ? m.include_in_headline
                                    : (row.include_in_headline?.trim() ?: '1') == '1',
             sra_accession:       row.sra_accession?.trim(),
+            biosample_accession: row.biosample_accession?.trim(),
         ]
 
         // A mass still marked PENDING is not a number; treat it as absent so
@@ -874,13 +916,28 @@ def parseSamplesheet(path) {
         if (meta.library_dna_ng == 'PENDING') meta.library_dna_ng = ''
         if (meta.carrier_dna_ng == 'PENDING') meta.carrier_dna_ng = '0'
 
-        if (!row.fastq?.trim()) {
-            error "${meta.sample_id} has no fastq path. Reads are not yet " +
-                    "deposited, so a local path is required (see docs/TODO.md)."
+        def fq
+        if (params.fetch_from_sra) {
+            // An accession, not a path. Prefer the run accession when the sheet
+            // carries one; otherwise resolve the BioSample to its run at fetch
+            // time, which is what lets this work the day the records are released
+            // without anyone editing a samplesheet.
+            if (!meta.sra_accession && !meta.biosample_accession) {
+                error "${meta.sample_id}: --fetch_from_sra needs an accession, and " +
+                        "${path} gives neither sra_accession nor biosample_accession " +
+                        "for this sample. Run without --fetch_from_sra to use the " +
+                        "local fastq column instead."
+            }
+            fq = placeholder
+        } else {
+            if (!row.fastq?.trim()) {
+                error "${meta.sample_id} has no fastq path. Either give one, or use " +
+                        "--fetch_from_sra to read the deposited reads from the archive."
+            }
+            fq = file(row.fastq.trim())
+            if (!fq.isAbsolute()) fq = file("${projectDir}/${row.fastq.trim()}")
+            if (!fq.exists()) error "FASTQ not found for ${meta.sample_id}: ${fq}"
         }
-        def fq = file(row.fastq.trim())
-        if (!fq.isAbsolute()) fq = file("${projectDir}/${row.fastq.trim()}")
-        if (!fq.exists()) error "FASTQ not found for ${meta.sample_id}: ${fq}"
 
         if (!row.reference_set?.trim()) {
             error "${meta.sample_id} has no reference_set"
@@ -907,6 +964,7 @@ workflow {
      low-input-nanopore ${workflow.manifest.version}
      samplesheet : ${params.samplesheet}
      mode        : ${params.mode}
+     reads       : ${params.fetch_from_sra ? "fetched by accession -> ${params.sradir}" : 'local paths from the samplesheet'}
      outdir      : ${params.outdir}
     ================================================================
     """.stripIndent()
@@ -928,6 +986,25 @@ workflow {
     ch_no_consensus   = file("${projectDir}/assets/NO_CONSENSUS_HITS", checkIfExists: true)
 
     ch_samples = parseSamplesheet(params.samplesheet)
+
+    // ---- optional: read the deposited reads instead of local files ---------
+    // Off by default. When on, the samplesheet's fastq column is ignored and
+    // every sample is fetched by accession, so a clone of this repository plus a
+    // network is the whole input. Everything downstream is unchanged: the fetched
+    // FASTQ simply takes the place of the local one.
+    if (params.fetch_from_sra) {
+        FETCH_READS(
+            ch_samples.map { meta, fq, ref ->
+                tuple(meta.sample_id, meta.sra_accession ?: meta.biosample_accession) },
+            file("${projectDir}/bin/fetch_ena_reads.sh",   checkIfExists: true),
+            file("${projectDir}/assets/deposited_files.tsv", checkIfExists: true)
+        )
+
+        ch_samples = ch_samples
+            .map { meta, fq, ref -> tuple(meta.sample_id, meta, ref) }
+            .join(FETCH_READS.out.reads)
+            .map { sid, meta, ref, fq -> tuple(meta, fq, ref) }
+    }
 
     // One reference build per distinct reference set, shared by its samples.
     ch_refsets = ch_samples
