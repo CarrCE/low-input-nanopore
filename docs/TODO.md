@@ -3,46 +3,55 @@
 What is not done, not sourced, or not yet trustworthy in this repository.
 
 Items 1–5 are open. Section 6 records questions that were open, were
-investigated, and were closed; they are kept because the manuscript's
-Supplementary Information refers to several of them, and because "we checked and
-it did not matter" is a result a reader may want to audit rather than take on
-trust.
+investigated, and were closed; they are kept because the paper's Supplementary
+Information refers to several of them, and because "we checked and it did not
+matter" is a result a reader may want to audit rather than take on trust.
+
+Last reviewed 17 August 2026, at the public release of the repository.
 
 ---
 
-## 1. The deposited reads are not public yet, so the fetch path is untested against live records
+## 1. The reads are public, but ENA has not mirrored them, so `--fetch_from_sra` is still untested against live records
 
-The masked FASTQs for `lowinput_s1` (r1–r3) and `lowinput_s2` (r0–r3) are
-deposited under BioProject **PRJNA1513130**, BioSamples
-`SAMN62407365`–`SAMN62407371`. Until the submission is released, nothing here is
-clone-and-run for anyone outside the lab.
+**Released 15 Aug 2026.** BioProject **PRJNA1513130**, BioSamples
+`SAMN62407365`–`SAMN62407371`, runs `SRR40180147`–`SRR40180153`. Per-run read
+and base counts were checked against `assets/deposited_files.tsv` and agree
+exactly, totalling 60,416,747 reads and 54,642,391,422 bases.
 
 Done: `FETCH_READS` in `main.nf` and `bin/fetch_ena_reads.sh` implement
-`--fetch_from_sra` end to end — resolve the accession through ENA's portal,
-prefer the *submitted* copy, verify it against both the archive's checksum and
-`assets/deposited_files.tsv`, cache in `sra/`. The samplesheets carry the
-BioSample accessions, so ENA resolves each to its run at fetch time and no edit
-is needed when run accessions are issued. `tests/sra_fetch.sh` covers every
-branch of that logic offline, in `make check`.
+`--fetch_from_sra` end to end. The samplesheets now carry the run accessions in
+`sra_accession` as well as the BioSample accessions, so resolution is
+unambiguous. `tests/sra_fetch.sh` covers every branch of that logic offline, in
+`make check`.
 
-No SRA toolkit was added. It publishes no `linux/arm64` build, and going through
-ENA over `curl` — already in `docker/tools` — both avoids a second emulated
-image and gets access to the submitted bytes, which is the only copy whose md5
-can be checked against the file we analysed.
+**What is not done, and why.** ENA returns nothing for these accessions — not
+for the BioProject, not for any individual run. INSDC mirroring from NCBI runs a
+few days behind, and `--fetch_from_sra` resolves through ENA, so it still cannot
+fetch a real file of ours. What has changed is that the failure is now
+diagnosable: `bin/fetch_ena_reads.sh` distinguishes "ENA has not mirrored this
+yet" from "not released" from "wrong accession", and prints the query that tells
+them apart.
 
-**What is not done.** Every path here has been exercised against saved portal
-responses and against the live portal's *empty* answer for our accessions; none
-of it has fetched a real file of ours, because none exists publicly. Two things
-close this:
+Two things close this, and one of them has an answer that will not change:
 
-1. Release, then run `--fetch_from_sra` for all seven and confirm the checksums
-   in `assets/deposited_files.tsv` match. If ENA serves only the regenerated
-   `fastq_ftp` copy, that check is skipped by design and the run is no longer
-   byte-verifiable — worth knowing before it is claimed in the manuscript.
-2. Repeat the full reproduction run from those files. The manuscript's Code
-   availability section says the verified run read local copies and deliberately
-   does not claim a reader can reproduce it today; that caveat comes out only
-   after this is done.
+1. **Byte-verification is probably not achievable, ever.** NCBI serves only the
+   `.sra` archive format for these runs — no original submitted file — and ENA
+   mirroring an NCBI-origin submission typically carries only the regenerated
+   `fastq_ftp` copy. So the md5s in `assets/deposited_files.tsv` record what was
+   uploaded rather than what can be downloaded, and the checksum check will be
+   skipped by design. That is the fallback `fetch_ena_reads.sh` was written for;
+   it is now the expected path rather than the unlucky one. Confirm when ENA
+   mirrors.
+2. **Repeat the reproduction run from archive-fetched files.** Note in advance
+   that this will differ from `results-of-record` in one visible way: SRA does
+   not preserve ONT header tags, so `qs:f:` is absent and
+   `bin/sequencing_summary.py` reports an empty `median_qscore`. Assignment-level
+   results should be identical, since the sequence is the same.
+
+The 15 Aug 2026 verification run already read the **deposited** files, from local
+copies of the uploaded bytes, so a reader who downloads the seven FASTQs from
+NCBI by hand can reproduce everything today. Only the one-command path is
+blocked.
 
 ## 2. The prior-study reanalysis is pinned but has not been re-run through the scripted path
 
