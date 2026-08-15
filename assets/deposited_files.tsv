@@ -1,0 +1,32 @@
+# The files deposited to the SRA, and what they must hash to.
+#
+# BioProject PRJNA1513130. One run per replicate; the BioSample accession for
+# each sample_id lives in the samplesheets, which are where per-sample keys
+# belong -- do not duplicate it here, or the two will drift.
+#
+# These are the FASTQs the analysis in the manuscript was run on, so the md5
+# below is the strongest available statement that a downloaded file is the file
+# we analysed. bin/fetch_ena_reads.sh checks it, and the check only holds for
+# ENA's `submitted_ftp` copy: SRA regenerates `fastq_ftp` from its own archive,
+# which is the same sequence but not the same bytes. The script says which one
+# it used.
+#
+# reads and bases are the totals BEFORE and AFTER masking alike -- masking
+# replaces bases with N in place and removes nothing, so these are also the
+# numbers reported in the manuscript. See results/summary/human_masking.tsv.
+#
+# Columns
+#   sample_id  key into the samplesheets
+#   filename   name as submitted; ENA reports it in `submitted_ftp`
+#   bytes      size of the submitted .gz
+#   md5        md5 of the submitted .gz, verified by the depositor before upload
+#   reads      records in the file
+#   bases      total sequence length
+sample_id	filename	bytes	md5	reads	bases
+lowinput_s1_r1	lowinput_s1_r1.masked.fastq.gz	6326640626	d91411331787ff7fd2745232d3b52cac	10388313	7805007525
+lowinput_s1_r2	lowinput_s1_r2.masked.fastq.gz	5258016931	098f206cfed1b06d9106a12fd776b902	7408404	6328018262
+lowinput_s1_r3	lowinput_s1_r3.masked.fastq.gz	5939274042	c631b3e04de2960c897175404c813a75	7242881	6999210464
+lowinput_s2_r0	lowinput_s2_r0.masked.fastq.gz	5739653416	f4a20b856303cf410b46d6f9af640587	7142009	7162301789
+lowinput_s2_r1	lowinput_s2_r1.masked.fastq.gz	6048280953	6ef721cf8f714727bdc6853f8b45db0e	6879435	7546882323
+lowinput_s2_r2	lowinput_s2_r2.masked.fastq.gz	7813443414	ccae1837d81a70a21bf7240927e57e40	9929615	9716302999
+lowinput_s2_r3	lowinput_s2_r3.masked.fastq.gz	7377739589	c20e5defd1d2205cabbd28522525532a	11426090	9084668060

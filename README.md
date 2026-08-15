@@ -33,7 +33,9 @@ the contaminant-divergence check is done **1 h 24 m** after a cold start. Only
 
 ### Pointing a clone at reads you already have
 
-The reads are not deposited yet, so `data/` is populated by hand. **Hard-link or
+Until the deposit is released, `data/` is populated by hand; once it is,
+`--fetch_from_sra` does this for you (see [Data
+availability](#data-availability)). **Hard-link or
 copy them — do not symlink to a directory outside the repository.** The Nextflow
 processes resolve symlinks and stage the real file, so `make all` works either
 way; but `assigneddepth`, `poolcov`, `seqsummary`, `runmeta` and `divergence`
@@ -54,11 +56,13 @@ mkdir -p data/test && ln "$SRC/test_s2.fastq" data/test/
 Hard links cost nothing and require the reads to be on the same filesystem as
 the clone. If they are not, copy them.
 
-> **Read this before step 2.** The sequencing reads are **not yet deposited**,
-> and the smoke-test FASTQ is derived from them, so *steps 2 and 3 cannot be run
-> from a fresh clone today*. See [Data availability](#data-availability). What
-> **is** reproducible from the repository alone is main-text Figure 3, which is
-> built from committed tables: `make images && make comparison`.
+> **Read this before step 2.** The sequencing reads are deposited
+> (BioProject `PRJNA1513130`) but **not yet public**, and the smoke-test FASTQ is
+> derived from them, so *steps 2 and 3 cannot be run from a fresh clone today* —
+> `--fetch_from_sra` has nothing to resolve until the submission is released. See
+> [Data availability](#data-availability). What **is** reproducible from the
+> repository alone is main-text Figure 3, which is built from committed tables:
+> `make images && make comparison`.
 
 ```bash
 # 1. Build the two local images (minimap2/samtools/seqkit/datasets, and python)
@@ -145,9 +149,12 @@ this project. Every reported value reproduced:
 
 This is stated because "the code is available" and "the code reproduces the
 paper" are different claims, and only the second is worth much. Note the
-prerequisite the reader cannot yet satisfy: the reads are not deposited, so the
-run above used local FASTQs. Until deposition, an outside reader can reproduce
-main-text Figure 3 — which is built from committed tables — and nothing else.
+prerequisite the reader cannot yet satisfy: the run above used local FASTQs,
+because the deposited records were not yet public. Until they are released, an
+outside reader can reproduce main-text Figure 3 — which is built from committed
+tables — and nothing else. Repeating this run through `--fetch_from_sra` is what
+converts that into a claim a reader can check, and is item 1 in
+[`docs/TODO.md`](docs/TODO.md).
 
 **Use `make all`, not `make s1` plus `make s2`.** `AGGREGATE` only sees the
 samples of the run that invokes it, and every target writes to the same
@@ -491,7 +498,7 @@ Pinned in `conf/base.config`. Nothing runs on host-installed software.
 
 | Label | Image | Source | Used by |
 |---|---|---|---|
-| `tools` | `low-input-nanopore/tools:0.1.0` | `docker/tools/Dockerfile` — built locally by `make images`; minimap2 2.28, htslib 1.21, samtools 1.21, seqkit 2.8.2, NCBI `datasets` v2, on `debian:bookworm-20241111-slim` | `FETCH_GENOMES`, `MAP_COMPETITIVE`, `COVERAGE_PROFILE` |
+| `tools` | `low-input-nanopore/tools:0.1.0` | `docker/tools/Dockerfile` — built locally by `make images`; minimap2 2.28, htslib 1.21, samtools 1.21, seqkit 2.8.2, NCBI `datasets` v2, on `debian:bookworm-20241111-slim` | `FETCH_GENOMES`, `FETCH_READS`, `MAP_COMPETITIVE`, `COVERAGE_PROFILE` |
 | `analysis` | `low-input-nanopore/analysis:0.1.0` | `docker/analysis/Dockerfile` — built locally by `make images`; `python:3.12-slim-bookworm` + pinned `requirements.txt` (numpy 2.1.3, pandas 2.2.3, matplotlib 3.9.2, openpyxl 3.1.5, pysam 0.22.1, scipy 1.14.1) | `BUILD_REFERENCE`, `ASSIGN_READS`, `COMPUTE_METRICS` |
 | `breseq` | `quay.io/biocontainers/breseq:0.40.1--h3be2455_0` | Upstream biocontainer, forced to `--platform linux/amd64`, run as root with `-e HOME=/tmp` | The optional sequential/`--breseq_consensus` path |
 | `scrubber` | `low-input-nanopore/scrubber:0.1.0` | `docker/scrubber/Dockerfile` — built locally by `make images`; NCBI `sra-human-scrubber` pinned by digest, plus `procps` | `HRRT_SCREEN`, on the optional `--mask_human` path |
@@ -516,15 +523,52 @@ A `singularity` profile is also defined in `nextflow.config`.
 
 ## Data availability
 
-**The reads are not yet deposited.** Until they are, every samplesheet row must
-carry a local `fastq` path; the pipeline fails with an explicit message if that
-column is blank.
+The seven replicates are deposited in the NCBI Sequence Read Archive under
+**BioProject [PRJNA1513130](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA1513130)**,
+one BioSample per replicate (`SAMN62407365`–`SAMN62407371`, listed per row in
+the samplesheets). The deposited FASTQs are the **human-masked** files described
+above, which is what the manuscript's numbers were computed from — see
+[Human read masking](#human-read-masking).
 
-The samplesheets reserve an `sra_accession` column, and `nextflow.config` reserves
-`params.fetch_from_sra`, for the point at which the FASTQs are deposited to
-SRA/ENA. Setting `--fetch_from_sra` today exits with an error — the retrieval
-path is not implemented. Deposition and the wiring of that parameter are tracked
-as item 1 in **[`docs/TODO.md`](docs/TODO.md)**.
+> **The records are not public until the submission is released.** `--fetch_from_sra`
+> is implemented and wired, but until release ENA has nothing to resolve and the
+> run stops with a message saying exactly that. Run without the flag in the
+> meantime.
+
+### Fetching the reads by accession
+
+```bash
+nextflow run . -profile docker \
+  --samplesheet assets/samplesheets/all.csv \
+  --fetch_from_sra
+```
+
+The samplesheet's local `fastq` column is ignored; every sample is fetched
+instead, into the gitignored `sra/` cache (`--sradir`). A repository clone plus
+a network is then the whole input.
+
+Resolution goes through ENA's portal API rather than the SRA toolkit, for two
+reasons: the toolkit publishes no `linux/arm64` build, and this study's
+reference platform is Apple Silicon; and ENA serves the **submitted** file — the
+exact bytes uploaded — alongside the archive's regenerated copy. Only the
+submitted copy can be checked against
+[`assets/deposited_files.tsv`](assets/deposited_files.tsv), which records the
+md5, size, read count and base count of each deposited file. `bin/fetch_ena_reads.sh`
+prefers it, verifies both the archive's own checksum and ours, and says which
+copy it used. If only the regenerated copy exists it falls back with a warning
+and skips our checksum, because SRA rebuilds `fastq_ftp` from its own archive:
+the same sequence, different bytes, and possibly different read names.
+
+Accessions are resolved at fetch time, so **nothing here needs editing when the
+run accessions are issued** — the samplesheets carry BioSample accessions, and
+ENA maps each to its run. The `sra_accession` column takes a run accession
+(`SRR`/`ERR`) and wins when present, which is the escape hatch if a BioSample
+ever resolves to more than one run.
+
+`tests/sra_fetch.sh` asserts every branch of that logic against saved portal
+responses, with no network: which copy is chosen, that a checksum mismatch
+deletes the file rather than caching a corrupt one, and that the two accession
+tables agree with each other.
 
 Reference genomes are *not* redistributed here either: they are fetched from NCBI
 by accession at run time, driven by the same reference-set TSV that defines the

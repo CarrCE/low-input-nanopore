@@ -153,6 +153,13 @@ check: ## Assert consensus accounting and human masking (needs `make test` first
 	@docker run --rm -u "$$(id -u):$$(id -g)" \
 	    -v "$(ROOT)":/repo -w /repo "$(ANALYSIS_IMAGE)" \
 	    python3 tests/mask_human_logic.py
+	@echo "==> SRA fetch: accession resolution and checksum enforcement"
+	@# The tools image, not the analysis one: this exercises a shell script that
+	@# needs curl, which the analysis image does not carry. No network is used --
+	@# the portal response is a saved fixture and the download is a file:// URL.
+	@docker run --rm -u "$$(id -u):$$(id -g)" \
+	    -v "$(ROOT)":/repo -w /repo "$(TOOLS_IMAGE)" \
+	    bash tests/sra_fetch.sh
 	@echo "==> human masking: committed read-level fixture"
 	@# Needs no mapping and no network; see assets/testdata/README.md.
 	@docker run --rm -u "$$(id -u):$$(id -g)" \

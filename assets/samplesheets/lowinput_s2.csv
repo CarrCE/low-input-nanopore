@@ -11,8 +11,8 @@
 #
 # Masses live in assets/measurements.tsv; see columns documented in
 # lowinput_s1.csv.
-sample_id,experiment,replicate,fastq,sra_accession,reference_set,notes
-lowinput_s2_r0,lowinput_s2,0,data/lowinput_s2_r0.fastq,,assets/references/lowinput_s2.tsv,fewer preps into extraction than r1-r3
-lowinput_s2_r1,lowinput_s2,1,data/lowinput_s2_r1.fastq,,assets/references/lowinput_s2.tsv,
-lowinput_s2_r2,lowinput_s2,2,data/lowinput_s2_r2.fastq,,assets/references/lowinput_s2.tsv,
-lowinput_s2_r3,lowinput_s2,3,data/lowinput_s2_r3.fastq,,assets/references/lowinput_s2.tsv,
+sample_id,experiment,replicate,fastq,sra_accession,biosample_accession,reference_set,notes
+lowinput_s2_r0,lowinput_s2,0,data/lowinput_s2_r0.fastq,,SAMN62407368,assets/references/lowinput_s2.tsv,fewer preps into extraction than r1-r3
+lowinput_s2_r1,lowinput_s2,1,data/lowinput_s2_r1.fastq,,SAMN62407369,assets/references/lowinput_s2.tsv,
+lowinput_s2_r2,lowinput_s2,2,data/lowinput_s2_r2.fastq,,SAMN62407370,assets/references/lowinput_s2.tsv,
+lowinput_s2_r3,lowinput_s2,3,data/lowinput_s2_r3.fastq,,SAMN62407371,assets/references/lowinput_s2.tsv,

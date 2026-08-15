@@ -1,0 +1,11 @@
+# Placeholder standing in for a sample's reads between parseSamplesheet and
+# FETCH_READS when --fetch_from_sra is set.
+#
+# Nextflow tuples cannot carry a null path, so "the reads are not local, fetch
+# them" has to be represented by a file. The workflow body replaces every
+# occurrence of this placeholder with the fetched FASTQ before anything reads a
+# sequence, so it must never reach a process; if it does, the join in main.nf
+# dropped a sample and the run should fail rather than analyse this file.
+#
+# The parallel case is assets/NO_CONSENSUS_HITS, which does the same for an
+# optional process input.
