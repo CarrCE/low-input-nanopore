@@ -57,6 +57,11 @@ def parse_args():
                                 formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("--this-study", nargs="*", default=[],
                    help="name=enrichment_bases,enrichment_reads (e.g. lowinput_s2=43.01,18.39)")
+    # The headline comparison. Without it the published fold over the control
+    # existed only as hand arithmetic on two numbers from different files.
+    p.add_argument("--experiment-summary",
+                   help="results/summary/experiment_summary.tsv: compare each experiment's "
+                        "mean enrichment (competitive assignment, headline replicates)")
     p.add_argument("--outdir", required=True)
     p.add_argument("--basename", default="estimated_control")
     return p.parse_args()
@@ -91,8 +96,18 @@ def main():
     print(f"  target mean read length      {mean_target_read:,.0f} bp")
     print("  => without adaptive sampling the sample is DEPLETED on a base basis")
 
+    specs = list(args.this_study)
+    if args.experiment_summary:
+        import csv
+        names = {"lowinput_s1": "D6311", "lowinput_s2": "D6321"}
+        with open(args.experiment_summary) as fh:
+            for r in csv.DictReader((l for l in fh if not l.startswith("#")), delimiter="\t"):
+                if r["mode"] == "competitive" and r["experiment"] in names:
+                    specs.append(f"{names[r['experiment']]}={r['enrichment_bases_mean']},"
+                                 f"{r['enrichment_reads_mean']}")
+
     comparisons = []
-    for spec in args.this_study:
+    for spec in specs:
         name, vals = spec.split("=")
         eb, er = (float(x) for x in vals.split(","))
         comparisons.append({

@@ -91,6 +91,7 @@ make images
 make attribution coverage modedelta comparison estcontrol
 make assigneddepth poolcov
 make seqsummary runmeta versions divergence
+make carriermodel          # needs the instrument-data record; see docs/carrier-model.md
 make measurements verify
 ```
 
@@ -120,6 +121,7 @@ All times below are measured on a complete cold run from a fresh clone (M3 Max,
 | 4 | `comparison` | per-femtogram comparison figure | 2 s |
 | 4 | `estcontrol` | estimated no-AS control | 2 s |
 | 4 | `assigneddepth` → `poolcov` | pooled-coverage figure | 5 m |
+| 4 | `carriermodel` | carrier-model figure and table; needs the masked reads and the instrument-data record | 6 m with per-replicate steps cached; the first run adds one pass over every FASTQ (not yet timed cold) |
 | 4 | `seqsummary`, `runmeta`, `versions` | sequencing-summary, runs and software tables | 5 m (`runmeta` reads all ~110 GB) |
 | 4 | `q10` | the **quality-matched rerun** table, at Q10 | **1 h 27 m** |
 | 4 | `raghavendra` | the committed prior-study rows behind the comparison figure | 38 s |
@@ -223,7 +225,7 @@ These mirror the conventions used across the lab's analysis repositories.
 | `nextflow.config` | Manifest, all `params` defaults, `docker`/`singularity`/`test` profiles, provenance reporting |
 | `conf/base.config` | Container pinning, per-label CPU/memory/time, `check_max` clamping |
 | `run.sh` | Launcher that works around Nextflow's inability to handle spaces in the project path |
-| `Makefile` | Runs: `all` (the published analysis), `s1`, `s2`, `raghavendra`, `q10`, `test`. Display items: `comparison`, `coverage`, `modedelta`, `poolcov`, `estcontrol`. Checks: `verify`, `check`, `measurements`. Records: `versions`, `runmeta`, `seqsummary`, `attribution`, `assigneddepth`. Plus `images`, `demo-data`, `clean`, `help` |
+| `Makefile` | Runs: `all` (the published analysis), `s1`, `s2`, `raghavendra`, `q10`, `test`. Display items: `comparison`, `coverage`, `modedelta`, `poolcov`, `estcontrol`, `carriermodel`. Checks: `verify`, `check`, `measurements`. Records: `versions`, `runmeta`, `seqsummary`, `attribution`, `assigneddepth`. Plus `images`, `demo-data`, `clean`, `help` |
 | `bin/build_reference_set.py` | Concatenates fetched genomes into one FASTA + contig→organism→role map + genome sizes + provenance |
 | `bin/assign_reads.py` | Competitive per-read assignment from a qname-grouped BAM; emits counts, per-read calls, read lengths |
 | `bin/compute_metrics.py` | Enrichment and per-femtogram metrics; enforces the read-accounting reconciliation |
@@ -232,6 +234,7 @@ These mirror the conventions used across the lab's analysis repositories.
 | `bin/assigned_depth.sh` | `make assigneddepth` — per-base depth of the reads assignment *awarded* to each organism, recovered from a finished run without re-mapping the full FASTQ. `COVERAGE_PROFILE` measures every primary alignment instead, which for a member sharing sequence with an abundant relative is largely that relative's reads |
 | `bin/pool_coverage.py` | `make poolcov` — sums per-base depth across the replicates of an experiment, so every community member can be assessed rather than only those deep enough in a single library. Reports alignment depth **and** the depth attributable to reads assignment awarded, because for a member sharing sequence with an abundant relative these differ by orders of magnitude |
 | `bin/plot_pooled_coverage.py` | The pooled-coverage figure — uniformity across every member, pooled; marks the members whose depth is not attributable |
+| `bin/carrier_model/` | `make carriermodel` — the carrier-depletion model against the runs: one pass over the deposited reads, lambda-end mapping, the MinKNOW instrument records joined by read id, and the figure and table. Also the scripts that built and verified the instrument-data record. See `docs/carrier-model.md` |
 | `bin/coverage_dropouts.py` | Locates low-coverage regions in a depth profile and annotates them against a GFF3; answers *where* and *what*, where the coverage summary answers only *how uneven* |
 | `assets/references/lowinput_s1.tsv` | Reference set A: D6311 community (10 organisms) + lambda carrier + K-12 contaminant |
 | `assets/references/lowinput_s2.tsv` | Reference set B: D6321 spike-in (3 organisms) + lambda carrier + K-12 contaminant |
@@ -250,6 +253,8 @@ These mirror the conventions used across the lab's analysis repositories.
 | `bin/comparison/` | The prior-work comparison: figure generator, the loader, the Kraken2/Raghavendra fetch and reanalysis scripts, and `seed_this_study.py` |
 | `assets/comparison/` | Its inputs: `prior_studies.tsv` (one row per prior-study sample per classifier variant, each citing its published source), `this_study.tsv` (a committed snapshot of pipeline output), `kraken2_db.manifest.tsv` (the pinned database) |
 | `docs/comparison.md` | How that comparison is built, and the four data defects it repairs |
+| `docs/carrier-model.md` | The carrier-depletion model, its inputs, the lambda-derived read definition, and what the runs show |
+| `assets/instrument_files.tsv` | Checksums of the MinKNOW instrument-data record that `make carriermodel` reads |
 | `data/`, `refs/`, `results/`, `work/` | **Gitignored.** Input reads, fetched genomes, outputs, Nextflow scratch |
 
 ---
