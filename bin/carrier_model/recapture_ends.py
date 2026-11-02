@@ -12,7 +12,7 @@
    depth for long reads by decision (unblock vs sequence vs none).
 
 Inputs: <workdir>/<s>.{reads,instrument,pairs}.npz, <workdir>/<s>.ends.paf.gz,
-        <results>/<s>/competitive/<s>.readlengths.tsv.gz
+        <workdir>/<s>.read_ids.txt.gz
 Output: <outdir>/recapture_ends.tsv, <outdir>/keep_decisions_5prime.tsv
 Usage: recapture_ends.py <results> <workdir> <outdir>
 """
@@ -61,8 +61,7 @@ def main(ror, work, out):
     ror, work, out = Path(ror), Path(work), Path(out)
     rc_rows, kp_rows = [], []
     for s in SAMPLES:
-        ids = pd.read_csv(ror / s / "competitive" / f"{s}.readlengths.tsv.gz", sep="\t",
-                          usecols=["read_id"])["read_id"].to_numpy()
+        ids = pd.read_csv(work / f"{s}.read_ids.txt.gz", header=None)[0].to_numpy()
         fp = five_prime(work, s)
         ins = np.load(work / f"{s}.instrument.npz"); act = ins["action"]; decb = ins["dec_bases"]
         d = np.load(work / f"{s}.reads.npz"); L = d["length"]

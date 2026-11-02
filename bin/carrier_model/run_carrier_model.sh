@@ -92,7 +92,7 @@ for s in "${SAMPLES[@]}"; do
     [ -d "${INSTRUMENT}/${s}" ] || die "${s}: no instrument records in ${INSTRUMENT}/${s}"
 
     # 1. one pass over the deposited reads
-    if [ ! -s "${WORK}/${s}.reads.npz" ]; then
+    if [ ! -s "${WORK}/${s}.reads.npz" ] || [ ! -s "${WORK}/${s}.read_ids.txt.gz" ]; then
         fastq="$(masked_reads "${s}")"
         [ -n "${fastq}" ] || die "${s}: no masked reads found (set READS=, or run with --fetch_from_sra)"
         log "${s}: reading ${fastq}"
@@ -123,7 +123,8 @@ for s in "${SAMPLES[@]}"; do
     if [ ! -s "${WORK}/${s}.instrument.npz" ]; then
         log "${s}: joining instrument records"
         run_py bin/carrier_model/join_instrument.py "${s}" \
-            "/results/${s}/competitive/${s}.readlengths.tsv.gz" "/instrument/${s}" \
+            "/results/${s}/competitive/${s}.readlengths.tsv.gz" \
+            "/results/carrier_model/work/${s}.read_ids.txt.gz" "/instrument/${s}" \
             /results/carrier_model/work > "${WORK}/${s}.join.log"
     fi
 done

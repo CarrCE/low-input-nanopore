@@ -49,7 +49,7 @@ def main(record, results, work, repo, manifest_out):
         with tempfile.TemporaryDirectory() as tmp:
             subprocess.run([sys.executable, str(Path(__file__).resolve().parent / "join_instrument.py"), s,
                             str(results / s / "competitive" / f"{s}.readlengths.tsv.gz"),
-                            str(record / s), tmp], check=True, capture_output=True)
+                            str(work / f"{s}.read_ids.txt.gz"), str(record / s), tmp], check=True, capture_output=True)
             a = np.load(work / f"{s}.instrument.npz")
             b = np.load(Path(tmp) / f"{s}.instrument.npz")
             bad = [k for k in a.files if not np.array_equal(a[k], b[k], equal_nan=a[k].dtype.kind == "f")]

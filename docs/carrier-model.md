@@ -23,6 +23,12 @@ so nothing here depends on unmasked data. The samplesheet's local `fastq`
 column is not used for this reason: in the lab's own checkout it points at the
 reads before masking.
 
+Copies fetched from SRA/ENA work too. The archive renames each read by run and
+spot (`SRR40180147.1`), keeps the ONT read id as the next header field, and
+drops the ONT header tags. `extract_reads.py` recovers the ONT read id, which
+keys the instrument records, and run time comes from the sequencing summary
+rather than from the header tags.
+
 The instrument records hold no sequence. For each run they are the Dorado
 sequencing summary (sup basecalling), the adaptive-sampling decision and timing
 logs, and pore activity, with rows restricted to the deposited reads.

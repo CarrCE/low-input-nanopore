@@ -69,9 +69,14 @@ def main(repo, ror, work, out, figdir):
     rows, time_rows = [], []
     for s in SAMPLES:
         d = np.load(work / f"{s}.reads.npz")
-        act = np.load(work / f"{s}.instrument.npz")["action"]
-        L, st = d["length"].astype(np.int64), d["st"]
+        ins = np.load(work / f"{s}.instrument.npz")
+        act = ins["action"]
+        L = d["length"].astype(np.int64)
         assert len(act) == len(L), f"{s}: instrument join is not in deposit order"
+        # Run time from the sequencing summary, not the FASTQ header tags: an
+        # archive-fetched FASTQ has none. Every deposited read is in the summary.
+        assert ins["in_summary"].all(), f"{s}: deposited reads missing from the summary"
+        st = ins["start_time"]
         R = classes(d)
         lam, car, smp = R["lambda_derived"], R["carrier"], R["sample"]
 

@@ -13,6 +13,16 @@ competitive read-length table, producing
                                       mapping needs.
   <workdir>/<sample>.lambda_ids.tsv   read_id, length, sampled_by (hash|long),
                                       call organism
+  <workdir>/<sample>.read_ids.txt.gz  the ONT read id of every read, in deposit
+                                      order: the key into the instrument records
+
+Read names. A FASTQ written by the basecaller names each read by its ONT read
+id. A copy fetched from SRA/ENA names it by run and spot ("SRR40180147.1") and
+carries the ONT id as the next field ("62280aea-...-62280a1f16ce/1"); it also
+drops the ONT header tags (st, qs). The pipeline's tables use the first field,
+whichever it is, so that is what is checked against readlengths.tsv.gz; the ONT
+id is recovered from whichever field holds one. Nothing downstream needs the
+header tags: run time comes from the instrument records.
 
 The FASTQ and readlengths.tsv.gz are in the same order (bin/sequencing_summary.py
 relies on the same fact); every record's read_id and length are asserted equal,
@@ -23,6 +33,7 @@ complete input: nothing here needs unmasked reads.
 Usage: extract_reads.py <sample_id> <fastq[.gz]> <readlengths.tsv.gz> <workdir>
 """
 import gzip
+import re
 import subprocess
 import sys
 from datetime import datetime
@@ -36,6 +47,16 @@ from common import ROLES, is_lambda_derived  # noqa: E402
 P = 0.02
 LONG_BP = 2000
 END_BP = 1500
+ONT_ID = re.compile(r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}")
+
+
+def ont_id(fields):
+    """The ONT read id among a header's whitespace-separated fields."""
+    for f in fields[:2]:
+        m = ONT_ID.match(f)
+        if m:
+            return m.group(0)
+    sys.exit(f"no ONT read id in FASTQ header fields {fields[:2]}")
 
 
 def hashed(rid):
@@ -55,16 +76,19 @@ def main(sample, fastq, rl_path, workdir):
     out_fa = open(work / f"{sample}.lambda_ends.fa", "w")
     out_ids = open(work / f"{sample}.lambda_ids.tsv", "w")
     out_ids.write("read_id\tread_length\tsampled_by\tcall_organism\n")
+    out_ont = gzip.open(work / f"{sample}.read_ids.txt.gz", "wt", compresslevel=1)
     n = 0
     it = iter(fq.stdout)
     for h in it:
         seq = next(it); next(it); next(it)
-        fields = h.decode()[1:].rstrip("\n").split("\t")
-        rid = fields[0]
+        fields = h.decode()[1:].split()
+        name = fields[0]
+        rid = ont_id(fields)
         tags = dict(f.split(":", 2)[0::2] for f in fields[1:] if f.count(":") >= 2)
         row = rl.readline().rstrip("\n").split("\t")
-        if row[0] != rid:
-            sys.exit(f"{sample}: order mismatch at record {n}: fastq {rid} vs readlengths {row[0]}")
+        if row[0] != name:
+            sys.exit(f"{sample}: order mismatch at record {n}: fastq {name} vs readlengths {row[0]}")
+        out_ont.write(rid + "\n")
         length = int(row[4])
         if length != len(seq) - 1:
             sys.exit(f"{sample}: length mismatch for {rid}: table {length} vs fastq {len(seq)-1}")
@@ -86,7 +110,7 @@ def main(sample, fastq, rl_path, workdir):
     assert rl.readline() == "", f"{sample}: readlengths has rows beyond the FASTQ"
     if fq.wait() != 0:
         sys.exit(f"{sample}: decompression failed")
-    out_fa.close(); out_ids.close()
+    out_fa.close(); out_ids.close(); out_ont.close()
     np.savez_compressed(
         work / f"{sample}.reads.npz",
         length=np.array(L, dtype=np.int32), st=np.array(ST, dtype=np.float64),

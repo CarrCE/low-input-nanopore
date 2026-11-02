@@ -19,8 +19,7 @@ def main(ror, work, out, iroot):
     ror, work, out, iroot = Path(ror), Path(work), Path(out), Path(iroot)
     q_rows, c_rows = [], []
     for s in SAMPLES:
-        ids = pd.read_csv(ror / s / "competitive" / f"{s}.readlengths.tsv.gz", sep="\t",
-                          usecols=["read_id"])
+        ids = pd.read_csv(work / f"{s}.read_ids.txt.gz", header=None, names=["read_id"])
         d = np.load(work / f"{s}.reads.npz"); act = np.load(work / f"{s}.instrument.npz")["action"]
         L = d["length"].astype(np.int64); R = classes(d)
         strict, like = R["carrier"], R["lambda_derived"]
