@@ -68,12 +68,12 @@ DISPLAY_ITEM_ID = "fig_low_input_comparison"
 # ---------------------------------------------------------------------------
 COLORS = {
     "Mojarro et al. 2019":        "#0072B2",   # blue
-    "B. Raghavendra et al. 2023": "#D55E00",   # vermilion
+    "Basapathi Raghavendra et al. 2023": "#D55E00",   # vermilion
     "Zorzano et al. 2025":        "#009E73",   # bluish green
 }
 MARKERS = {
     "Mojarro et al. 2019":        "o",
-    "B. Raghavendra et al. 2023": "s",
+    "Basapathi Raghavendra et al. 2023": "s",
     "Zorzano et al. 2025":        "^",
 }
 FALLBACK_COLOR, FALLBACK_MARKER = "#CC79A7", "v"
@@ -81,7 +81,7 @@ FALLBACK_COLOR, FALLBACK_MARKER = "#CC79A7", "v"
 THIS_STUDY_COLOR = "#000000"
 ROUND_STYLE = {
     "Round 1": {"marker": "*", "s": 260, "legend_ms": 14, "edge_lw": 0.9},
-    "Round 2": {"marker": "D", "s": 130, "legend_ms": 8,  "edge_lw": 0.8},
+    "Round 2": {"marker": "D", "s": 100, "legend_ms": 8,  "edge_lw": 0.8},
 }
 FALLBACK_ROUND_STYLE = {"marker": "P", "s": 150, "legend_ms": 9, "edge_lw": 0.8}
 
@@ -420,11 +420,13 @@ def build_figure(prior: pd.DataFrame, rounds: dict, title: str | None,
     perf = prior[~blank]       # what fold calculations may use
 
     # ---- this study, one series per round ----------------------------------
-    for name, info in rounds.items():
+    # Earlier rounds are drawn on top: the two rounds' markers sit close
+    # together, and the larger stars would otherwise vanish under the diamonds.
+    for i, (name, info) in enumerate(rounds.items()):
         st = ROUND_STYLE.get(name, FALLBACK_ROUND_STYLE)
         ax.scatter(info["reads_values"], info["bases_values"],
                    marker=st["marker"], s=st["s"], c=THIS_STUDY_COLOR,
-                   edgecolors="white", linewidths=st["edge_lw"], zorder=6)
+                   edgecolors="white", linewidths=st["edge_lw"], zorder=6.9 - 0.1 * i)
 
     ref_name = reference_round or next(iter(rounds))
     ref_name = {disp(k): k for k in rounds}.get(ref_name, ref_name)   # accept "D6321"
@@ -845,7 +847,7 @@ def main(argv=None):
             },
             "classifier_selection": {
                 "Zorzano et al. 2025": args.zorzano_classifier,
-                "B. Raghavendra et al. 2023": args.raghavendra_classifier,
+                "Basapathi Raghavendra et al. 2023": args.raghavendra_classifier,
                 "Mojarro et al. 2019": "published_table1",
             },
             "n_points_plotted": int(len(prior) + len(mine)),

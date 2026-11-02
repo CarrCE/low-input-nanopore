@@ -155,7 +155,8 @@ abstract. The row now carries `verified=TRUE`, `source=published_table1`,
 no longer rests on the workbook at all.
 
 Note the organism name: Mojarro et al.\ report *B. subtilis*, which is the name
-used here whenever their number is quoted. `prior_studies.tsv` records the
+used here whenever their number is quoted, including the figure callout (the
+`condition` column). The `organism` column of `prior_studies.tsv` records the
 current designation, *Bacillus spizizenii*, for the same material.
 
 The machinery built for the unverified case is still present and still correct —
