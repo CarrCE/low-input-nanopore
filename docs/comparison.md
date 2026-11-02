@@ -49,9 +49,27 @@ paper's own main-text yield of 1.046 Mbp per ng extracted DNA:
 `dna_ng = total_bases / 1.046e6`. The `dna_basis` column records which of the
 two applies to each row.
 
-The dashed contours on the figure are iso-improvement circles around the
-Round 1 mean: geometric-mean fold improvement expressed as Euclidean distance
-in log10-log10 space, at 10x / 100x / 1000x.
+The dashed contours on the figure are iso-improvement circles around the mean
+of one round, set by `--reference-round`: geometric-mean fold improvement
+expressed as Euclidean distance in log10-log10 space, at 10x / 100x / 1000x.
+The script defaults to Round 1; `make comparison` renders the published figure
+around **Round 2** (D6321, whole cells taken through extraction), the more
+realistic low-biomass case. Because choosing the reference that compares
+better could look selective, the fold against **every** round is reported
+regardless of the choice: in the CSV, in the sidecar
+(`smallest_improvement_per_study_by_round`, `nearest_prior_by_round`) and in
+the caption, which states how far the nearest prior sample sits below each
+round's mean.
+
+The figure labels the rounds by standard (Round 1 = **D6311**, Round 2 =
+**D6321**); the data files, CSV columns and sidecar keep the internal round
+names. `--reference-round` accepts either form.
+
+Zorzano et al.'s procedural **Blank** is a negative control, not a performance
+measurement. It is drawn as a hollow marker labelled "blank", so nothing is
+hidden, and it is excluded from every fold calculation (callouts, nearest prior
+sample, and `smallest_improvement_per_study*`). The sidecar lists it under
+`blank_points_excluded_from_folds`.
 
 ## Known defects, and how each is handled
 
@@ -137,7 +155,8 @@ abstract. The row now carries `verified=TRUE`, `source=published_table1`,
 no longer rests on the workbook at all.
 
 Note the organism name: Mojarro et al.\ report *B. subtilis*, which is the name
-used here whenever their number is quoted. `prior_studies.tsv` records the
+used here whenever their number is quoted, including the figure callout (the
+`condition` column). The `organism` column of `prior_studies.tsv` records the
 current designation, *Bacillus spizizenii*, for the same material.
 
 The machinery built for the unverified case is still present and still correct —
@@ -245,7 +264,7 @@ Writes to `results/comparison/`:
 * `low_input_comparison.pdf` — vector, Type 42 (editable) fonts
 * `low_input_comparison.png` — 600 dpi
 * `low_input_comparison.csv` — every plotted point with full provenance, plus
-  fold-improvement columns against the Round 1 mean
+  fold-improvement columns against the mean of every round
 * `low_input_comparison.json` — display-item sidecar with
   `id` / `title` / `caption` / `source_files` / `software` / `metrics`.
   `source_files` records a SHA-256 for each input, so a figure can always be

@@ -46,7 +46,7 @@ DEFAULT_RESULTS_DIR = REPO / "results"
 NUMERIC_COLUMNS = ["replicate_idx", "reads", "bases", "dna_pg",
                    "reads_per_fg", "bases_per_fg"]
 
-STUDIES = ["Mojarro et al. 2019", "B. Raghavendra et al. 2023", "Zorzano et al. 2025"]
+STUDIES = ["Mojarro et al. 2019", "Basapathi Raghavendra et al. 2023", "Zorzano et al. 2025"]
 
 #: Which classifier variant is plotted for each prior study by default.
 #:
@@ -65,7 +65,7 @@ STUDIES = ["Mojarro et al. 2019", "B. Raghavendra et al. 2023", "Zorzano et al. 
 DEFAULT_CLASSIFIERS = {
     "Mojarro et al. 2019": "published_table1",
     "Zorzano et al. 2025": "kraken2_q1",          # conservative; see note above
-    "B. Raghavendra et al. 2023": "kraken2_q10",  # only variant with base counts
+    "Basapathi Raghavendra et al. 2023": "kraken2_q10",  # only variant with base counts
 }
 
 def classifier_choices(study, tsv=PRIOR_TSV):
@@ -93,7 +93,7 @@ def classifier_choices(study, tsv=PRIOR_TSV):
 
 
 ZORZANO_CHOICES = classifier_choices("Zorzano et al. 2025")
-RAGHAVENDRA_CHOICES = classifier_choices("B. Raghavendra et al. 2023")
+RAGHAVENDRA_CHOICES = classifier_choices("Basapathi Raghavendra et al. 2023")
 
 #: experiment id -> figure series label.
 ROUND_BY_EXPERIMENT = {"lowinput_s1": "Round 1", "lowinput_s2": "Round 2"}
@@ -171,7 +171,7 @@ def load_prior(path: Path = PRIOR_TSV,
 
     chosen = dict(DEFAULT_CLASSIFIERS)
     chosen["Zorzano et al. 2025"] = zorzano_classifier
-    chosen["B. Raghavendra et al. 2023"] = raghavendra_classifier
+    chosen["Basapathi Raghavendra et al. 2023"] = raghavendra_classifier
 
     samples = df[df["row_type"] == "sample"].copy()
     n_aggregate = int((df["row_type"] == "aggregate").sum())
