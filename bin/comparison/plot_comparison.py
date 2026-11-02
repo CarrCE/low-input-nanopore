@@ -6,9 +6,11 @@ Log-log scatter of reads / fg DNA into library prep (x) against bases / fg DNA
 into library prep (y). Every prior-study sample is one point, coloured and
 marker-shaped by study (Okabe-Ito, colourblind-safe). This study's rounds are
 large bold black markers, read from `this_study.tsv` or from live pipeline
-output. Dashed circles are iso-improvement contours around the Round 1 mean:
-the geometric-mean fold improvement, expressed as Euclidean distance in
-log10-log10 space, at 10x / 100x / 1000x.
+output. Dashed circles are iso-improvement contours around the reference round's
+mean (--reference-round; default the first round, Round 1): the geometric-mean
+fold improvement, expressed as Euclidean distance in log10-log10 space, at
+10x / 100x / 1000x. Fold factors against EVERY round are written to the CSV,
+the sidecar and the caption, so the choice of reference cannot hide the other.
 
 Inputs are the versioned TSVs under assets/comparison/:
     prior_studies.tsv   one row per prior-study sample per classifier variant,
@@ -82,6 +84,21 @@ ROUND_STYLE = {
     "Round 2": {"marker": "D", "s": 130, "legend_ms": 8,  "edge_lw": 0.8},
 }
 FALLBACK_ROUND_STYLE = {"marker": "P", "s": 150, "legend_ms": 9, "edge_lw": 0.8}
+
+# What a reader sees. Data files, CSV columns and the sidecar keep the internal
+# round names; only labels, legend and caption use these.
+ROUND_DISPLAY = {"Round 1": "D6311", "Round 2": "D6321"}
+
+
+def disp(name: str) -> str:
+    return ROUND_DISPLAY.get(name, name)
+
+
+def is_blank(prior: pd.DataFrame) -> pd.Series:
+    """Procedural blanks (negative controls) in the prior-study table. They are
+    drawn, hollow, so nothing is hidden, but a blank is not a performance
+    measurement and never enters a fold calculation."""
+    return prior["condition"].astype(str).str.strip().str.lower().eq("blank")
 
 # Label placement is solved, not tabulated. The previous version carried
 # hand-tuned per-study offsets in log10 units; they were correct for the data as
@@ -326,6 +343,7 @@ def summarise_smallest(prior: pd.DataFrame, ref: dict) -> list[dict]:
         r = grp.loc[d.idxmin()]
         out.append({"study": str(r["study"]),
                     "condition": str(r["condition"]),
+                    "organism": str(r["organism"]),
                     "fold_reads": float(ref["reads"] / r["reads_per_fg"]),
                     "fold_bases": float(ref["bases"] / r["bases_per_fg"])})
     return out
@@ -384,15 +402,22 @@ def verify_placement(fig, ax, artists, points_xy, pad_px=1.5):
     return hits
 
 
-def build_figure(prior: pd.DataFrame, rounds: dict, title: str | None):
+def build_figure(prior: pd.DataFrame, rounds: dict, title: str | None,
+                 reference_round: str | None = None):
     fig, ax = plt.subplots(figsize=(7.0, 5.2))
 
     # ---- prior-study points ------------------------------------------------
-    for study, grp in prior.groupby("study"):
+    blank = is_blank(prior)
+    for study, grp in prior[~blank].groupby("study"):
         ax.scatter(grp["reads_per_fg"], grp["bases_per_fg"],
                    marker=marker_of(study), color=color_of(study),
                    s=42, alpha=0.85, edgecolors="black", linewidths=0.5,
                    label=study, zorder=3)
+    for study, grp in prior[blank].groupby("study"):
+        ax.scatter(grp["reads_per_fg"], grp["bases_per_fg"],
+                   marker=marker_of(study), facecolors="white", edgecolors=color_of(study),
+                   s=42, linewidths=1.2, zorder=3)
+    perf = prior[~blank]       # what fold calculations may use
 
     # ---- this study, one series per round ----------------------------------
     for name, info in rounds.items():
@@ -401,7 +426,10 @@ def build_figure(prior: pd.DataFrame, rounds: dict, title: str | None):
                    marker=st["marker"], s=st["s"], c=THIS_STUDY_COLOR,
                    edgecolors="white", linewidths=st["edge_lw"], zorder=6)
 
-    ref_name = next(iter(rounds))
+    ref_name = reference_round or next(iter(rounds))
+    ref_name = {disp(k): k for k in rounds}.get(ref_name, ref_name)   # accept "D6321"
+    if ref_name not in rounds:
+        sys.exit(f"[error] --reference-round {ref_name!r} is not one of {list(rounds)}")
     ref = {"reads": rounds[ref_name]["reads_mean"], "bases": rounds[ref_name]["bases_mean"]}
 
     # ---- axis limits -------------------------------------------------------
@@ -433,7 +461,7 @@ def build_figure(prior: pd.DataFrame, rounds: dict, title: str | None):
         handles.append(Line2D([0], [0], marker=st["marker"], color=THIS_STUDY_COLOR,
                               markeredgecolor="white", markeredgewidth=0.7,
                               linestyle="None", markersize=st["legend_ms"],
-                              label=f"{name} (this study)"))
+                              label=f"{disp(name)} (this study)"))
     legend = ax.legend(handles=handles, loc="lower right", bbox_to_anchor=(0.965, 0.02),
                        frameon=True, framealpha=0.95, edgecolor="0.7")
 
@@ -478,10 +506,10 @@ def build_figure(prior: pd.DataFrame, rounds: dict, title: str | None):
                 zorder=2), bpr_text))
 
     # ---- per-study callouts ------------------------------------------------
-    callouts = pick_callouts(prior, ref)
+    callouts = pick_callouts(perf, ref)
     # Computed here, where `ref` still holds the plotted reference point; it is
     # rebound to the round record further down.
-    smallest = summarise_smallest(prior, ref)
+    smallest = summarise_smallest(perf, ref)
     for c in callouts:
         tx, ty = placer.place((c["x"], c["y"]), c["text"], 7.5)
         placed_artists.append((ax.annotate(
@@ -493,6 +521,15 @@ def build_figure(prior: pd.DataFrame, rounds: dict, title: str | None):
                             lw=0.6, alpha=0.7, connectionstyle="arc3,rad=0.12"),
             zorder=5), c["study"]))
 
+    # ---- procedural blanks: a short label beside the hollow marker ---------
+    for _, r in prior[blank].iterrows():
+        bx, by = placer.place((r["reads_per_fg"], r["bases_per_fg"]), "blank", 7)
+        placed_artists.append((ax.annotate(
+            "blank", xy=(r["reads_per_fg"], r["bases_per_fg"]), xytext=(bx, by),
+            fontsize=7, ha="center", va="center", color=color_of(r["study"]),
+            arrowprops=dict(arrowstyle="-", color=color_of(r["study"]), lw=0.5, alpha=0.7),
+            zorder=5), f"blank {r['study']}"))
+
     # ---- this-study labels -------------------------------------------------
     for name, info in rounds.items():
         n = len(info["reads_values"])
@@ -501,10 +538,10 @@ def build_figure(prior: pd.DataFrame, rounds: dict, title: str | None):
             order = np.argsort(info["reads_values"])
             j = int(order[n // 2])
             anchor = (info["reads_values"][j], info["bases_values"][j])
-            head = f"{name}\n(n={n}, this study)\nmean:"
+            head = f"{disp(name)}\n(n={n}, this study)\nmean:"
         else:
             anchor = (info["reads_values"][0], info["bases_values"][0])
-            head = f"{name}\n(this study)"
+            head = f"{disp(name)}\n(this study)"
         text = (f"{head}\n{fmt_rate(info['reads_mean'])} reads/fg\n"
                 f"{fmt_rate(info['bases_mean'])} bases/fg")
         tx, ty = placer.place(anchor, text, 8)
@@ -564,6 +601,33 @@ def summarise_round(df: pd.DataFrame) -> dict:
     }
 
 
+def nearest_prior(prior: pd.DataFrame, info: dict) -> dict:
+    """The single prior sample nearest a round's mean in log-log space, with folds."""
+    ref = {"reads": info["reads_mean"], "bases": info["bases_mean"]}
+    return min(summarise_smallest(prior, ref),
+               key=lambda r: np.hypot(np.log10(r["fold_reads"]), np.log10(r["fold_bases"])))
+
+
+def nearest_sentence(prior: pd.DataFrame, rounds: dict) -> str:
+    parts = []
+    for name, info in rounds.items():
+        r = nearest_prior(prior, info)
+        parts.append(f"{r['fold_reads']:.2f}x reads and {r['fold_bases']:.2f}x bases "
+                     f"below the {disp(name)} mean ({r['study']}, {r['organism']} in "
+                     f"{r['condition']})")
+    return ("The nearest prior sample to each round is " + "; ".join(parts)
+            + " (a fold below 1 means the prior sample is ahead on that axis).")
+
+
+def blank_sentence(prior: pd.DataFrame) -> str:
+    b = prior[is_blank(prior)]
+    if b.empty:
+        return ""
+    who = ", ".join(sorted(set(b["study"])))
+    return (f"Hollow marker{'s' if len(b) > 1 else ''}: procedural blank "
+            f"({who}), shown for completeness and excluded from every fold calculation. ")
+
+
 def build_caption(prior, rounds, ref_name, args, callouts) -> str:
     ref = rounds[ref_name]
     studies = ", ".join(sorted(set(prior["study"])))
@@ -575,13 +639,15 @@ def build_caption(prior, rounds, ref_name, args, callouts) -> str:
         "entering library preparation. Each prior-study point is one sample "
         f"({len(prior)} samples from {studies}); reads/fg = reads/(pg DNA x 1000) "
         "and bases/fg = bases/(pg DNA x 1000). This study is shown as "
-        + " and ".join(f"{k} (n={v['n']})" for k, v in rounds.items())
-        + f". Dashed contours are iso-improvement circles around the {ref_name} mean "
+        + " and ".join(f"{disp(k)} (n={v['n']})" for k, v in rounds.items())
+        + f". Dashed contours are iso-improvement circles around the {disp(ref_name)} mean "
         f"({fmt_rate(ref['reads_mean'])} reads/fg, {fmt_rate(ref['bases_mean'])} "
         "bases/fg) at 10x, 100x and 1000x geometric-mean fold improvement in "
         "log10-log10 space. Callouts mark each prior study's weakest condition, "
         "which is where the improvement is largest: "
-        f"{folds}. Zorzano et al. 2025 counts use the '{args.zorzano_classifier}' "
+        f"{folds}. {nearest_sentence(prior[~is_blank(prior)], rounds)} "
+        f"{blank_sentence(prior)}"
+        f"Zorzano et al. 2025 counts use the '{args.zorzano_classifier}' "
         f"variant and Basapathi Raghavendra et al. 2023 the "
         f"'{args.raghavendra_classifier}' variant; see prior_studies.tsv for the "
         "per-row provenance of every point.")
@@ -595,6 +661,10 @@ def parse_args(argv=None):
                     help="prior-study table (default: %(default)s)")
     ap.add_argument("--this-study-tsv", type=Path, default=cd.THIS_STUDY_TSV,
                     help="seeded this-study table (default: %(default)s)")
+    ap.add_argument("--reference-round", default=None,
+                    help="round whose mean centres the iso-improvement contours and "
+                         "the callout folds (default: the first round, 'Round 1'). "
+                         "Folds against every round are reported regardless.")
     ap.add_argument("--results-dir", type=Path, default=None,
                     help="pipeline results/ directory; headline rows of "
                          "<sample_id>/<mode>/<sample_id>.metrics.tsv supersede the "
@@ -697,7 +767,7 @@ def main(argv=None):
 
     # ---- figure ------------------------------------------------------------
     fig, callouts, smallest, bpr_median, ref_name = build_figure(
-        prior, rounds, args.title if args.draw_title else None)
+        prior, rounds, args.title if args.draw_title else None, args.reference_round)
 
     outdir = args.outdir
     outdir.mkdir(parents=True, exist_ok=True)
@@ -721,10 +791,10 @@ def main(argv=None):
         mine.assign(series=mine["round"]),
     ], ignore_index=True)
     plotted = plotted.reindex(columns=cols)
-    plotted[f"fold_reads_vs_{ref_name.lower().replace(' ', '')}_mean"] = \
-        ref["reads_mean"] / plotted["reads_per_fg"]
-    plotted[f"fold_bases_vs_{ref_name.lower().replace(' ', '')}_mean"] = \
-        ref["bases_mean"] / plotted["bases_per_fg"]
+    for name, info in rounds.items():
+        key = name.lower().replace(' ', '')
+        plotted[f"fold_reads_vs_{key}_mean"] = info["reads_mean"] / plotted["reads_per_fg"]
+        plotted[f"fold_bases_vs_{key}_mean"] = info["bases_mean"] / plotted["bases_per_fg"]
     # repr() is the shortest text that round-trips a float64 exactly; pandas'
     # default serialiser drops the last significant digit on mixed-dtype frames.
     plotted.to_csv(csv, index=False, float_format=lambda v: repr(float(v)))
@@ -794,6 +864,18 @@ def main(argv=None):
             # so the strongest condition of each study is recorded here and the
             # manuscript reports both.
             "smallest_improvement_per_study": smallest,
+            # The same, against every round, so the reference choice is auditable.
+            "smallest_improvement_per_study_by_round": {
+                name: summarise_smallest(prior[~is_blank(prior)],
+                                         {"reads": info["reads_mean"], "bases": info["bases_mean"]})
+                for name, info in rounds.items()},
+            "nearest_prior_by_round": {name: nearest_prior(prior[~is_blank(prior)], info)
+                                       for name, info in rounds.items()},
+            "round_display_names": {k: disp(k) for k in rounds},
+            "blank_points_excluded_from_folds": [
+                {"study": r["study"], "condition": r["condition"],
+                 "reads_per_fg": float(r["reads_per_fg"]), "bases_per_fg": float(r["bases_per_fg"])}
+                for _, r in prior[is_blank(prior)].iterrows()],
             "unverified_points_plotted": [
                 {"study": r["study"], "condition": r["condition"],
                  "classifier": r["classifier"], "reads_per_fg": float(r["reads_per_fg"]),

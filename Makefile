@@ -286,7 +286,7 @@ divergence: ## Contaminant divergence from stock MG1655 (Supplementary Section S
 comparison: ## Prior-work comparison figure (Fig. 3) into results/comparison/
 	@docker run --rm -u "$$(id -u):$$(id -g)" -e MPLCONFIGDIR=/tmp/mpl \
 	    -v "$(ROOT)":/repo -w /repo "$(ANALYSIS_IMAGE)" \
-	    python3 bin/comparison/plot_comparison.py --results-dir results
+	    python3 bin/comparison/plot_comparison.py --results-dir results --reference-round "Round 2"
 
 versions: ## Record the software the built images actually contain
 	@"$(ROOT)/bin/software_versions.sh" --out "$(ROOT)/results/summary/software_versions.tsv"
