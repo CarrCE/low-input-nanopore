@@ -1,4 +1,4 @@
-# Checksums of the MinKNOW instrument-data record (Zenodo DOI: PENDING), one row per file.
+# Checksums of the MinKNOW instrument-data record (doi:10.5281/zenodo.23907136), one row per file.
 # Built by bin/carrier_model/build_instrument_record.py; verified by
 # bin/carrier_model/verify_instrument_record.py, which re-runs the analysis join on these
 # files and requires every array to equal the one built from the original MinKNOW output.

@@ -15,7 +15,7 @@ make carriermodel        # bin/carrier_model/run_carrier_model.sh
 | Deposited, human-masked reads | SRA/ENA (`--fetch_from_sra` caches them in `sra/`), a `--mask_human` run's `results/<sample>/human/`, or a folder named by `READS=` |
 | Read assignments and per-sample totals | a finished `make all` (`results/`) |
 | Lambda genome | `results/references/<set>/combined.fasta`, contig `NC_001416.1` |
-| MinKNOW instrument records | the instrument-data record (Zenodo DOI: PENDING), unpacked to `data/instrument/<sample>/` or named by `INSTRUMENT=`; checksums in [`assets/instrument_files.tsv`](../assets/instrument_files.tsv) |
+| MinKNOW instrument records | the instrument-data record, [doi:10.5281/zenodo.23907136](https://doi.org/10.5281/zenodo.23907136), fetched to `data/instrument/<sample>/` by `make instrumentdata` (or named by `INSTRUMENT=`); checksums in [`assets/instrument_files.tsv`](../assets/instrument_files.tsv) |
 
 Every read-level quantity comes from the deposited reads, the ones a reader
 downloads. Human masking replaced bases with N but kept read count and length,

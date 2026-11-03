@@ -14,9 +14,9 @@
 #   - a finished `make all` run: results/<sample>/competitive/*.readlengths.tsv.gz,
 #     results/summary/per_sample.tsv and per_organism.tsv, and
 #     results/references/<set>/combined.fasta (lambda is taken from it)
-#   - the MinKNOW instrument records, one folder per replicate, as published in
-#     the instrument-data record: $INSTRUMENT/<sample>/{summary_,AS_decisions_,
-#     AS_timings_,pore_activity_}<sample>.*.gz. Checksums: assets/instrument_files.tsv.
+#   - the MinKNOW instrument records (doi:10.5281/zenodo.23907136), one folder per
+#     replicate: $INSTRUMENT/<sample>/{summary_,AS_decisions_,AS_timings_,
+#     pore_activity_}<sample>.*.gz. `make instrumentdata` fetches and checks them.
 #
 # Outputs
 #   results/carrier_model/        analysis tables (decomposition, cos ends,
@@ -51,7 +51,7 @@ die() { printf '[carrier-model] error: %s\n' "$*" >&2; exit 1; }
 
 command -v docker >/dev/null 2>&1 || die "'docker' is required but not on PATH"
 RESULTS="$(cd "${RESULTS}" 2>/dev/null && pwd -P)" || die "no results directory; run 'make all' first"
-[ -d "${INSTRUMENT}" ] || die "no instrument records at ${INSTRUMENT}; download the instrument-data record (docs/carrier-model.md) or set INSTRUMENT=..."
+[ -d "${INSTRUMENT}" ] || die "no instrument records at ${INSTRUMENT}; run 'make instrumentdata' or set INSTRUMENT=..."
 INSTRUMENT="$(cd "${INSTRUMENT}" && pwd -P)"
 
 OUT="${RESULTS}/carrier_model"

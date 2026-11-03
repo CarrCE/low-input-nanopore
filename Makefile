@@ -36,7 +36,7 @@ DEMO_READS  ?= 40000
 
 .DEFAULT_GOAL := help
 
-.PHONY: help images test check verify measurements masksummary threshold seqsummary versions runmeta poolcov attribution comparison coverage modedelta estcontrol carriermodel assigneddepth divergence s1 s2 all raghavendra q10 demo-data clean
+.PHONY: help images test check verify measurements masksummary threshold seqsummary versions runmeta poolcov attribution comparison coverage modedelta estcontrol instrumentdata carriermodel assigneddepth divergence s1 s2 all raghavendra q10 demo-data clean
 
 help: ## Show this help
 	@printf 'low-input-nanopore -- make targets\n\n'
@@ -237,9 +237,11 @@ estcontrol: ## Estimated no-adaptive-sampling control from Mojarro et al. 2019
 	    python3 bin/comparison/estimated_control.py --outdir results/comparison \
 	        --experiment-summary results/summary/experiment_summary.tsv
 
+instrumentdata: ## Download the MinKNOW instrument records (doi:10.5281/zenodo.23907136) to data/instrument/
+	@bash "$(ROOT)/bin/carrier_model/fetch_instrument_record.sh"
+
 # Needs a finished `make all`, the deposited (masked) reads, and the MinKNOW
-# instrument records from their own data record (docs/carrier-model.md), unpacked
-# to data/instrument/<sample>/ or pointed at with INSTRUMENT=. READS= names a
+# instrument records (`make instrumentdata`, or point INSTRUMENT= at a copy). READS= names a
 # folder of masked FASTQs if they are neither in sra/ nor in results/*/human/.
 # Slow the first time (one pass over every FASTQ); per-replicate steps are then
 # cached under results/carrier_model/work.

@@ -91,7 +91,7 @@ make images
 make attribution coverage modedelta comparison estcontrol
 make assigneddepth poolcov
 make seqsummary runmeta versions divergence
-make carriermodel          # needs the instrument-data record; see docs/carrier-model.md
+make instrumentdata carriermodel   # see docs/carrier-model.md
 make measurements verify
 ```
 
