@@ -163,8 +163,30 @@ case "$URL" in *://*) ;; *) URL="https://${URL}" ;; esac
 echo "==> ${SAMPLE_ID}: ${RUN} (${SOURCE}) <- ${URL}" >&2
 # --no-progress-meter, not -s: a 6 GB transfer's progress bar is unreadable
 # noise in .command.err, but errors must still be reported.
-curl -fL -C - --no-progress-meter --retry 20 --retry-delay 5 --retry-all-errors \
-     -o "$OUT" "$URL"
+#
+# Retries are this loop, not curl's --retry. On an in-process retry curl
+# truncates the file back to where THAT invocation started ("Throwing away N
+# bytes"), so a connection ENA dropped at 4 GB restarted the file from zero.
+# Each pass here is a fresh curl whose -C - resumes from the file's current
+# size. --speed-limit/--speed-time turn a stalled connection into a failure
+# the loop can resume, rather than a hang until the task's time limit.
+FETCH_ATTEMPTS="${FETCH_ATTEMPTS:-30}"
+attempt=1
+until curl -fL -C - --no-progress-meter --connect-timeout 30 \
+           --speed-limit 1024 --speed-time 120 \
+           -o "$OUT" "$URL"; do
+    rc=$?
+    if [ "$attempt" -ge "$FETCH_ATTEMPTS" ]; then
+        echo "error: download of ${URL} failed ${attempt} times (last curl exit ${rc})" >&2
+        exit 1
+    fi
+    # 33: the server refused the byte range, so the partial file is unusable.
+    if [ "$rc" -eq 33 ]; then rm -f "$OUT"; fi
+    have="$( [ -f "$OUT" ] && { stat -c %s "$OUT" 2>/dev/null || stat -f %z "$OUT"; } || echo 0)"
+    echo "    curl exit ${rc}; resuming at byte ${have} (attempt $((attempt + 1)) of ${FETCH_ATTEMPTS})" >&2
+    attempt=$((attempt + 1))
+    sleep 10
+done
 
 # md5sum on Linux (and so in the tools image); `md5 -q` on macOS, where this is
 # run by hand and by tests/sra_fetch.sh.

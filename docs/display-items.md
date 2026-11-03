@@ -59,6 +59,8 @@ display item in the paper.
 | `mode_delta` | `bin/plot_mode_delta.py` | `results/summary/` |
 | `low_input_comparison` | `bin/comparison/plot_comparison.py` | `results/comparison/` |
 | `estimated_control` | `bin/comparison/estimated_control.py` | `results/comparison/` (CSV + JSON only; no figure) |
+| `carrier-model` | `bin/carrier_model/analyze.py` (`make carriermodel`) | `results/summary/` |
+| `carrier-model-table` | `bin/carrier_model/analyze.py` (`make carriermodel`) | `results/summary/` (CSV + JSON only; a table) |
 
 ## Regenerating everything
 
@@ -95,6 +97,7 @@ docker run --rm -u $(id -u):$(id -g) -v "$PWD":/w -w /w -e MPLCONFIGDIR=/tmp/mpl
 
 # the vector figures a manuscript would use are now at:
 #   results/summary/{abundance,readlengths,coverage,mode_delta,pooled_coverage}.pdf
+#   results/summary/carrier-model.pdf      (make carriermodel; needs the instrument records)
 #   results/comparison/low_input_comparison.pdf
 ```
 
