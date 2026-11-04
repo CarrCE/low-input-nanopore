@@ -63,13 +63,14 @@ breakdown is [below](#reproducing-the-published-analysis).
 The sequencing reads are public: BioProject `PRJNA1513130`, runs
 `SRR40180147`–`SRR40180153`, released 15 August 2026.
 
-**ENA has not mirrored them yet, and `--fetch_from_sra` resolves through ENA**,
-so for now download the seven FASTQs from NCBI and place them in `data/` —
-hard-link or copy, never symlink to a directory outside the repository, for the
-reason in [`docs/operating-notes.md`](docs/operating-notes.md#getting-reads-into-data-link-or-copy-never-symlink-outward).
-Steps 2 and 3 then run from a fresh clone. Once ENA catches up,
-`--fetch_from_sra` does this for you; see [Data
-availability](#data-availability).
+ENA mirrors them, and **`make fetchreads`** downloads all seven into the
+gitignored `sra/` cache: about 41 GB, verified against the archive's checksums,
+and resumable if interrupted. Steps 2 and 3 then run with `--fetch_from_sra`,
+which finds the files in the cache instead of downloading them again; see [Data
+availability](#data-availability). Alternatively, download the FASTQs from NCBI
+and place them in `data/`, hard-linking or copying and never symlinking to a
+directory outside the repository, for the reason in
+[`docs/operating-notes.md`](docs/operating-notes.md#getting-reads-into-data-link-or-copy-never-symlink-outward).
 
 One result needs no reads at all — the per-femtogram comparison figure is built
 from committed tables: `make images && make comparison`.
@@ -167,14 +168,18 @@ downstream targets minutes more.
 This is stated because "the code is available" and "the code reproduces the
 paper" are different claims, and only the second is worth much.
 
-**What a reader can and cannot yet check.** The run above read the deposited
-files from local disk. The deposit is public — runs `SRR40180147`–`SRR40180153`,
-released 15 Aug 2026 — but ENA has not yet mirrored it, so `--fetch_from_sra`
-cannot resolve them today. Downloading the seven FASTQs by hand from NCBI and
-supplying them through the samplesheet reproduces everything above; the one-command
-path becomes available when ENA catches up. When it does, expect the archive's
-regenerated copy rather than the submitted bytes — see
-[Data availability](#data-availability) for what that does and does not change.
+**Reproducing from the archive.** The run above read the deposited files from
+local disk. On 2–3 November 2026 the whole analysis was run again from ENA's
+copies of runs `SRR40180147`–`SRR40180153` (`--fetch_from_sra`, then
+`make carriermodel`) and compared with the results above. Every library had the
+same number of reads and the same read lengths. Between 0 and 24 reads per
+library (at most 0.0002%) changed assignment, all near-ties between closely
+related references. The cause is that the archive renames reads (`SRR…N`), and
+minimap2's output depends on the read name: the same sequences aligned under
+both names gave different alignments. No reported value changes at the precision
+given. The archive serves its regenerated copy rather than the submitted bytes;
+see [Data availability](#data-availability) for what that does and does not
+change.
 
 Each target writes to its own subdirectory of `results/`, so a clone has exactly
 one output tree and no run can overwrite another's tables. Which target produces
@@ -545,24 +550,39 @@ The deposit was **released on 15 August 2026**. The seven runs are
 [`assets/deposited_files.tsv`](assets/deposited_files.tsv) and agree exactly,
 totalling 60,416,747 reads and 54,642,391,422 bases.
 
-> **ENA has not yet mirrored the project, so `--fetch_from_sra` cannot resolve
-> these accessions yet.** The records are public at NCBI; ENA, which this
-> repository fetches from, receives INSDC submissions on a delay of a few days.
-> Until it does, run without the flag and supply the FASTQs through the
-> samplesheet's `fastq` column. `bin/fetch_ena_reads.sh` says which of the two
-> situations it is in rather than reporting both as "not released".
+ENA, which this repository fetches from, mirrors all seven runs (checked
+2 November 2026).
 
 ### Fetching the reads by accession
 
 ```bash
+make fetchreads                    # download all seven runs into sra/
 nextflow run . -profile docker \
   --samplesheet assets/samplesheets/all.csv \
   --fetch_from_sra
 ```
 
-The samplesheet's local `fastq` column is ignored; every sample is fetched
-instead, into the gitignored `sra/` cache (`--sradir`). A repository clone plus
-a network is then the whole input.
+The samplesheet's local `fastq` column is ignored; every sample is read from
+the gitignored `sra/` cache (`--sradir`). A repository clone plus a network is
+then the whole input.
+
+`make fetchreads` (`bin/fetch_all_reads.sh`) downloads on the host, outside
+Docker and Nextflow, all seven at once: ENA limits throughput per connection,
+about 0.4–0.8 MB/s on 3 November 2026, so parallel downloads add up. Stop it at
+any point and run it again, and each partial file resumes where it stopped. A
+file is renamed into the cache only once it passes its checks. Without it,
+`--fetch_from_sra` downloads the same way inside the pipeline, as one task per
+sample.
+
+**ENA sometimes writes an error message into a download.** When ENA's storage
+back end drops a connection mid-file, its download server writes that back
+end's XML error (`<Error><Code>ConnectionClosedException</Code>…`) into the
+response as data and carries on, so the file arrives at the right length with
+about 200 bytes of text in place of data, and no error is reported. We saw this
+three times in two files on 2–3 November 2026. `bin/fetch_ena_reads.sh` handles
+it: a file that fails its checksum is scanned for that text, each occurrence is
+replaced with the same byte range fetched again, and the checksum then decides.
+Repairing a 6 GB file takes about 30 seconds instead of a full re-download.
 
 Resolution goes through ENA's portal API rather than the SRA toolkit, for two
 reasons: the toolkit publishes no `linux/arm64` build, and this study's
@@ -594,8 +614,8 @@ exactly one run.
 
 `tests/sra_fetch.sh` asserts every branch of that logic against saved portal
 responses, with no network: which copy is chosen, that a checksum mismatch
-deletes the file rather than caching a corrupt one, and that the two accession
-tables agree with each other.
+deletes the file rather than caching a corrupt one, that injected error text is
+found and repaired, and that the two accession tables agree with each other.
 
 Reference genomes are *not* redistributed here either: they are fetched from NCBI
 by accession at run time, driven by the same reference-set TSV that defines the

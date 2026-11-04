@@ -94,10 +94,10 @@ error: ENA returned no runs for ${ACCESSION} (${SAMPLE_ID}).
     - the submission is not yet released anywhere; or
     - the accession is wrong.
 
-  For this study the first is the one to expect. BioProject PRJNA1513130 was
-  released at NCBI on 15 Aug 2026 as runs SRR40180147-SRR40180153, and ENA
-  receives INSDC submissions on a delay of a few days. Check which case you are
-  in before assuming the accession is bad:
+  ENA receives INSDC submissions from NCBI on a delay of a few days. This
+  study's runs (SRR40180147-SRR40180153, BioProject PRJNA1513130) were mirrored
+  by 2 Nov 2026, so for them an empty result most likely means a mistyped
+  accession or a passing portal fault. Check which case you are in:
 
       curl -s 'https://www.ebi.ac.uk/ena/portal/api/filereport?accession=${ACCESSION}&result=read_run&fields=run_accession&format=tsv'
 
@@ -195,10 +195,47 @@ md5_of () {
     else md5 -q "$1"; fi
 }
 
+size_of () { stat -c %s "$1" 2>/dev/null || stat -f %z "$1"; }
+
+# ENA's download server streams each file from a storage back end. When that
+# back end drops mid-file, the server writes the back end's XML error into the
+# response AS DATA and carries on from just after it, so the file arrives at
+# exactly the right length with ~200 bytes of text where data should be, and
+# nothing on the client side reports an error (seen three times on 2-3 Nov
+# 2026, e.g. SRR40180153 at byte 758,224,317):
+#
+#   <Error><Code>ConnectionClosedException</Code><Message>Premature end of
+#   Content-Length delimited message body (expected: ...; received: ...)
+#   </Message><ErrorMessage/><RequestId/></Error>
+#
+# Each such blob replaces exactly its own length of real bytes, so fetching that
+# byte range again and writing it back restores the file; the md5 check that
+# follows is what decides whether the repair worked. Returns 0 if it repaired
+# anything. A false positive would need this exact text inside gzip output.
+repair_injected () {
+    local pat='<Error><Code>[A-Za-z]+</Code><Message>[^<]*</Message><ErrorMessage/><RequestId/></Error>'
+    local n=0 off text len part
+    while IFS=: read -r off text; do
+        [ -n "$off" ] || continue
+        len="$(printf '%s' "$text" | LC_ALL=C wc -c | tr -d ' ')"
+        part="$(mktemp)"
+        if ! curl -fsS --retry 5 --retry-delay 5 --retry-all-errors \
+                  -r "${off}-$((off + len - 1))" -o "$part" "$URL" \
+           || [ "$(size_of "$part")" -ne "$len" ]; then
+            echo "    could not refetch bytes ${off}-$((off + len - 1)) to repair them" >&2
+            rm -f "$part"; return 1
+        fi
+        dd if="$part" of="$OUT" bs=1 seek="$off" conv=notrunc 2>/dev/null
+        rm -f "$part"
+        echo "    repaired ${len} bytes of server error text written into the download at byte ${off}" >&2
+        n=$((n + 1))
+    done < <(LC_ALL=C grep -aobE "$pat" "$OUT" || true)
+    [ "$n" -gt 0 ]
+}
+
 verify_md5 () {
-    local want="$1" label="$2"
-    local got
-    got="$(md5_of "$OUT")"
+    local want="$1" label="$2" got="${3:-}"
+    [ -n "$got" ] || got="$(md5_of "$OUT")"
     if [ "$got" != "$want" ]; then
         echo "error: md5 mismatch against ${label} for ${SAMPLE_ID}" >&2
         echo "  expected ${want}" >&2
@@ -210,8 +247,15 @@ verify_md5 () {
 }
 
 if [ -n "${MD5S:-}" ]; then
-    verify_md5 "$MD5S" "the archive's own checksum"
+    # Only a file that fails its checksum is scanned, so a good download costs
+    # one md5 pass, not a scan as well.
+    got="$(md5_of "$OUT")"
+    if [ "$got" != "$MD5S" ] && repair_injected; then
+        got="$(md5_of "$OUT")"
+    fi
+    verify_md5 "$MD5S" "the archive's own checksum" "$got"
 else
+    repair_injected || true
     echo "warning: ENA reported no checksum for ${RUN}; transport integrity unverified." >&2
 fi
 

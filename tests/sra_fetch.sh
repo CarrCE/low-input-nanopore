@@ -111,6 +111,44 @@ bash "$FETCH" --accession PRJNA1513130 --out "${TMP}/out.gz" > "${TMP}/log" 2>&1
 [ "$rc" -ne 0 ];              check "BioProject accession: rejected" $?
 grep -q "cannot identify one"             "${TMP}/log"; check "BioProject accession: explains why"        $?
 
+# ---- 8b. ENA's injected error text is repaired, not re-downloaded ----------
+# ENA's server sometimes writes its storage back end's XML error into a download
+# in place of real bytes and carries on, so the file has the right length and
+# the wrong md5. A curl shim first on PATH plays that server: a whole-file
+# request gets the copy with the error written in, a byte-range request gets the
+# true bytes. The fetch must find the text, refetch its range, and pass md5.
+md5f () { md5sum "$1" 2>/dev/null | cut -d' ' -f1 || md5 -q "$1"; }
+head -c 6000 /dev/urandom > "${TMP}/inj_good.bin"
+BLOB='<Error><Code>ConnectionClosedException</Code><Message>Premature end of Content-Length delimited message body (expected: 6,000; received: 1,234)</Message><ErrorMessage/><RequestId/></Error>'
+BL="$(printf '%s' "$BLOB" | LC_ALL=C wc -c | tr -d ' ')"
+{ head -c 1234 "${TMP}/inj_good.bin"; printf '%s' "$BLOB"
+  tail -c +"$((1234 + BL + 1))" "${TMP}/inj_good.bin"; } > "${TMP}/inj_served.bin"
+INJ_MD5="$(md5f "${TMP}/inj_good.bin")"
+mkdir -p "${TMP}/shim"
+cat > "${TMP}/shim/curl" <<'SHIM'
+#!/usr/bin/env bash
+ranged=0
+for a in "$@"; do [ "$a" = "-r" ] && ranged=1; done
+[ "$ranged" -eq 1 ] || set -- "${@/inj_good.bin/inj_served.bin}"
+exec "$REAL_CURL" "$@"
+SHIM
+chmod +x "${TMP}/shim/curl"
+printf "$hdr"                                       >  "${TMP}/inject.tsv"
+printf 'ERR7\t\t\t%s\t%s\n' "file://${TMP}/inj_good.bin" "$INJ_MD5" >> "${TMP}/inject.tsv"
+
+[ "$(md5f "${TMP}/inj_served.bin")" != "$INJ_MD5" ] && \
+  [ "$(wc -c < "${TMP}/inj_served.bin")" -eq "$(wc -c < "${TMP}/inj_good.bin")" ]
+check "injected copy: same length, different md5 (the fixture is what ENA serves)" $?
+rm -f "${TMP}/out.gz"
+REAL_CURL="$(command -v curl)" PATH="${TMP}/shim:${PATH}" \
+  bash "$FETCH" --accession SAMN00000001 --sample-id demo --out "${TMP}/out.gz" \
+  --report "${TMP}/inject.tsv" > "${TMP}/log" 2>&1; rc=$?
+check "injected error text: exits 0" "$rc"
+[ -s "${TMP}/out.gz" ] && [ "$(md5f "${TMP}/out.gz")" = "$INJ_MD5" ]
+check "injected error text: repaired to the archive's md5" $?
+grep -q "repaired ${BL} bytes of server error text written into the download at byte 1234" "${TMP}/log"
+check "injected error text: reports where and how much it repaired" $?
+
 # ---- 9. the shipped accessions and checksums agree -------------------------
 # A stale accession or a missing checksum row cannot be caught at run time: the
 # fetch would succeed and silently deliver the wrong sample, or skip the check
