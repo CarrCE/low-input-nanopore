@@ -28,6 +28,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
+from display_names import read_experiment_names
+
 plt.rcParams.update({
     "font.family": "sans-serif",
     "font.sans-serif": ["Helvetica", "Arial", "DejaVu Sans"],
@@ -44,6 +46,9 @@ def parse_args():
                    help="results/summary/per_organism.tsv (must contain both modes)")
     p.add_argument("--outdir", required=True)
     p.add_argument("--basename", default="mode_delta")
+    p.add_argument("--measurements", default=None,
+                   help="assets/measurements.tsv, for experiment display names "
+                        "(default: the repository's copy)")
     return p.parse_args()
 
 
@@ -82,7 +87,9 @@ def main():
 
     plot = piv[(piv["role"] == "sample") & piv["reads_retained"].notna()
                & (piv["reads_competitive"] > 0)].copy()
-    plot = plot.sort_values("reads_retained")
+    # Grouped by experiment in run order (D6311 first), most affected first
+    # within each group; drawn top to bottom in this order.
+    plot = plot.sort_values(["experiment", "reads_retained"])
 
     # <id>.csv is canonical: exactly the bars the figure draws, in draw order.
     # The full table, including the carrier and contaminant rows that are
@@ -91,29 +98,38 @@ def main():
         outdir / f"{args.basename}.csv", index=False)
     piv.to_csv(outdir / f"{args.basename}_summary.csv", index=False)
 
-    fig, ax = plt.subplots(figsize=(7.2, max(3.2, 0.30 * len(plot) + 1.4)))
-    ypos = np.arange(len(plot))
+    names = (read_experiment_names(args.measurements) if args.measurements
+             else read_experiment_names())
+    exps = list(dict.fromkeys(plot["experiment"]))
+    GAP = 0.6                                   # extra space between experiments
+    ypos = np.array([i + GAP * exps.index(e) for i, e in enumerate(plot["experiment"])])
+
+    fig, ax = plt.subplots(figsize=(7.2, max(3.2, 0.30 * (len(plot) + GAP * (len(exps) - 1)) + 1.2)))
     # Anything that loses more than a couple of percent is worth flagging.
     colors = ["#D55E00" if v < 0.98 else "#009E73" for v in plot["reads_retained"]]
     ax.barh(ypos, plot["reads_retained"], color=colors, edgecolor="black",
             linewidth=0.4, height=0.68, zorder=3)
     ax.axvline(1.0, color="0.35", lw=0.9, ls=(0, (4, 3)), zorder=4)
 
-    labels = [f"{italicize(o)}  ({e.replace('lowinput_', '')})"
+    labels = [f"{italicize(o)}  ({names.get(e, e)})"
               for o, e in zip(plot["organism"], plot["experiment"])]
     ax.set_yticks(ypos)
     ax.set_yticklabels(labels, fontsize=8)
-    ax.set_xlabel("Reads retained by sequential subtraction "
+    ax.invert_yaxis()
+    ax.set_xlabel("Reads retained by sequential subtraction\n"
                   "(fraction of competitive assignment)")
     ax.set_xlim(0, 1.08)
-    ax.set_title("What sequential subtraction removes", loc="left")
 
+    # A short bar is labelled beyond its end; a long one inside its end, so the
+    # label can never cross the dashed 1.0 line. Text is ink, not the bar colour.
     for y, (_, r) in zip(ypos, plot.iterrows()):
         if r["reads_retained"] < 0.98:
-            ax.text(r["reads_retained"] + 0.015, y,
-                    f"{r['reads_retained']*100:.1f}%  "
-                    f"({int(r['reads_competitive']):,} → {int(r['reads_sequential']):,})",
-                    va="center", fontsize=7.5, color="#D55E00")
+            txt = (f"{r['reads_retained']*100:.1f}%  "
+                   f"({int(r['reads_competitive']):,} → {int(r['reads_sequential']):,})")
+            inside = r["reads_retained"] > 0.5
+            ax.text(r["reads_retained"] + (-0.015 if inside else 0.015), y, txt,
+                    va="center", ha="right" if inside else "left", fontsize=7.5,
+                    color="0.1", zorder=5)
     ax.grid(True, axis="x", color="0.93", lw=0.5, zorder=0)
     fig.tight_layout()
     fig.savefig(outdir / f"{args.basename}.pdf", bbox_inches="tight")

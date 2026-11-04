@@ -32,6 +32,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
+from display_names import read_experiment_names, sample_label
+from plot_labels import place_labels, segment_boxes
+
 plt.rcParams.update({
     "font.family": "sans-serif",
     "font.sans-serif": ["Helvetica", "Arial", "DejaVu Sans"],
@@ -40,11 +43,24 @@ plt.rcParams.update({
     "mathtext.fontset": "dejavusans",
 })
 
-# Okabe-Ito
-PALETTE = ["#0072B2", "#D55E00", "#009E73", "#CC79A7",
-           "#E69F00", "#56B4E9", "#F0E442", "#000000"]
+# Colour carries the experiment, as in the pooled figure; organisms are named
+# directly. Thirteen organisms cannot each have a distinguishable hue (cycling
+# an 8-colour palette made pairs identical), and each panel already names its
+# organism.
+EXP_COLOR = {"lowinput_s1": "#0072B2", "lowinput_s2": "#D55E00"}
+
+
+def experiment_of(sample_id):
+    return sample_id.rsplit("_r", 1)[0]
+
+
+def abbrev(name):
+    """'Listeria monocytogenes' -> 'L. monocytogenes', for direct labels."""
+    parts = name.split(" ", 1)
+    return f"{parts[0][0]}. {parts[1]}" if len(parts) == 2 else name
 
 MIN_DEPTH_INTERPRETABLE = 1.0
+NAMES = read_experiment_names()       # lowinput_s1 -> D6311, from measurements.tsv
 
 
 def parse_args():
@@ -119,7 +135,6 @@ def main():
     # redraw the figure without rerunning the pipeline.
     plotted_rows = []
 
-    colors = {o: PALETTE[i % len(PALETTE)] for i, o in enumerate(organisms)}
     for i, org in enumerate(organisms):
         axp = fig.add_subplot(gs[i // ncol, i % ncol])
         cand = deep[deep["organism"] == org]
@@ -140,14 +155,15 @@ def main():
                 "depth_over_mean_raw": yi, "depth_over_mean_smoothed": si_,
                 "gini": "",
             })
-        axp.fill_between(x, 0, y, color=colors[org], alpha=0.22, lw=0, zorder=2)
-        axp.plot(x, smooth, color=colors[org], lw=1.1, zorder=3)
+        c = EXP_COLOR.get(experiment_of(sid), "0.4")
+        axp.fill_between(x, 0, y, color=c, alpha=0.22, lw=0, zorder=2)
+        axp.plot(x, smooth, color=c, lw=1.1, zorder=3)
         axp.axhline(1.0, color="0.4", lw=0.8, ls=(0, (4, 3)), zorder=4)
         axp.set_ylim(0, 2.5)
         axp.set_xlim(0, x.max() if len(x) else 1)
         frac = attribution.get((sid, org))
         weak = frac is not None and frac < 0.9
-        title = f"{italicize(org)}\n{sid}, {mean_depth:.1f}$\\times$"
+        title = f"{italicize(org)}\n{sample_label(sid, NAMES)}, {mean_depth:.1f}$\\times$"
         if weak:
             title += f" ({mean_depth * frac:.2f}$\\times$ attributable)"
         axp.set_title(title, fontsize=8, loc="left",
@@ -183,12 +199,19 @@ def main():
              transform=axB.transAxes, fontsize=7.5, color="0.35", va="bottom")
 
     all_orgs = sorted(summ["organism"].unique())
-    colorsB = {o: PALETTE[i % len(PALETTE)] for i, o in enumerate(all_orgs)}
+    seg_obstacles, label_at = [], []
     for org in all_orgs:
-        sub = summ[summ["organism"] == org]
-        axB.scatter(sub["mean_depth"], sub["gini"], s=34, alpha=0.9,
-                    color=colorsB[org], edgecolors="black", linewidths=0.4,
-                    label=italicize(org), zorder=3)
+        sub = summ[summ["organism"] == org].sort_values("mean_depth")
+        exp = experiment_of(sub["sample_id"].iloc[0])
+        c = EXP_COLOR.get(exp, "0.4")
+        # One organism's replicates, joined so they read as one group.
+        axB.plot(sub["mean_depth"], sub["gini"], color=c, lw=0.6, alpha=0.45, zorder=2)
+        axB.scatter(sub["mean_depth"], sub["gini"], s=34, alpha=0.95, color=c,
+                    edgecolors="black", linewidths=0.4, zorder=3)
+        pts = list(zip(sub["mean_depth"], sub["gini"]))
+        seg_obstacles.append(pts)
+        # Labelled once, at its deepest replicate.
+        label_at.append((pts[-1], abbrev(org)))
         for _, r in sub.iterrows():
             plotted_rows.append({
                 "panel": "B", "organism": org, "sample_id": r["sample_id"],
@@ -199,10 +222,26 @@ def main():
     axB.set_xscale("log")
     axB.set_xlabel("Mean depth (×)")
     axB.set_ylabel("Gini coefficient of per-base depth")
-    axB.set_ylim(0, 1.02)
+    axB.set_ylim(0, 1.08)
     axB.axvline(MIN_DEPTH_INTERPRETABLE, color="0.4", lw=0.8, ls=(0, (4, 3)), zorder=2)
-    axB.legend(fontsize=6.5, frameon=True, framealpha=0.95, edgecolor="0.7",
-               loc="upper right", ncol=1)
+    from matplotlib.lines import Line2D
+    handles = [Line2D([], [], marker="o", ls="none", color=EXP_COLOR[e],
+                      markeredgecolor="black", markeredgewidth=0.4, markersize=6,
+                      label=f"{NAMES.get(e, e)} (one point per replicate)")
+               for e in EXP_COLOR if (summ["sample_id"].map(experiment_of) == e).any()]
+    leg = axB.legend(handles=handles, fontsize=7, frameon=True, framealpha=0.95,
+                     edgecolor="0.7", loc="center right")
+    note = axB.texts[0]                         # the shaded-region note
+    every_point = [p for pts in seg_obstacles for p in pts]
+    obstacles = [b for pts in seg_obstacles for p0, p1 in zip(pts, pts[1:])
+                 for b in segment_boxes(axB, p0, p1)]
+    # place_labels treats `points` as both what to label and markers to avoid,
+    # so unlabelled replicates go in as obstacles of their own.
+    obstacles += [b for p in every_point for b in segment_boxes(axB, p, p, half_px=5)]
+    ylo, yhi = axB.get_ylim()                  # the dashed 1x line
+    obstacles += segment_boxes(axB, (MIN_DEPTH_INTERPRETABLE, ylo), (MIN_DEPTH_INTERPRETABLE, yhi))
+    place_labels(axB, [p for p, _ in label_at], [s for _, s in label_at],
+                 fontsize=6.6, style="italic", obstacles=obstacles, avoid=[leg, note])
     axB.set_title("B  Uniformity vs sequencing depth", loc="left")
     axB.grid(True, which="major", color="0.93", lw=0.5, zorder=0)
 
@@ -259,7 +298,9 @@ def main():
             "at 162x apart from two discrete dropouts, which are genuine artifacts. "
             "(B) Gini "
             "coefficient of per-base depth against mean depth for every organism and "
-            "replicate. The shaded region marks coverage below 1x, where most positions "
+            "replicate. Colour marks the experiment (D6311 blue, D6321 vermillion); each "
+            "organism's replicates are joined by a faint line, and the organism is named "
+            "at its deepest replicate. The shaded region marks coverage below 1x, where most positions "
             "are zero because the genome was not sampled rather than because coverage is "
             "uneven; Gini there approaches 1 for any organism and carries no information "
             "about uniformity. In a log-distributed community only the most abundant "

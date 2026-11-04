@@ -22,7 +22,7 @@ into sections S1-S9).
 |---|---|---|---|
 | `results/summary/mode_delta.pdf` + `.csv` + `.json` | reads retained, competitive vs sequential | Fig. 2 | |
 | `results/summary/abundance.pdf` + `.csv` + `.json` | theoretical vs measured community abundance | Fig. 3 | |
-| `results/summary/readlengths.pdf` + `.csv` + `.json` | read-length distribution by assignment class | Fig. 4 | |
+| `results/summary/readlengths.pdf` + `.csv` + `.json` | (a) read-length distribution by assignment class; (b) carrier read lengths per experiment, by read and by base | Fig. 4 | |
 | `results/comparison/low_input_comparison.pdf` + `.csv` + `.json` | performance per femtogram against prior studies | Fig. 5 | |
 | `results/summary/carrier-model.pdf` + `.csv` + `.json` | carrier-depletion model against the runs (`make carriermodel`) | Fig. S1 | |
 | `results/summary/coverage.pdf` + `.csv` + `.json` | coverage uniformity, depth in 1 kb bins, per library | Fig. S2 | |

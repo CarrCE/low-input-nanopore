@@ -45,6 +45,9 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
+
+from display_names import read_experiment_names
+from plot_labels import place_labels, segment_boxes
 import pandas as pd
 from matplotlib.lines import Line2D
 
@@ -59,6 +62,7 @@ plt.rcParams.update({
 # Two hues only, one per experiment. Validated for CVD separation
 # (worst adjacent pair dE 21.9 protan, 31.2 normal) against a light surface.
 EXP_COLOR = {"lowinput_s1": "#0072B2", "lowinput_s2": "#D55E00"}
+NAMES = read_experiment_names()       # lowinput_s1 -> D6311, from measurements.tsv
 
 MIN_DEPTH_INTERPRETABLE = 1.0
 # Below this, alignment depth is mostly reads assigned elsewhere and the profile
@@ -191,7 +195,7 @@ def main():
     axB.axvspan(lo, MIN_DEPTH_INTERPRETABLE, color="0.90", zorder=0)
     axB.axvline(MIN_DEPTH_INTERPRETABLE, color="0.4", lw=0.8, ls=(0, (4, 3)), zorder=2)
 
-    labels = []
+    labels, gaps = [], []
     for _, r in summ.iterrows():
         c = EXP_COLOR.get(r["experiment"], "0.4")
         weak = r["attributable"] < MIN_ATTRIBUTABLE
@@ -201,6 +205,7 @@ def main():
                      color=c, lw=1.0, ls=":", zorder=3, alpha=0.85)
             axB.scatter(r["alignment_depth"], r["gini"], s=44, facecolors="none",
                         edgecolors=c, linewidths=1.2, zorder=4)
+            gaps.append(((r["mean_depth"], r["gini"]), (r["alignment_depth"], r["gini"])))
         axB.scatter(r["mean_depth"], r["gini"],
                     s=40, color=c, edgecolors="black", linewidths=0.4, zorder=5)
         labels.append((r["mean_depth"],
@@ -215,15 +220,6 @@ def main():
     axB.set_xlim(lo, float(summ["alignment_depth"].max()) * 2.6)
     axB.set_ylim(-0.03, 1.16)
 
-    # Six of the thirteen sit within 0.03 Gini of each other along the top of the
-    # panel, so a fixed label offset overplots them. Alternate above/below in
-    # order of depth: with the points effectively collinear there, alternating is
-    # enough to separate every pair without a layout solver.
-    for k, (lx, ly, txt) in enumerate(sorted(labels)):
-        above = (k % 2 == 0)
-        axB.annotate(txt, (lx, ly), textcoords="offset points",
-                     xytext=(0, 8 if above else -14), ha="center",
-                     fontsize=6.4, color="0.25", style="italic", zorder=6)
     axB.set_xlabel("Pooled depth (×)")
     axB.set_ylabel("Gini coefficient of per-base depth")
     axB.grid(True, which="major", color="0.93", lw=0.5, zorder=0)
@@ -234,18 +230,31 @@ def main():
 
     handles = [Line2D([], [], marker="o", ls="none", color=EXP_COLOR["lowinput_s1"],
                       markeredgecolor="black", markeredgewidth=0.4, markersize=7,
-                      label="lowinput_s1 (D6311, 3 replicates)"),
+                      label=f"{NAMES.get('lowinput_s1', 'lowinput_s1')} (3 replicates)"),
                Line2D([], [], marker="o", ls="none", color=EXP_COLOR["lowinput_s2"],
                       markeredgecolor="black", markeredgewidth=0.4, markersize=7,
-                      label="lowinput_s2 (D6321, 4 replicates)"),
+                      label=f"{NAMES.get('lowinput_s2', 'lowinput_s2')} (4 replicates)"),
                Line2D([], [], marker="o", ls=":", color="0.35", markerfacecolor="none",
                       markeredgecolor="0.35", markersize=7,
                       label="filled: depth of awarded reads\nhollow: raw alignment depth")]
     # Parked mid-right: the only region of this panel with no marks in it, and
     # clear of the shaded-region note at lower left.
-    axB.legend(handles=handles, fontsize=6.8, frameon=True, framealpha=0.95,
-               edgecolor="0.7", loc="center right", bbox_to_anchor=(0.995, 0.60),
-               handlelength=2.2, borderpad=0.5)
+    leg = axB.legend(handles=handles, fontsize=6.8, frameon=True, framealpha=0.95,
+                     edgecolor="0.7", loc="center right", bbox_to_anchor=(0.995, 0.60),
+                     handlelength=2.2, borderpad=0.5)
+
+    # Labels last, once the legend and the note exist, so they can steer clear
+    # of both. Six of the thirteen organisms sit within 0.03 Gini of each other
+    # along the top of the panel; a fixed or alternating offset overprinted
+    # neighbours (S. cerevisiae over A. halotolerans).
+    obstacles = [b for p0, p1 in gaps for b in segment_boxes(axB, p0, p1)]
+    obstacles += [b for _, p1 in gaps for b in segment_boxes(axB, p1, p1, half_px=6)]
+    ylo, yhi = axB.get_ylim()                  # the dashed 1x line
+    obstacles += segment_boxes(axB, (MIN_DEPTH_INTERPRETABLE, ylo), (MIN_DEPTH_INTERPRETABLE, yhi))
+    labels = sorted(labels)
+    place_labels(axB, [(x, y) for x, y, _ in labels], [s for _, _, s in labels],
+                 fontsize=6.4, style="italic", obstacles=obstacles,
+                 avoid=[leg] + [tx for tx in axB.texts if tx.get_text().startswith("shaded")])
 
     fig.savefig(outdir / f"{args.basename}.pdf", bbox_inches="tight")
     fig.savefig(outdir / f"{args.basename}.png", bbox_inches="tight", dpi=600)
