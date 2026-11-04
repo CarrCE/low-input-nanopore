@@ -632,7 +632,8 @@ If you use this pipeline, please cite it using the metadata in
 Each release is archived on Zenodo. **Cite the concept DOI,
 [10.5281/zenodo.21959294](https://doi.org/10.5281/zenodo.21959294)** — it always
 resolves to the latest version, so a citation written today stays correct when
-this is bumped to 1.0.0 at publication. To pin a specific version instead, v0.9.0
+this is bumped to 1.0.0 at publication. To pin a specific version instead, v0.10.0
+is [10.5281/zenodo.23940365](https://doi.org/10.5281/zenodo.23940365) and v0.9.0
 is [10.5281/zenodo.21959295](https://doi.org/10.5281/zenodo.21959295).
 
 Authors: Jordan McKaig (School of Earth and Atmospheric Sciences; Daniel

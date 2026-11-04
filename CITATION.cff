@@ -14,11 +14,12 @@ date-released: 2026-11-03
 license: MIT
 repository-code: "https://github.com/CarrCE/low-input-nanopore"
 url: "https://github.com/CarrCE/low-input-nanopore"
-# `doi` is normally the VERSION DOI matching `version:` above. Zenodo mints that
-# DOI only when the release is published, so until then it is the concept DOI,
-# which always resolves to the latest version. The concept DOI is the one to cite
-# in a paper -- it stays correct when this bumps to 1.0.0 at publication.
-doi: "10.5281/zenodo.21959294"
+# `doi` is the VERSION DOI, pinned to v0.10.0, so it matches `version:` above.
+# Zenodo mints it only when a release is published, so between a version bump
+# and its release this holds the concept DOI instead. The concept DOI below
+# always resolves to the latest version and is the one to cite in a paper -- it
+# stays correct when this bumps to 1.0.0 at publication.
+doi: "10.5281/zenodo.23940365"
 identifiers:
   - type: doi
     value: "10.5281/zenodo.21959294"
@@ -26,6 +27,9 @@ identifiers:
   - type: doi
     value: "10.5281/zenodo.21959295"
     description: "Archived release v0.9.0"
+  - type: doi
+    value: "10.5281/zenodo.23940365"
+    description: "Archived release v0.10.0"
 keywords:
   - nanopore
   - adaptive sampling
