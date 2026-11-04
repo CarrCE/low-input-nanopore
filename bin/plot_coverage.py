@@ -184,10 +184,9 @@ def main():
                  ha="center", va="center", transform=axp.transAxes, color="0.4")
         axp.set_axis_off()
 
-    fig.text(0.005, 0.985,
-             f"A  Depth uniformity along each genome (deepest replicate; "
-             f"{int(SMOOTH_BINS)}-bin rolling median over shading of raw 1 kb bins)",
-             fontsize=9.5, va="top", ha="left")
+    # Panel letters only; what each panel shows is in the caption, as
+    # journals expect.
+    fig.text(0.005, 0.985, "A", fontsize=11, fontweight="bold", va="top", ha="left")
 
     # ---- Panel B: Gini vs mean depth --------------------------------------
     axB = fig.add_subplot(gs[nrow_prof, :])
@@ -242,7 +241,7 @@ def main():
     obstacles += segment_boxes(axB, (MIN_DEPTH_INTERPRETABLE, ylo), (MIN_DEPTH_INTERPRETABLE, yhi))
     place_labels(axB, [p for p, _ in label_at], [s for _, s in label_at],
                  fontsize=6.6, style="italic", obstacles=obstacles, avoid=[leg, note])
-    axB.set_title("B  Uniformity vs sequencing depth", loc="left")
+    axB.set_title("B", loc="left", fontsize=11, fontweight="bold")
     axB.grid(True, which="major", color="0.93", lw=0.5, zorder=0)
 
     # tight_layout fights the explicit gridspec spacing set above; the figure is

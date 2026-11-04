@@ -349,7 +349,7 @@ def main():
             ax.set_xscale("log"); ax.set_yscale("log")
             ax.set_xlim(*span); ax.set_ylim(*span)
             ax.set_xlabel("Abundance (theoretical, genomic DNA fraction)")
-            ax.set_ylabel("Abundance (measured, fraction of sample bases)")
+            ax.set_ylabel("Abundance (measured, fraction of community bases)")
             ax.set_title(f"{exp_names.get(exp, exp)}  "
                          f"(n={sub['sample_id'].nunique()} replicates)")
             ax.grid(True, which="major", color="0.93", lw=0.5, zorder=0)
@@ -431,27 +431,38 @@ def main():
             e = np.unique(np.round(np.logspace(0, np.log10(top), n))) - 0.5
             return e.astype(float)
 
-        # FINE: for quantiles (2000 bins, as before). SHOW: what is drawn.
-        FINE = int_edges(2000 / np.log10(2_000_000))
+        # SHOW: the drawn bins. Quantiles do not come from bins at all: lengths
+        # are integers, so a count per length (one bincount per role, a few MB)
+        # gives EXACT medians and quartiles. A binned estimate put two medians
+        # 1 bp off, enough for a table and a figure to disagree.
         SHOW = int_edges(50)
         sample_exp = dict(zip(per_org["sample_id"], per_org["experiment"]))
 
-        hist = defaultdict(lambda: np.zeros(len(FINE) - 1, dtype=np.int64))
+        per_len = {}                      # role -> count of reads at each length
         shown = defaultdict(lambda: np.zeros(len(SHOW) - 1, dtype=np.int64))
         exact = defaultdict(lambda: {"n": 0, "sum": 0, "max": 0})
         # Panel b: carrier lengths per experiment, by read and by base.
         car_reads = defaultdict(lambda: np.zeros(len(SHOW) - 1, dtype=np.int64))
         car_bases = defaultdict(lambda: np.zeros(len(SHOW) - 1, dtype=np.float64))
         car_exact = defaultdict(lambda: {"n": 0, "sum": 0})
-        car_fine = defaultdict(lambda: np.zeros(len(FINE) - 1, dtype=np.int64))
+        car_len = {}                      # experiment -> count per length
+
+        def add_counts(acc, key, v):
+            b = np.bincount(v)
+            a = acc.get(key)
+            if a is None:
+                acc[key] = b
+            else:
+                if len(b) > len(a):
+                    a = np.pad(a, (0, len(b) - len(a)))
+                a[:len(b)] += b
+                acc[key] = a
 
         # These files hold one row per read -- ~120 million rows across this
         # study's replicates. Concatenating them into a single DataFrame needs
         # well over 10 GB and gets the process OOM-killed, so accumulate
-        # per-role histograms in fixed bins instead and never hold more than one
-        # chunk at a time. Counts, sums and maxima stay exact; quantiles are
-        # derived from the histogram and are therefore approximate, to within
-        # the bin width (under 1%).
+        # per-role counts instead and never hold more than one chunk at a time.
+        # Everything reported is exact.
         for f in args.readlengths:
             sid = Path(f).name.split(".readlengths")[0]
             exp = sample_exp.get(sid, sid.rsplit("_r", 1)[0])
@@ -462,7 +473,7 @@ def main():
                 chunk = chunk[chunk["read_length"] > 0]
                 for role, sub in chunk.groupby("role", sort=False):
                     v = sub["read_length"].to_numpy()
-                    hist[role] += np.histogram(v, bins=FINE)[0]
+                    add_counts(per_len, role, v)
                     shown[role] += np.histogram(v, bins=SHOW)[0]
                     e = exact[role]
                     e["n"] += int(v.size)
@@ -471,22 +482,26 @@ def main():
                     if role == "carrier":
                         car_reads[exp] += np.histogram(v, bins=SHOW)[0]
                         car_bases[exp] += np.histogram(v, bins=SHOW, weights=v)[0]
-                        car_fine[exp] += np.histogram(v, bins=FINE)[0]
+                        add_counts(car_len, exp, v)
                         car_exact[exp]["n"] += int(v.size)
                         car_exact[exp]["sum"] += int(v.sum())
 
-        def hist_quantile(counts, q, edges=FINE):
-            """Quantile from binned counts, interpolated within the bin."""
-            total = counts.sum()
-            if total == 0:
-                return float("nan")
+        def exact_quantile(counts, q):
+            """Exact quantile of integer lengths from a count per length.
+
+            Same definition as numpy.quantile's default (linear between the two
+            order statistics around rank q*(n-1)), so the median of an even
+            count is the mean of the middle two.
+            """
             cum = np.cumsum(counts)
-            i = int(np.searchsorted(cum, q * total))
-            i = min(i, len(counts) - 1)
-            lo, hi = edges[i], edges[i + 1]
-            before = cum[i - 1] if i > 0 else 0
-            frac = ((q * total - before) / counts[i]) if counts[i] else 0.0
-            return float(lo + frac * (hi - lo))
+            n = int(cum[-1]) if len(cum) else 0
+            if n == 0:
+                return float("nan")
+            h = q * (n - 1)
+            lo_k, hi_k = int(np.floor(h)), int(np.ceil(h))
+            lo = int(np.searchsorted(cum, lo_k + 1))
+            hi = int(np.searchsorted(cum, hi_k + 1))
+            return float(lo + (h - lo_k) * (hi - lo))
 
         SHOW_N_INT = np.diff(SHOW)                       # integer lengths per bin
         SHOW_MID = np.sqrt(np.maximum(SHOW[:-1], 0.5) * SHOW[1:])
@@ -508,6 +523,12 @@ def main():
                              "none", "unassigned"] if exact.get(r, {}).get("n")]
         exps = sorted(car_exact)
         LAMBDA_BP = 48_502
+        # The legend uses the paper's names for the classes; the CSV and the
+        # sidecar keep the pipeline's role names, which are what a reader
+        # filtering the per-read tables will search for.
+        CLASS_NAME = {"carrier": "carrier", "contaminant": "carrier host",
+                      "sample": "community", "ambiguous": "ambiguous",
+                      "none": "unassigned", "unassigned": "unassigned"}
 
         fig = plt.figure(figsize=(7.2, 6.6))
         gs = fig.add_gridspec(2, max(1, len(exps)), height_ratios=[1.25, 1],
@@ -517,9 +538,9 @@ def main():
         for role in roles:
             n = exact[role]["n"]
             y = density(shown[role], n)
-            med = hist_quantile(hist[role], 0.5)
+            med = exact_quantile(per_len[role], 0.5)
             ax.stairs(y, SHOW, color=ROLE_COLORS.get(role, "0.5"), linewidth=1.3,
-                      label=f"{role} (n={n:,}, median {med:,.0f} bp)")
+                      label=f"{CLASS_NAME.get(role, role)} (n={n:,}, median {med:,.0f} bp)")
             for i in np.nonzero(shown[role])[0]:
                 plotted.append({"panel": "a", "series": role, "weighting": "reads",
                                 "bin_lower_bp": SHOW[i], "bin_upper_bp": SHOW[i + 1],
@@ -555,7 +576,7 @@ def main():
             bax.set_xscale("log")
             bax.set_xlim(20, 2e5)
             bax.set_ylim(bottom=0)
-            med = hist_quantile(car_fine[exp], 0.5)
+            med = exact_quantile(car_len[exp], 0.5)
             intact = car_bases[exp][SHOW[:-1] >= 40_000].sum() / ce["sum"]
             intact_r = car_reads[exp][SHOW[:-1] >= 40_000].sum() / ce["n"]
             car_stats[exp] = {"n": ce["n"], "median_bp": med,
@@ -592,9 +613,9 @@ def main():
             "role": role,
             "n": exact[role]["n"],
             "mean": exact[role]["sum"] / exact[role]["n"],
-            "median": hist_quantile(hist[role], 0.50),
-            "p25": hist_quantile(hist[role], 0.25),
-            "p75": hist_quantile(hist[role], 0.75),
+            "median": exact_quantile(per_len[role], 0.50),
+            "p25": exact_quantile(per_len[role], 0.25),
+            "p75": exact_quantile(per_len[role], 0.75),
             "max": exact[role]["max"],
         } for role in roles])
 
@@ -618,10 +639,8 @@ def main():
             "Bins are log-spaced, 50 per decade, with edges on half-integers; each "
             "count is scaled by the number of integer lengths its bin spans relative "
             "to the bin's nominal width, which removes the comb that integer read "
-            "lengths otherwise draw in narrow bins. Counts, means and maxima are "
-            "exact; medians and quartiles come from 2000 log-spaced bins over 1 bp "
-            "to 2 Mb (accurate to well under 1%), because the per-read tables are too "
-            "large to hold in memory at once.",
+            "lengths otherwise draw in narrow bins. Counts, means, medians, "
+            "quartiles and maxima are exact.",
             [Path(f).name for f in args.readlengths],
             {**{r["role"]: {"n": int(r["n"]), "median_bp": float(r["median"])}
                 for _, r in stats.iterrows()},
