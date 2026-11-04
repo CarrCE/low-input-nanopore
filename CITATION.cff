@@ -9,15 +9,16 @@ abstract: >-
   reference holding the community, the carrier, and the E. coli contaminant
   carried over from lambda production, so that every read is accounted for
   exactly once and enrichment is computed against an exact denominator.
-version: 0.9.0
-date-released: 2026-08-17
+version: 0.10.0
+date-released: 2026-11-03
 license: MIT
 repository-code: "https://github.com/CarrCE/low-input-nanopore"
 url: "https://github.com/CarrCE/low-input-nanopore"
-# `doi` is the VERSION DOI, pinned to v0.9.0, so it matches `version:` above.
-# The concept DOI below always resolves to the latest version and is the one to
-# cite in a paper -- it stays correct when this bumps to 1.0.0 at publication.
-doi: "10.5281/zenodo.21959295"
+# `doi` is normally the VERSION DOI matching `version:` above. Zenodo mints that
+# DOI only when the release is published, so until then it is the concept DOI,
+# which always resolves to the latest version. The concept DOI is the one to cite
+# in a paper -- it stays correct when this bumps to 1.0.0 at publication.
+doi: "10.5281/zenodo.21959294"
 identifiers:
   - type: doi
     value: "10.5281/zenodo.21959294"
