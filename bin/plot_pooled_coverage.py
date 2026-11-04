@@ -184,10 +184,9 @@ def main():
     for j in range(len(organisms), nrow * NCOL):          # blank out the tail
         fig.add_subplot(gs[j // NCOL, j % NCOL]).set_axis_off()
 
-    fig.text(0.005, 0.995,
-             "A  Pooled depth along each genome, every community member, ordered by depth "
-             f"({SMOOTH_BINS}-bin rolling median over shaded raw 1 kb bins; clipped at 2.5)",
-             fontsize=9.5, va="top", ha="left")
+    # Panel letters only; what each panel shows is in the caption, as
+    # journals expect.
+    fig.text(0.005, 0.995, "A", fontsize=11, fontweight="bold", va="top", ha="left")
 
     # ---- Panel B: Gini vs depth -------------------------------------------
     axB = fig.add_subplot(gs[nrow, :])
@@ -226,7 +225,7 @@ def main():
     axB.text(0.006, 0.05, "shaded: below 1× pooled depth,\nGini reflects sparse sampling,"
              "\nnot true unevenness", transform=axB.transAxes, fontsize=7,
              color="0.35", va="bottom")
-    axB.set_title("B  Uniformity vs pooled sequencing depth", loc="left")
+    axB.set_title("B", loc="left", fontsize=11, fontweight="bold")
 
     handles = [Line2D([], [], marker="o", ls="none", color=EXP_COLOR["lowinput_s1"],
                       markeredgecolor="black", markeredgewidth=0.4, markersize=7,
