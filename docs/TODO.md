@@ -2,8 +2,8 @@
 
 What is not done, not sourced, or not yet trustworthy in this repository.
 
-Items 2–5 are open. Item 1 was closed on 3 November 2026 and stays in
-place so that the section numbers, which the paper cites, do not move. Section 6 records questions that were open, were
+Items 2, 3 and 5 are open. Items 1 and 4 were closed in November 2026 and stay
+in place so that the section numbers, which the paper cites, do not move. Section 6 records questions that were open, were
 investigated, and were closed; they are kept because the paper's Supplementary
 Information refers to several of them, and because "we checked and it did not
 matter" is a result a reader may want to audit rather than take on trust.
@@ -128,15 +128,17 @@ the ten `lowinput_s1` organisms. The two that differ are *E. coli* (0.86, the
 route via `counts.tsv` counts aligned span including bases placed on other
 contigs) and *C. neoformans* (87 reads pooled, so counting noise).
 
-## 4. Declared parameters that nothing reads
+## 4. Closed 4 Nov 2026: declared parameters that nothing read
 
 `params.min_readlen`, `params.community`, `params.carrier_accession` and
-`params.contaminant_accession` are defined in `nextflow.config` but no process
-uses them. Either implement them or delete them — advertised knobs that do
-nothing are a reproducibility hazard.
+`params.contaminant_accession` were defined in `nextflow.config`, but no process
+used them. Advertised settings that do nothing are a reproducibility hazard, so
+all four were deleted. The genomes they appeared to set come from the
+reference-set TSV that each samplesheet row names, whose `role` column marks
+every genome as sample, carrier or contaminant.
 
-(`params.min_qscore` and `params.coverage_window` were on this list and are now
-both consumed.)
+(`params.min_qscore` and `params.coverage_window` were on this list earlier and
+are consumed.)
 
 ## 5. Genome-set caveats not assessed
 
