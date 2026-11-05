@@ -15,8 +15,18 @@
 # recomputed from the quality string otherwise, so the same threshold can be
 # applied to this study's reads and to published datasets from older basecallers.
 #
+# When the tag is absent, TRIM sets how many leading bases the recomputation
+# leaves out. Dorado leaves out the first 60, so TRIM=60 reproduces its qs:f: for
+# dorado reads whose header has lost the tag -- as every read does in the
+# archive's regenerated FASTQ (`@SRR... <uuid>/1`). Measured on 500,000 reads of
+# lowinput_s1_r1: TRIM=60 agrees with the tag's Q10 decision for all but 8
+# reads; TRIM=0 disagrees on 1,404. The default stays 0 because published
+# datasets from older basecallers carry no tag and are compared against
+# wf-metagenomics, which averages every base.
+#
 # Usage:
 #   awk -v MINQ=10 -f filter_by_qscore.awk in.fastq > out.fastq
+#   awk -v MINQ=10 -v TRIM=60 -f filter_by_qscore.awk in.fastq > out.fastq
 #   awk -v MINQ=10 -v STATS=stats.txt -f filter_by_qscore.awk in.fastq > out.fastq
 
 BEGIN {
@@ -54,10 +64,21 @@ NR % 4 == 0 {
         if (n == 0) {
             qs = 0
         } else {
+            # TRIM leaves the first TRIM bases out of the mean, as dorado does
+            # for the qs:f: tag it writes (60). Reads no longer than TRIM use
+            # every base. TRIM=0, the default, averages every base, as fastcat
+            # and therefore wf-metagenomics do.
+            start = (TRIM + 0 > 0 && n > TRIM + 0) ? TRIM + 1 : 1
             s = 0
-            for (i = 1; i <= n; i++) s += perr[substr(qual, i, 1)]
-            m = s / n
+            for (i = start; i <= n; i++) s += perr[substr(qual, i, 1)]
+            m = s / (n - start + 1)
             qs = (m > 0) ? -10 * log(m) / log(10) : 0
+            # When emulating dorado (TRIM > 0), round as its tag is written,
+            # to 4 decimals. Without this, a read whose remaining bases are all
+            # exactly Q10 computes to 9.999999999999998 and fails a threshold
+            # of 10 that its tag, qs:f:10.000, passes. The default (TRIM=0) is
+            # left unrounded, as it was, so prior-study filtering is unchanged.
+            if (TRIM + 0 > 0) qs = sprintf("%.4f", qs) + 0
         }
     }
 

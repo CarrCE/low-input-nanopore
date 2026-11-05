@@ -609,7 +609,12 @@ than what can be downloaded. The reads themselves are unaffected: read and base
 counts were verified against NCBI's own records per run. One consequence worth
 anticipating is that SRA does not preserve ONT header tags, so `qs:f:` is
 absent from a fetched FASTQ and `bin/sequencing_summary.py` will report an
-empty `median_qscore`.
+empty `median_qscore`. The Q10 filter handles it: without the tag it recomputes
+each read's mean quality from the quality string, and `make q10` sets
+`--qscore_trim_start 60` so that the recomputation follows dorado's rule of
+leaving out the first 60 bases. Run from the archive's copies, `make q10` then
+reproduces the published Q10 values to within 0.0024%; without that setting,
+0.28% of reads fall on the other side of Q10.
 
 The samplesheets carry both a BioSample accession and, since the 15 Aug 2026
 release, the run accession itself. `sra_accession` wins when present, so
