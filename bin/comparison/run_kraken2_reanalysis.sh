@@ -52,6 +52,12 @@ WF_REPO="epi2me-labs/wf-metagenomics"
 WF_TAG="v2.14.1"
 WF_COMMIT="a57ff73c22b77c2754b7910cd8d24ab6056ed8cc"
 
+# The Nextflow that ran the published rows (EPI2ME, 29 April 2026). v2.14.1 was
+# written for Nextflow 23 and has not been tested on later releases; the
+# launcher honours NXF_VER, downloading that version on first use. Override by
+# exporting NXF_VER before calling this script.
+export NXF_VER="${NXF_VER:-23.04.2}"
+
 DB_DEFAULT="${REPO_ROOT}/data/kraken2_db/pluspf8_20241228"
 TAX_DEFAULT="${REPO_ROOT}/data/kraken2_db/new_taxdump_2025-01-01.zip"
 

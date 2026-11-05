@@ -357,10 +357,36 @@ today it returns a file with today's date. Only the dated copy under
 rolling path would silently reclassify against a different taxonomy.
 
 ```bash
-bash bin/comparison/fetch_kraken2_db.sh                    # ~5.5 GiB, verified
-bash bin/comparison/run_kraken2_reanalysis.sh \
-     --fastq data/raghavendra_2023 --out results_kraken2 --min-qual 10
+# the database (~5.5 GiB download, ~7.5 GiB unpacked; keep it out of synced folders)
+DEST=~/kraken2_db bash bin/comparison/fetch_kraken2_db.sh
+DB=~/kraken2_db/pluspf8_20241228; TAX=~/kraken2_db/new_taxdump_2025-01-01.zip
+W=~/k2work    # scratch space for staged reads and runs
+
+# the reads, laid out one directory per sample as the April runs read them
+bash bin/comparison/fetch_zorzano.sh          # authors' GitHub repo @ 08ff9f2, MD5-checked
+bash bin/comparison/fetch_raghavendra.sh      # Zenodo 8208597
+python3 bin/comparison/stage_prior_reads.py zorzano     --src data/zorzano_2025/RawData --out $W/zorzano
+python3 bin/comparison/stage_prior_reads.py raghavendra --src data/raghavendra_2023      --out $W/raghavendra
+
+# classify (wf-metagenomics v2.14.1, run under Nextflow 23.04.2 via NXF_VER)
+for q in 1 10; do
+  bash bin/comparison/run_kraken2_reanalysis.sh --fastq $W/zorzano --out $W/k2_zorzano_q$q \
+       --min-qual $q --db $DB --taxonomy $TAX
+done
+bash bin/comparison/run_kraken2_reanalysis.sh --fastq $W/raghavendra --out $W/k2_raghavendra_q10 \
+     --min-qual 10 --db $DB --taxonomy $TAX
+
+# count hits with the rules behind the rows
+python3 bin/comparison/count_kraken2_hits.py zorzano     --run $W/k2_zorzano_q1   --label q1
+python3 bin/comparison/count_kraken2_hits.py zorzano     --run $W/k2_zorzano_q10  --label q10
+python3 bin/comparison/count_kraken2_hits.py raghavendra --run $W/k2_raghavendra_q10 --label q10
 ```
+
+The hit rules differ by study, following each paper's own reporting:
+- **Zorzano:** a hit is any classified read.
+- **Raghavendra:** a hit is a read whose lineage names the target species.
+
+`count_kraken2_hits.py` documents both.
 
 `fetch_kraken2_db.sh` stops on any size or checksum mismatch rather than
 redownloading, because a mismatch means the URL has started serving something
@@ -368,13 +394,14 @@ other than the pinned build — the exact event this pin exists to catch. The
 runner additionally re-resolves the workflow tag and stops if it no longer points
 at the recorded commit; upstream tags can move.
 
-**What this does and does not claim.** The committed `kraken2_q1` and
-`kraken2_q10` values were produced through the EPI2ME desktop application, which
-records its parameters only inside the run directory it creates. The scripts here
-are the command-line equivalent with the same pinned inputs, added so the
-provenance lives in version control; the committed numbers have **not** been
-regenerated through them. Anyone re-running should expect agreement and should
-report it if not.
+**Reproduced by script, 4 November 2026.** The committed `kraken2_q1` and `kraken2_q10` values were first produced in the EPI2ME desktop application on 29 April 2026. The commands above regenerate them exactly, and the match was checked at every level:
+
+| Level | Result |
+|---|---|
+| Inputs | identical to the files EPI2ME read (9 Zorzano, 10 Raghavendra) |
+| Database | `hash.k2d`, `opts.k2d` and `taxo.k2d` identical to EPI2ME's copy |
+| Per-read assignments | 28 of 28 files identical (132,561 reads) |
+| Rows in `prior_studies.tsv` | all 33, and the Zorzano q1 total, identical |
 
 Note also that `--min_read_qual` in wf-metagenomics thresholds on the mean
 **Phred** value of a read, while this repository's own filter averages in

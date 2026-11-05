@@ -2,7 +2,7 @@
 
 What is not done, not sourced, or not yet trustworthy in this repository.
 
-Items 2, 3 and 5 are open. Items 1 and 4 were closed in November 2026 and stay
+Items 3 and 5 are open. Items 1, 2 and 4 were closed in November 2026 and stay
 in place so that the section numbers, which the paper cites, do not move. Section 6 records questions that were open, were
 investigated, and were closed; they are kept because the paper's Supplementary
 Information refers to several of them, and because "we checked and it did not
@@ -43,30 +43,18 @@ sometimes writes its storage back end's error text into a download in place of
 data (now found and repaired; see the README's data-availability section).
 `make fetchreads` downloads on the host, outside the pipeline.
 
-## 2. The prior-study reanalysis is pinned but has not been re-run through the scripted path
+## 2. Closed 4 Nov 2026: the prior-study reanalysis is reproduced by script
 
-`assets/comparison/kraken2_db.manifest.tsv` records exactly what the `kraken2_q1` and
-`kraken2_q10` rows classified against — URL, byte count, checksum, and the
-provenance of each checksum:
+The `kraken2_q1` and `kraken2_q10` rows in `assets/comparison/prior_studies.tsv` were first produced in the EPI2ME desktop application on 29 April 2026. They are now regenerated exactly through the repository's scripts; `docs/comparison.md` (Classification provenance) has the commands and the checks.
 
-- Kraken2 PlusPF-8, 2024-12-28 build (`k2_pluspf_08gb_20241228.tar.gz`,
-  5,925,280,339 B, MD5 `01b8b1eb…`, published upstream)
-- NCBI new_taxdump 2025-01-01 (139,761,991 B, MD5 `171470a1…`, SHA-256
-  `7ff98c65…`, computed locally — NCBI publishes no sidecar for archived dumps)
+- **Inputs:** the 9 Zorzano FASTQs come from the authors' GitHub repository at commit `08ff9f2` (`bin/comparison/fetch_zorzano.sh`). The 10 Raghavendra FASTQs come from Zenodo 8208597. Both are byte-identical to what EPI2ME read.
+- **Database:** the pinned PlusPF-8 build is identical to EPI2ME's copy.
+- **Per-read assignments:** all 28 files are identical.
+- **Rows:** all 33 values and the Zorzano total are identical.
 
-Both URLs were verified to be the ones `epi2me-labs/wf-metagenomics` v2.14.1
-(commit `a57ff73c…`) hard-codes for `--database_set PlusPF-8`, so the pin records
-what was actually used rather than a plausible substitute.
+This item previously said the Zorzano raw reads were "not staged locally". They had been local all along, in the working folder used for the April runs. Restaging them also showed that `fetch_kraken2_db.sh` had been reading its manifest from the wrong directory since the inputs moved to `assets/`. That is fixed.
 
-**The gap:** the committed numbers were produced through the EPI2ME desktop
-application and have *not* been regenerated through
-`bin/comparison/run_kraken2_reanalysis.sh`. Doing so would convert "pinned and
-reproducible in principle" into "reproduced", and is the natural response if a
-reviewer questions the prior-study values. It needs a ~5.5 GiB download, ~8 GiB
-of RAM, and the Zorzano raw reads, which are not staged locally (the Basapathi
-Raghavendra reads are, under `data/raghavendra_2023/`).
-
-Nothing here touches the main pipeline, which does not use Kraken2 at all.
+wf-metagenomics v2.14.1 runs under Nextflow 23.04.2, the version EPI2ME used. `run_kraken2_reanalysis.sh` sets it through `NXF_VER`.
 
 ## 3. `COVERAGE_PROFILE` measures alignments, not assignments
 
