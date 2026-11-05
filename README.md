@@ -126,6 +126,7 @@ All times below are measured on a complete cold run from a fresh clone (M3 Max,
 | 4 | `seqsummary`, `runmeta`, `versions` | sequencing-summary, runs and software tables | 5 m (`runmeta` reads all ~110 GB) |
 | 4 | `q10` | the **quality-matched rerun** table, at Q10 | **1 h 27 m** |
 | 4 | `nofloor` → `floor` | the attribution-floor table and every number in its paragraph (needs `q10`) | read assignment only, mapping reused from `all` (4 m for three replicates) |
+| 4 | `fragmentation` | the reference-fragmentation test (needs `nofloor`); not a published table and not in the total; see [`docs/reference-fragmentation.md`](docs/reference-fragmentation.md) | 1 h 12 m |
 | 4 | `raghavendra` | the committed prior-study rows behind the comparison figure | 38 s |
 | 4 | `divergence` | the contaminant-divergence table | **1 h 33 m** (breseq under amd64 emulation) |
 | 4 | `measurements`, `verify` | the two checks | seconds |
@@ -256,6 +257,7 @@ These mirror the conventions used across the lab's analysis repositories.
 | `docs/TODO.md` | Honest list of known gaps |
 | `docs/paper-crosswalk.md` | Which output backs which figure and table in the paper |
 | `docs/history-rewrite.md` | The 15 Aug 2026 history rewrite: what was removed and why |
+| `docs/reference-fragmentation.md` | `make fragmentation`: whether the contig-level yeast references cost reads (they do not), and why the floor's losses are yeast genome content |
 | `bin/comparison/` | The prior-work comparison: figure generator, the loader, the Kraken2/Raghavendra fetch and reanalysis scripts, and `seed_this_study.py` |
 | `assets/comparison/` | Its inputs: `prior_studies.tsv` (one row per prior-study sample per classifier variant, each citing its published source), `this_study.tsv` (a committed snapshot of pipeline output), `kraken2_db.manifest.tsv` (the pinned database) |
 | `docs/comparison.md` | How that comparison is built, and the four data defects it repairs |

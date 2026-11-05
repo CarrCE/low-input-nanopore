@@ -36,7 +36,7 @@ DEMO_READS  ?= 40000
 
 .DEFAULT_GOAL := help
 
-.PHONY: help images test check verify measurements masksummary nofloor threshold floor seqsummary versions runmeta poolcov attribution comparison coverage modedelta estcontrol fetchreads instrumentdata carriermodel assigneddepth divergence s1 s2 all raghavendra q10 demo-data clean
+.PHONY: help images test check verify measurements masksummary nofloor threshold floor fragmentation seqsummary versions runmeta poolcov attribution comparison coverage modedelta estcontrol fetchreads instrumentdata carriermodel assigneddepth divergence s1 s2 all raghavendra q10 demo-data clean
 
 help: ## Show this help
 	@printf 'low-input-nanopore -- make targets\n\n'
@@ -223,6 +223,14 @@ floor: threshold ## Every number behind the attribution floor (needs all, nofloo
 	    python3 bin/floor_effect.py \
 	        --with results --without results/nofloor --q10 results/q10 \
 	        --out results/summary
+
+# Does a contig-level reference change read assignment? D6311 again, with the
+# two contig-level yeast assemblies swapped for complete genomes (arm B) and for
+# those same genomes cut where the assemblies break (arm C), each with the floor
+# on and off. See docs/reference-fragmentation.md. Needs `make all` and
+# `make nofloor` (arm A); writes results/fragmentation/.
+fragmentation: ## Reference-fragmentation test (needs all, nofloor; -> results/fragmentation)
+	@PROFILE="$(PROFILE)" NF_ARGS="$(NF_ARGS)" bash "$(ROOT)/bin/fragmentation_test.sh"
 
 # Only meaningful after a run with --mask_human true, which is what writes the
 # per-sample human_stats.json files this reads.

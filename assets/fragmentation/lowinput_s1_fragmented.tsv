@@ -1,0 +1,38 @@
+# TEST REFERENCE SET for `make fragmentation` (docs/reference-fragmentation.md);
+# not used by the published analysis. The same genomes as
+# lowinput_s1_complete.tsv, but the two yeast genomes are cut where the
+# contig-level assemblies of the exact strains break
+# (bin/fragment_reference.py). The pipeline cannot download a cut genome, so
+# `make fragmentation` places the cut FASTAs in this set's reference cache
+# before the run. Arm C of the fragmentation test.
+#
+# Reference set A -- lowinput_s1
+# ZymoBIOMICS Microbial Community DNA Standard II (Log Distribution), D6311,
+# sequenced with a lambda genomic carrier under depletion-mode adaptive sampling.
+#
+# role:
+#   sample      -- a member of the mock community (the DNA we are trying to enrich)
+#   carrier     -- the genomic carrier added to reach library-prep input mass
+#   contaminant -- organism carried over from carrier production, not part of the community
+#
+# theoretical_dna_fraction is the manufacturer's genomic-DNA fraction, and sums
+# to 1.0 across role=sample rows. Carrier/contaminant rows are 0 by definition.
+#
+# NOTE: this set contains E. coli in BOTH roles. Zymo's community strain
+# (B-1109, 4,925,141 bp) and the lambda-prep background (K-12 MG1655,
+# 4,641,652 bp) are distinct strains, so reads can be partitioned between them
+# rather than discarded wholesale. See docs/ecoli-partitioning.md.
+#
+organism	accession	role	theoretical_dna_fraction	strain	notes
+Listeria monocytogenes	GCF_028743575.1	sample	0.891	B-33116 = ATCC 19117	complete
+Pseudomonas aeruginosa	GCF_028743595.1	sample	0.089	B-3509 = ATCC 15442	complete
+Bacillus spizizenii	GCF_028743795.1	sample	0.0089	B-354 = ATCC 6633	listed by Zymo as B. subtilis
+Saccharomyces cerevisiae	GCF_000146045.2	sample	0.0089	S288C	complete, other strain; cut at the contig-level assembly's breaks (arm C)
+Escherichia coli	GCF_028743555.1	sample	0.00089	B-1109	complete; community member
+Salmonella enterica	GCF_028743635.1	sample	0.00089	B-4212	complete
+Limosilactobacillus fermentum	GCF_030770375.1	sample	0.000089	B-1840 = ATCC 14931	listed by Zymo as Lactobacillus fermentum
+Enterococcus faecalis	GCF_028743535.1	sample	0.000009	B-537 = ATCC 7080	complete
+Cryptococcus neoformans	GCF_000149245.1	sample	0.000009	H99	complete, other strain; cut at the contig-level assembly's breaks (arm C)
+Staphylococcus aureus	GCF_028743615.1	sample	0.000001	B-41012	complete
+Enterobacteria phage lambda	GCF_000840245.1	carrier	0	NC_001416.1	48,502 bp
+Escherichia coli K-12	GCF_000005845.2	contaminant	0	K-12 substr. MG1655	lambda-production background
