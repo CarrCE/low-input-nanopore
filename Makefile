@@ -36,7 +36,7 @@ DEMO_READS  ?= 40000
 
 .DEFAULT_GOAL := help
 
-.PHONY: help images test check verify measurements masksummary threshold seqsummary versions runmeta poolcov attribution comparison coverage modedelta estcontrol fetchreads instrumentdata carriermodel assigneddepth divergence s1 s2 all raghavendra q10 demo-data clean
+.PHONY: help images test check verify measurements masksummary nofloor threshold floor seqsummary versions runmeta poolcov attribution comparison coverage modedelta estcontrol fetchreads instrumentdata carriermodel assigneddepth divergence s1 s2 all raghavendra q10 demo-data clean
 
 help: ## Show this help
 	@printf 'low-input-nanopore -- make targets\n\n'
@@ -182,15 +182,43 @@ check: ## Assert consensus accounting and human masking (needs `make test` first
 
 # Exit 2 means "pendings, no errors" and is tolerated; exit 1 (a real
 # inconsistency) still fails the target.
-# The evidence behind params.min_aln_frac. Reads a finished run's per-read
-# assignments, so it needs no BAM pass and no re-mapping. Regenerate this rather
-# than quoting the numbers from memory if the threshold is ever questioned.
-threshold: ## Coverage distribution behind the attribution floor (--min_aln_frac)
+# The attribution floor is judged against the same reads WITHOUT it, so the
+# analysis needs a second run with the floor off. `nofloor` is that run, into
+# results/nofloor; -resume reuses the mapping of `make all`, so only read
+# assignment and aggregation rerun. Competitive mode, which is what the floor
+# figures describe.
+nofloor: ## The published run with the attribution floor off (-> results/nofloor)
+	@"$(ROOT)/run.sh" -profile $(PROFILE) \
+	    --samplesheet assets/samplesheets/all.csv --mode competitive \
+	    --min_aln_frac 0 --outdir results/nofloor -resume $(NF_ARGS)
+
+# The evidence behind params.min_aln_frac: the alignment-coverage distribution
+# of the reads awarded WITHOUT a floor (Table S3). It reads per-read
+# assignments, so it needs no BAM pass and no re-mapping, but it must read the
+# floor-off run: in the published run the reads below the floor are already
+# unassigned and the distribution would be missing exactly the reads in
+# question. Regenerate this rather than quoting the numbers from memory.
+threshold: ## Coverage distribution behind the attribution floor (needs nofloor)
+	@test -d "$(ROOT)/results/nofloor" \
+	  || { echo "error: results/nofloor not found. Run 'make nofloor' first." >&2; exit 1; }
 	@docker run --rm -u "$$(id -u):$$(id -g)" \
 	    -v "$(ROOT)":/repo -w /repo "$(ANALYSIS_IMAGE)" \
 	    python3 bin/attribution_threshold.py \
-	        --assignments 'results/*/competitive/*.assignments.tsv.gz' \
+	        --assignments 'results/nofloor/*/competitive/*.assignments.tsv.gz' \
 	        --outdir results/summary --chosen $(MIN_ALN_FRAC)
+
+# Every number in the attribution-floor paragraph (Supplementary Section S2):
+# what the floor excludes, from whom, how much of it Q10 would also remove, and
+# what it does to each experiment. Compares the published run (results/), the
+# floor-off run (results/nofloor) and the Q10 run (results/q10).
+floor: threshold ## Every number behind the attribution floor (needs all, nofloor, q10)
+	@test -d "$(ROOT)/results/q10" \
+	  || { echo "error: results/q10 not found. Run 'make q10' first." >&2; exit 1; }
+	@docker run --rm -u "$$(id -u):$$(id -g)" \
+	    -v "$(ROOT)":/repo -w /repo "$(ANALYSIS_IMAGE)" \
+	    python3 bin/floor_effect.py \
+	        --with results --without results/nofloor --q10 results/q10 \
+	        --out results/summary
 
 # Only meaningful after a run with --mask_human true, which is what writes the
 # per-sample human_stats.json files this reads.
