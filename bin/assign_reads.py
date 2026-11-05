@@ -235,11 +235,13 @@ def main():
         # ---- attribution floor ------------------------------------------
         # A read is credited to an organism with its FULL length (read_bases),
         # not with the part that aligned. Without a floor, an organism that
-        # explains a sliver of a long read carries all of it: measured across
-        # this study's own data, 2,523 reads whose best alignment covered under
-        # 10% of the read carried 8.1% of all sample-role bases, at a mean read
-        # length of 60 kb. Nearly all of them were long, repeat-rich reads
-        # touching a eukaryotic genome over a few hundred bases.
+        # explains a sliver of a long read carries all of it. On this study's
+        # deposited (human-masked) reads the floor excludes 483 community reads
+        # carrying 1.35% of sample-role bases, at a mean length of 49 kb; before
+        # masking, when the floor was designed, the same rule excluded 2,523
+        # reads carrying 8.1%. Nearly all are long, repeat-rich reads touching a
+        # eukaryotic genome over a few hundred bases. `make floor` regenerates
+        # these numbers.
         #
         # The floor is applied HERE, before the mode branch, so competitive and
         # sequential see the same population of attributable reads and any

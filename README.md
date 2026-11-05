@@ -125,6 +125,7 @@ All times below are measured on a complete cold run from a fresh clone (M3 Max,
 | 4 | `carriermodel` | carrier-model figure and table; needs the masked reads and the instrument-data record | 6 m with per-replicate steps cached; the first run adds one pass over every FASTQ (not yet timed cold) |
 | 4 | `seqsummary`, `runmeta`, `versions` | sequencing-summary, runs and software tables | 5 m (`runmeta` reads all ~110 GB) |
 | 4 | `q10` | the **quality-matched rerun** table, at Q10 | **1 h 27 m** |
+| 4 | `nofloor` → `floor` | the attribution-floor table and every number in its paragraph (needs `q10`) | read assignment only, mapping reused from `all` (4 m for three replicates) |
 | 4 | `raghavendra` | the committed prior-study rows behind the comparison figure | 38 s |
 | 4 | `divergence` | the contaminant-divergence table | **1 h 33 m** (breseq under amd64 emulation) |
 | 4 | `measurements`, `verify` | the two checks | seconds |
@@ -365,8 +366,11 @@ read-weighted. An earlier preliminary analysis of `lowinput_s1` reported this as
 the community lowers it to **53.6x** (manuscript, Supplementary Section S2).
 That figure moved once more, from 70.7x, when the attribution floor
 (`--min_aln_frac`) stopped an organism claiming a whole read on a sliver of
-alignment; see [Metric definitions](#metric-definitions) above and
-`bin/attribution_threshold.py` for the distribution behind the threshold.
+alignment; see [Metric definitions](#metric-definitions) above. `make floor`
+regenerates everything said about the floor from a floor-off run (`make nofloor`):
+the distribution behind the threshold (`bin/attribution_threshold.py`) and what
+the floor excludes, from whom, and what it does to each experiment
+(`bin/floor_effect.py`).
 
 **`reads_per_fg` / `bases_per_fg`**
 reads (or bases) assigned to an organism, divided by the femtograms of that

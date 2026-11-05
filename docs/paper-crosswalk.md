@@ -41,7 +41,8 @@ anything. See [`display-items.md`](display-items.md).
 |---|---|---|---|
 | `assets/measurements.tsv` | sequencing runs and the DNA masses behind every per-femtogram and enrichment figure | Table S1 | |
 | `assets/references/*.tsv` | reference sets: every organism, its role and accession | Table S2 | |
-| `results/summary/attribution_threshold.*` | the distribution behind `--min_aln_frac` (`make threshold`) | Table S3 | |
+| `results/summary/attribution_threshold.*` | the distribution behind `--min_aln_frac` (`make threshold`, from the floor-off run) | Table S3 | |
+| `results/summary/floor_effect.json`, `floor_effect_by_organism.tsv` | every number in the attribution-floor paragraph: what the floor excludes, from whom, Q10's overlap, and the effect on each experiment (`make floor`) | Section S2 text | |
 | `results/summary/experiment_summary.tsv` + `results/q10/summary/experiment_summary.tsv` | experiment-level summary, both decision rules, all reads and Q10 | Table S4 | |
 | `results/summary/human_masking.tsv` | human read masking (`make masksummary`) | Table S5 | |
 | `results/summary/mode_delta_summary.csv` | community reads destroyed by sequential subtraction | Table S6 | |
@@ -69,7 +70,8 @@ must be regenerated deliberately:
 |---|---|---|
 | `results/summary/human_masking.tsv` | `make masksummary` | reads `results/*/human/*.human_stats.json`, which only a `--mask_human` run writes. The published table came from the 13 Aug 2026 masking run. |
 | `results/summary/sequencing_summary.tsv` | `make seqsummary` | needs the FASTQs as well as the assignments. Note that reads fetched from the SRA archive have no `qs:f:` header tag, so `median_qscore` comes back empty from a fetched copy. |
-| `results/summary/attribution_threshold.*` | `make threshold` | the distribution behind `--min_aln_frac`; regenerate this rather than quoting the threshold from memory if it is ever questioned |
+| `results/summary/attribution_threshold.*` | `make threshold` | the distribution behind `--min_aln_frac`, read from the floor-off run `results/nofloor` (`make nofloor`): in the published run the reads below the floor are already unassigned. Regenerate this rather than quoting the threshold from memory. |
+| `results/summary/floor_effect.*` | `make floor` | needs `make all`, `make nofloor` and `make q10`. Counts the reads the assigner actually excluded, which is slightly stricter than `attribution_threshold.py`'s view (winning organism only). The paper's floor paragraph was first computed on the reads before human masking; regenerate it here, on the deposited reads. |
 | software versions table | `make versions` | what the built images report when asked, not what was pinned |
 | `results/summary/carrier-model*`, `results/carrier_model/` | `make carriermodel` | needs the masked reads and the MinKNOW instrument-data record as well as a finished run; see [`carrier-model.md`](carrier-model.md) |
 

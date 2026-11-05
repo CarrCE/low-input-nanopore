@@ -59,6 +59,7 @@ subdirectory of `results/`, so a clone has exactly one output tree.
 |---|---|---|
 | `make all` | `results/summary/` | Yes — the study-level tables and figures |
 | `make q10` | `results/q10/` | **Yes.** The quality-matched rerun at Q10. Reproducing the paper means running this. It sets `--qscore_trim_start 60`, which matters only for reads that have lost dorado's `qs:f:` tag, as the archive's copies have. |
+| `make nofloor` | `results/nofloor/` | **Yes**, through `make floor`: the published run with the attribution floor off, which every statement about the floor is measured against. Reuses the mapping of `make all`. |
 | `make raghavendra` | `results/raghavendra/` | Indirectly — it is the *provenance* of the prior-study rows committed to `assets/comparison/prior_studies.tsv`. The comparison figure is drawn from that committed table, so it reproduces without this; running it re-derives those numbers from the reads. |
 | `make test` | `results/smoke/` | No — 40,000 reads |
 
