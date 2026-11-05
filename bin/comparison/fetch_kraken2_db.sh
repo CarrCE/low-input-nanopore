@@ -32,7 +32,7 @@ set -euo pipefail
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
 REPO_ROOT="$(cd -- "${SCRIPT_DIR}/../.." && pwd -P)"
 
-MANIFEST="${SCRIPT_DIR}/kraken2_db.manifest.tsv"
+MANIFEST="${REPO_ROOT}/assets/comparison/kraken2_db.manifest.tsv"
 DEST="${DEST:-${REPO_ROOT}/data/kraken2_db}"
 CACHE_DIR="${DEST}/.archive"
 
