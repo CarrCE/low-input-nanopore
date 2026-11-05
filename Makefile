@@ -98,7 +98,7 @@ raghavendra: ## Reanalyse the Basapathi Raghavendra 2023 reads (-> results/ragha
 q10: ## Quality-matched rerun at Q10 -- a published result (-> results/q10)
 	@"$(ROOT)/run.sh" -profile $(PROFILE) \
 	    --samplesheet assets/samplesheets/all.csv --mode both \
-	    --min_qscore 10 --outdir results/q10 $(NF_ARGS)
+	    --min_qscore 10 --qscore_trim_start 60 --outdir results/q10 $(NF_ARGS)
 
 # Whole 4-line records only: a plain `head -n` is fine at 40000 but silently
 # truncates a record the moment DEMO_READS is set to a value that is not a
@@ -160,6 +160,10 @@ check: ## Assert consensus accounting and human masking (needs `make test` first
 	@docker run --rm -u "$$(id -u):$$(id -g)" \
 	    -v "$(ROOT)":/repo -w /repo "$(TOOLS_IMAGE)" \
 	    bash tests/sra_fetch.sh
+	@echo "==> quality filter: tag, recomputation, dorado's 60-base rule"
+	@docker run --rm -u "$$(id -u):$$(id -g)" \
+	    -v "$(ROOT)":/repo -w /repo "$(TOOLS_IMAGE)" \
+	    bash tests/qscore_filter.sh
 	@echo "==> human masking: committed read-level fixture"
 	@# Needs no mapping and no network; see assets/testdata/README.md.
 	@docker run --rm -u "$$(id -u):$$(id -g)" \

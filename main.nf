@@ -196,10 +196,10 @@ process FILTER_READS {
     FQ="${fastq}"
     if [ "\$FQ" != "\${FQ%.gz}" ]; then
         gzip -dc "\$FQ" \\
-          | awk -v MINQ=${params.min_qscore} -v STATS=${meta.sample_id}.qfilter.tsv \\
+          | awk -v MINQ=${params.min_qscore} -v TRIM=${params.qscore_trim_start} -v STATS=${meta.sample_id}.qfilter.tsv \\
                 -f ${script} - > ${meta.sample_id}.filtered.fastq
     else
-        awk -v MINQ=${params.min_qscore} -v STATS=${meta.sample_id}.qfilter.tsv \\
+        awk -v MINQ=${params.min_qscore} -v TRIM=${params.qscore_trim_start} -v STATS=${meta.sample_id}.qfilter.tsv \\
             -f ${script} "\$FQ" > ${meta.sample_id}.filtered.fastq
     fi
 
