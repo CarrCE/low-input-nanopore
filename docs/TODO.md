@@ -2,8 +2,8 @@
 
 What is not done, not sourced, or not yet trustworthy in this repository.
 
-Items 3 and 5 are open. Items 1, 2 and 4 were closed in November 2026 and stay
-in place so that the section numbers, which the paper cites, do not move. Section 6 records questions that were open, were
+Item 3 and the second part of item 5 are open. Items 1, 2 and 4, and the first
+part of item 5, were closed in November 2026 and stay in place so that the section numbers, which the paper cites, do not move. Section 6 records questions that were open, were
 investigated, and were closed; they are kept because the paper's Supplementary
 Information refers to several of them, and because "we checked and it did not
 matter" is a result a reader may want to audit rather than take on trust.
@@ -128,16 +128,25 @@ every genome as sample, carrier or contaminant.
 (`params.min_qscore` and `params.coverage_window` were on this list earlier and
 are consumed.)
 
-## 5. Genome-set caveats not assessed
+## 5. Genome-set caveats
 
-Two `lowinput_s1` references are contig-level rather than complete
-(*S. cerevisiae* `GCA_030867715.1`, *C. neoformans* `GCA_028975465.1`). Complete
-chromosome-level substitutes from different strains are noted in
-`data/readme.md` (`GCF_000146045.2`, `GCF_000149245.1`). A fragmented reference
-can lose alignment-score competitions at contig boundaries; the size of that
-effect has not been measured. Stated as a limitation in the manuscript.
+**Closed 5 Nov 2026: the fragmentation effect is measured, and is zero.** Two
+`lowinput_s1` references are contig-level rather than complete
+(*S. cerevisiae* `GCA_030867715.1`, *C. neoformans* `GCA_028975465.1`). A
+fragmented reference could lose alignment-score competitions at contig
+boundaries. `make fragmentation` ([`reference-fragmentation.md`](reference-fragmentation.md))
+reruns D6311 against complete genomes of other strains (`GCF_000146045.2`,
+`GCF_000149245.1`), and against those genomes cut where the assemblies break:
 
-Relatedly, `data/readme.md` and `assets/references/*.tsv` describe the same
+- Cutting changes the assignment of no yeast read, and the 39 reads whose
+  alignment crosses a cut stay with *S. cerevisiae*.
+- With the floor off, the cut and uncut genomes lose identical bases to the
+  floor (9,912,829 bp, 90.5% of them yeast). The floor's yeast losses come from
+  genome content, not assembly quality.
+- The complete genomes of other strains assign 7.8% fewer *S. cerevisiae* reads,
+  so the exact strains, contig-level as published, are the better reference.
+
+**Still open:** `data/readme.md` and `assets/references/*.tsv` describe the same
 genomes twice and can drift. The TSVs are authoritative — the pipeline reads
 them; `data/readme.md` should point at them rather than restate them.
 
