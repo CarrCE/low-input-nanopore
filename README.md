@@ -126,6 +126,7 @@ All times below are measured on a complete cold run from a fresh clone (M3 Max,
 | 4 | `seqsummary`, `runmeta`, `versions` | sequencing-summary, runs and software tables | 5 m (`runmeta` reads all ~110 GB) |
 | 4 | `q10` | the **quality-matched rerun** table, at Q10 | **1 h 27 m** |
 | 4 | `nofloor` → `floor` | the attribution-floor table and every number in its paragraph (needs `q10`) | read assignment only, mapping reused from `all` (4 m for three replicates) |
+| 4 | `floorcomplexity` | what the floor excludes, by sequence: the complexity of the excluded reads and the simple-repeat content of every reference (needs `nofloor`; reads the deposited reads); not in the total | 9 m |
 | 4 | `fragmentation` | the reference-fragmentation test (needs `nofloor`); not a published table and not in the total; see [`docs/reference-fragmentation.md`](docs/reference-fragmentation.md) | 1 h 12 m |
 | 4 | `raghavendra` | the committed prior-study rows behind the comparison figure | 38 s |
 | 4 | `divergence` | the contaminant-divergence table | **1 h 33 m** (breseq under amd64 emulation) |
@@ -372,7 +373,11 @@ alignment; see [Metric definitions](#metric-definitions) above. `make floor`
 regenerates everything said about the floor from a floor-off run (`make nofloor`):
 the distribution behind the threshold (`bin/attribution_threshold.py`) and what
 the floor excludes, from whom, and what it does to each experiment
-(`bin/floor_effect.py`).
+(`bin/floor_effect.py`). `make floorcomplexity` (`bin/floor_complexity.py`) says
+what the excluded reads are: mostly low-complexity sequence, about half of it
+1-3 bp tandem repeats, which in these panels only the two yeast genomes hold.
+`make fragmentation` shows that the yeasts' contig-level assemblies are not the
+cause ([`docs/reference-fragmentation.md`](docs/reference-fragmentation.md)).
 
 **`reads_per_fg` / `bases_per_fg`**
 reads (or bases) assigned to an organism, divided by the femtograms of that
