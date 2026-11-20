@@ -36,7 +36,7 @@ DEMO_READS  ?= 40000
 
 .DEFAULT_GOAL := help
 
-.PHONY: help images test check verify measurements masksummary nofloor threshold floor floorcomplexity fragmentation seqsummary versions runmeta poolcov attribution comparison coverage modedelta estcontrol fetchreads instrumentdata carriermodel assigneddepth divergence s1 s2 all raghavendra q10 demo-data clean
+.PHONY: help images test check verify measurements masksummary nofloor threshold floor floorcomplexity flooralignments fragmentation seqsummary versions runmeta poolcov attribution comparison coverage modedelta estcontrol fetchreads instrumentdata carriermodel assigneddepth divergence s1 s2 all raghavendra q10 demo-data clean
 
 help: ## Show this help
 	@printf 'low-input-nanopore -- make targets\n\n'
@@ -232,6 +232,15 @@ floor: threshold ## Every number behind the attribution floor (needs all, nofloo
 # bin/floor_complexity.sh.
 floorcomplexity: ## Sequence complexity of the floor-excluded reads; repeat content of the references (needs all, nofloor)
 	@bash "$(ROOT)/bin/floor_complexity.sh"
+
+# Where those reads align. Extracts the excluded reads' alignments out of each
+# replicate's 7 GB alignment BAM into a few MB under results/summary (cached,
+# so a finished run can delete the BAMs and keep the evidence), then measures
+# which organisms the alignments land on and how much of the reference they
+# cover inside a simple repeat. RESULTS=, NOFLOOR=, REFDIR=, OUT=, CONTROLS=,
+# SEED= as in bin/floor_alignments.sh.
+flooralignments: ## Where the floor-excluded reads align (needs all, nofloor)
+	@bash "$(ROOT)/bin/floor_alignments.sh"
 
 # Does a contig-level reference change read assignment? D6311 again, with the
 # two contig-level yeast assemblies swapped for complete genomes (arm B) and for
