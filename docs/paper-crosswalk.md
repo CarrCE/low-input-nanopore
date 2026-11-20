@@ -44,6 +44,7 @@ anything. See [`display-items.md`](display-items.md).
 | `results/summary/attribution_threshold.*` | the distribution behind `--min_aln_frac` (`make threshold`, from the floor-off run) | Table S3 | |
 | `results/summary/floor_effect.json`, `floor_effect_by_organism.tsv` | every number in the attribution-floor paragraph: what the floor excludes, from whom, Q10's overlap, and the effect on each experiment (`make floor`) | Section S2 text | |
 | `results/summary/floor_complexity.json`, `floor_complexity_references.tsv` | what the excluded reads are by sequence, and which reference genomes hold simple repeats (`make floorcomplexity`) | Section S2 text | |
+| `results/summary/floor_alignments.json`, `floor_alignments_loci.tsv` | where the excluded reads align, and the share of the reference they cover that is a simple repeat (`make flooralignments`) | Section S2 text | |
 | `results/summary/experiment_summary.tsv` + `results/q10/summary/experiment_summary.tsv` | experiment-level summary, both decision rules, all reads and Q10 | Table S4 | |
 | `results/summary/human_masking.tsv` | human read masking (`make masksummary`) | Table S5 | |
 | `results/summary/mode_delta_summary.csv` | community reads destroyed by sequential subtraction | Table S6 | |
@@ -75,6 +76,7 @@ must be regenerated deliberately:
 | `results/summary/floor_effect.*` | `make floor` | needs `make all`, `make nofloor` and `make q10`. Counts the reads the assigner actually excluded, which is slightly stricter than `attribution_threshold.py`'s view (winning organism only). The paper's floor paragraph was first computed on the reads before human masking; regenerate it here, on the deposited reads. |
 | `results/fragmentation/summary/fragmentation.json` | `make fragmentation` | needs `make all` and `make nofloor`. Backs what the paper says about the cause of the floor's eukaryote losses: genome content, not assembly quality; see [`reference-fragmentation.md`](reference-fragmentation.md). About 1 h 12 m. |
 | `results/summary/floor_complexity.json`, `floor_complexity_references.tsv` | `make floorcomplexity` | needs `make all` and `make nofloor`, and the deposited (masked) reads, never the originals in `data/`. The SI S2 statements on what the excluded reads are (masked share, compressibility, low-entropy windows, 1-3 bp tandem repeats) and on which reference genomes hold simple repeats. |
+| `results/summary/floor_alignments.*` | `make flooralignments` | needs `make all` and `make nofloor`. Reads each replicate's alignment BAM once and caches the excluded reads' alignments under `results/summary/floor_alignments/`, which is what later runs and later questions read; the full BAMs are not needed again. |
 | software versions table | `make versions` | what the built images report when asked, not what was pinned |
 | `results/summary/carrier-model*`, `results/carrier_model/` | `make carriermodel` | needs the masked reads and the MinKNOW instrument-data record as well as a finished run; see [`carrier-model.md`](carrier-model.md) |
 
