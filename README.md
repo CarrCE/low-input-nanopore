@@ -379,9 +379,12 @@ what the excluded reads are: mostly low-complexity sequence, about half of it
 1-3 bp tandem repeats, which in these panels only the two yeast genomes hold.
 `make flooralignments` (`bin/floor_alignments.py`) says where they align:
 every one of them does align, but only in fragments, and 89% of the reference
-they cover is the two yeasts. It keeps those reads' alignments under
-`results/summary/floor_alignments/`, so the 7 GB-per-replicate alignment BAMs
-can be deleted once a run is finished without losing the evidence.
+they cover is the two yeasts. They are not short reads that align badly. A
+D6311 excluded read runs to a median 21.3 kb, and its longest alignment covers
+a median 0.4% of it, against 99.97% for the community reads the floor keeps.
+It keeps those reads' alignments under `results/summary/floor_alignments/`, so
+the 7 GB-per-replicate alignment BAMs can be deleted once a run is finished
+without losing the evidence.
 `make fragmentation` shows that the yeasts' contig-level assemblies are not the
 cause ([`docs/reference-fragmentation.md`](docs/reference-fragmentation.md)).
 

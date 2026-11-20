@@ -27,6 +27,12 @@ least 24 bp, the definition floor_complexity.py applies to whole genomes.
 Reports, per experiment, for the excluded reads of each role and for the
 controls:
   * reads, how many align at all, and alignments per read;
+  * the reads' own median length, and the median share of a read its longest
+    alignment covers. These two carry the finding: the excluded reads are not
+    short reads that align badly, they are reads about twice the controls'
+    length that align over a fraction of a percent of themselves, while the
+    controls align over almost all of theirs. Read lengths come from the same
+    floor-off table as the roles, never from a different run;
   * the share of aligned reference bases inside a simple repeat, excluded
     against control -- the number that decides the mechanism;
   * aligned and simple-repeat reference bases by organism;
@@ -151,18 +157,32 @@ def read_rows(bam, want, cmap, repeats):
     return rows
 
 
-def summarise(rows, ids):
+def summarise(rows, ids, lengths):
     aligned = [rows[r] for r in ids if r in rows]
     shares = [d["repeat_bases"] / d["ref_bases"] for d in aligned if d["ref_bases"]]
     by_org, repeat_by_org = Counter(), Counter()
     for d in aligned:
         by_org.update(d["by_org"])
         repeat_by_org.update(d["repeat_by_org"])
+    # The length of the reads themselves, not of their alignments. Without it
+    # the alignment lengths cannot be read: a 60 bp longest alignment means one
+    # thing on a 500 bp read and another on a 21 kb one, and these reads are
+    # long. Over the same reads the `reads` field counts.
+    lens = [lengths[r] for r in ids if r in lengths]
+    # How much of itself a read aligns, as a median over reads of
+    # longest/length. NOT median_longest_alignment / median_read_length: a
+    # ratio of medians is not a median of ratios, and only this one is a
+    # statistic of the reads.
+    own = [rows[r]["longest"] / lengths[r]
+           for r in ids if r in rows and lengths.get(r)]
     return {
         "reads": len(ids),
         "with_an_alignment": len(aligned),
+        "reads_with_a_length": len(lens),
+        "median_read_length": median(lens),
         "median_alignments_per_read": median([d["alignments"] for d in aligned]),
         "median_longest_alignment": median([d["longest"] for d in aligned]),
+        "median_longest_alignment_share_of_read": round(median(own), 6) if own else None,
         "median_repeat_share_of_aligned_reference": median(shares),
         "reads_over_half_repeat": sum(s > 0.5 for s in shares),
         "aligned_reference_bases": sum(by_org.values()),
@@ -219,7 +239,7 @@ def main():
         with open(f"{a.ids}/{sample}.{kind}.txt") as f:
             return [l.strip() for l in f if l.strip()]
 
-    rows_all, loci, repeats_cache = {}, Counter(), {}
+    rows_all, lengths_all, loci, repeats_cache = {}, {}, Counter(), {}
     picked = {"excluded": defaultdict(lambda: defaultdict(list)),
               "control": defaultdict(lambda: defaultdict(list))}
     for s in samples:
@@ -234,6 +254,9 @@ def main():
         excl, ctrl = ids_of(s, "excluded"), ids_of(s, "control")
         rows = read_rows(bams[s], set(excl) | set(ctrl), cmap, repeats)
         rows_all[s] = rows
+        # Read lengths come from the same floor-off table the roles do, so a
+        # read's length and its role cannot be taken from different runs.
+        lengths_all[s] = {r: off[r][3] for r in set(excl) | set(ctrl) if r in off}
         e = experiment_of(s)
         for r in excl:
             role = off.get(r, ("", "unknown"))[1]
@@ -250,23 +273,34 @@ def main():
         "controls": f"community reads >= 10 kb the floor keeps, up to {a.controls}"
                     f" per sample, seed {a.seed}",
         "repeat_share": "simple-repeat bases of the aligned reference span, over that span",
+        "median_read_length": "the reads' own length, from the floor-off run's"
+                              " read_length, over the reads counted in `reads`"
+                              " (`reads_with_a_length` says how many had one)",
+        "median_longest_alignment_share_of_read": "median over reads of"
+                              " longest alignment / read length; a median of"
+                              " ratios, which is not median_longest_alignment"
+                              " / median_read_length",
     }, "experiments": {}}
     for kind in ("excluded", "control"):
         for e, by_role in picked[kind].items():
-            rows = {}
+            rows, lengths = {}, {}
             for s in samples:
                 if experiment_of(s) == e:
                     rows.update(rows_all[s])
+                    lengths.update(lengths_all[s])
             dest = result["experiments"].setdefault(e, {}).setdefault(kind, {})
             for role, ids in by_role.items():
-                dest[role] = summarise(rows, ids)
+                dest[role] = summarise(rows, ids, lengths)
 
     os.makedirs(a.out, exist_ok=True)
     with open(f"{a.out}/floor_alignments.json", "w") as f:
         json.dump(result, f, indent=1)
     with open(f"{a.out}/floor_alignments_loci.tsv", "w") as f:
         f.write("experiment\tcontig\tstart\tend\tlength\treads\n")
-        for (e, c, st, en), n in loci.most_common():
+        # Sort fully, not by most_common() alone: the per-read loci are held in
+        # a set, so ties came out in an order that moved between runs and the
+        # file was not byte-reproducible.
+        for (e, c, st, en), n in sorted(loci.items(), key=lambda kv: (-kv[1], kv[0])):
             f.write(f"{e}\t{c}\t{st}\t{en}\t{en - st}\t{n}\n")
     print(json.dumps(result["experiments"], indent=1))
     print(f"{len(loci)} distinct simple-repeat tracts carry an aligned excluded read")
