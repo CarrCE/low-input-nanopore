@@ -33,9 +33,10 @@ abs() { (cd "$1" 2>/dev/null && pwd -P) || die "no such directory: $1"; }
 RESULTS="${RESULTS:-results}"
 [ -d "${RESULTS}" ] || die "${RESULTS} not found. Run 'make all' first."
 RESULTS="$(abs "${RESULTS}")"
+# Checked where it is used, not here. Only choosing the reads needs the
+# floor-off run; once the cache holds the .tsv files, measuring does not, and
+# that run is 651 MB that a finished clone has no reason to keep.
 NOFLOOR="${NOFLOOR:-${RESULTS}/nofloor}"
-[ -d "${NOFLOOR}" ] || die "${NOFLOOR} not found. Run 'make nofloor' first."
-NOFLOOR="$(abs "${NOFLOOR}")"
 REFDIR="$(abs "${REFDIR:-refs}")"
 OUT="${OUT:-${RESULTS}/summary}"
 mkdir -p "${OUT}/floor_alignments"
@@ -72,16 +73,25 @@ done
 [ ${#samples[@]} -gt 0 ] || die "no finished replicates in ${RESULTS}"
 
 run_py() {
+    local mount=() runs=()
+    if [ -d "${NOFLOOR}" ]; then
+        mount=(-v "$(abs "${NOFLOOR}")":/nofloor:ro)
+        runs=(--with /results --without /nofloor)
+    fi
     docker run --rm -u "$(id -u):$(id -g)" \
-        -v "${ROOT}":/repo:ro -v "${RESULTS}":/results:ro -v "${NOFLOOR}":/nofloor:ro \
+        -v "${ROOT}":/repo:ro -v "${RESULTS}":/results:ro "${mount[@]+"${mount[@]}"}" \
         -v "${REFDIR}":/refs:ro -v "${OUT}":/out -w /repo "${ANALYSIS_IMAGE}" \
-        python3 bin/floor_alignments.py --with /results --without /nofloor \
+        python3 bin/floor_alignments.py "${runs[@]+"${runs[@]}"}" \
         --contig-map "${maps[@]}" --refset "${sets[@]}" --refdir /refs \
         --controls "${CONTROLS}" --seed "${SEED}" "$@"
 }
 
 # 1. the read ids, then their alignments
-if [ ! -s "${ALN}/${samples[0]}.excluded.txt" ]; then
+if [ ! -s "${ALN}/${samples[0]}.excluded.tsv" ]; then
+    [ -d "${NOFLOOR}" ] || die "${NOFLOOR} not found. Run 'make nofloor' first.
+  It is needed only to choose the reads and record each one's role and length;
+  once ${ALN} holds the .tsv files, this step is skipped and the floor-off run
+  is not needed again."
     log "choosing reads -> ${ALN}"
     run_py --ids /out/floor_alignments --write-ids
 fi
@@ -92,7 +102,10 @@ for s in "${samples[@]}"; do
         src="${RESULTS}/${s}/alignments/${s}.qname.bam"
         [ -f "${src}" ] || die "${s}: no ${src}. The alignment BAMs are needed once,
   to extract these reads; after that ${ALN}/${s}.bam stands in for them."
-        cat "${ALN}/${s}.excluded.txt" "${ALN}/${s}.control.txt" > "${ALN}/${s}.want.txt"
+        # Column one of each, skipping the header: samtools -N wants a bare
+        # list, while the files also carry the role and the read length.
+        tail -n +2 -q "${ALN}/${s}.excluded.tsv" "${ALN}/${s}.control.tsv" \
+            | cut -f1 > "${ALN}/${s}.want.txt"
         log "${s}: extracting $(wc -l < "${ALN}/${s}.want.txt" | tr -d ' ') reads"
         docker run --rm -u "$(id -u):$(id -g)" \
             -v "${RESULTS}":/results:ro -v "${OUT}":/out -w /out "${TOOLS_IMAGE}" \
