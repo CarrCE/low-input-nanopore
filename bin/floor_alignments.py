@@ -10,14 +10,31 @@ those repeats. This script closes that step from the alignments themselves.
 
 Two steps, because the second needs a BAM holding only these reads:
 
-  --write-ids DIR   choose the reads and write DIR/<sample>.{excluded,control}.txt.
+  --write-ids DIR   choose the reads and write DIR/<sample>.{excluded,control}.tsv,
+                    columns read_id, role, read_length, with a header.
                     Excluded: every read the floor excludes (low_coverage with
                     the floor on). Control: community reads of at least 10 kb
                     that the floor keeps, up to --controls per sample, drawn
                     with --seed. bin/floor_alignments.sh then extracts their
-                    alignments with samtools.
-  (no --write-ids)  measure, reading those same id files, so the selection is
+                    alignments with samtools, taking the first column.
+                    Needs --with and --without; nothing else does.
+  (no --write-ids)  measure, reading those same files, so the selection is
                     recorded rather than recomputed.
+
+The role and the read length sit beside each id because they exist nowhere
+else that survives. Both come from the floor-off run, whose assignments are
+651 MB, are not committed, and cannot be rebuilt without `make all` first.
+Carrying them here makes the cache self-contained: the 461 excluded community
+reads of D6311, and every median over them, can be recomputed from the cached
+BAMs and these files alone. It also leaves one source of truth, so what the
+JSON reports and what the cache records cannot drift apart.
+
+A cache written before this carries a bare id per line; the measuring pass
+says so and stops rather than guessing.
+
+`role` is the floor-off run's own value. The JSON groups any role outside
+sample, carrier and contaminant under "other", so filter on role == "sample"
+to recover the community reads.
 
 For each read it takes every alignment minimap2 reported, the organism of each
 alignment's contig, and how much of the reference span the alignment covers
@@ -117,12 +134,50 @@ def assignments(root, sample):
 
 
 def select(on, off, controls, rng):
-    """(excluded read ids, control read ids) for one sample."""
-    excluded = [r for r, v in on.items() if v[0] == "low_coverage"]
+    """(excluded, control) for one sample, each a list of (id, role, length).
+
+    The role and the length travel with the id so that the cache carries them.
+    Both come from `off`, the floor-off run, which is the only place they are
+    recorded; keeping them here is what lets the measuring pass work from the
+    cache alone instead of reading that run's 651 MB of assignments again.
+    """
+    excluded = [(r, off.get(r, ("", "unknown", "", 0))[1],
+                 off.get(r, ("", "", "", 0))[3])
+                for r, v in on.items() if v[0] == "low_coverage"]
     pool = [r for r, v in off.items()
             if v[0] == "assigned" and v[1] == "sample" and v[3] >= 10_000
             and on.get(r, ("",))[0] == "assigned"]
-    return excluded, rng.sample(pool, min(len(pool), controls))
+    keep = rng.sample(pool, min(len(pool), controls))
+    return excluded, [(r, off[r][1], off[r][3]) for r in keep]
+
+
+IDS_HEADER = ("read_id", "role", "read_length")
+
+
+def write_ids(path, rows):
+    with open(path, "w") as f:
+        f.write("\t".join(IDS_HEADER) + "\n")
+        for rid, role, length in rows:
+            f.write(f"{rid}\t{role}\t{length}\n")
+
+
+def read_ids(path):
+    """[(id, role, length)] from one cache file, header checked."""
+    with open(path) as f:
+        head = next(f).rstrip("\n").split("\t")
+        if tuple(head) != IDS_HEADER:
+            sys.exit(f"error: {path} has columns {head}, expected"
+                     f" {list(IDS_HEADER)}. A cache written before the ids"
+                     f" files carried the role and the read length holds a"
+                     f" bare id per line; re-run with --write-ids (which needs"
+                     f" the floor-off run) to rewrite it.")
+        out = []
+        for line in f:
+            if not line.strip():
+                continue
+            rid, role, length = line.rstrip("\n").split("\t")
+            out.append((rid, role, int(length)))
+    return out
 
 
 def median(xs):
@@ -200,8 +255,12 @@ def summarise(rows, ids, lengths):
 def main():
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--with", dest="on", required=True, help="run with the floor on")
-    ap.add_argument("--without", dest="off", required=True, help="the same run, floor off")
+    # Needed only to choose the reads. Once the cache carries the role and the
+    # length, measuring reads nothing from either run.
+    ap.add_argument("--with", dest="on", help="run with the floor on"
+                    " (--write-ids only)")
+    ap.add_argument("--without", dest="off", help="the same run, floor off"
+                    " (--write-ids only)")
     ap.add_argument("--contig-map", nargs="+", required=True, metavar="SAMPLE=PATH")
     ap.add_argument("--refset", nargs="+", required=True, metavar="SAMPLE=NAME")
     ap.add_argument("--ids", required=True, metavar="DIR",
@@ -221,13 +280,23 @@ def main():
     samples = sorted(maps)
 
     if a.write_ids:
+        if not a.on or not a.off:
+            sys.exit("error: --with and --without are required with --write-ids")
         os.makedirs(a.ids, exist_ok=True)
         rng = random.Random(a.seed)
         for s in samples:
             excl, ctrl = select(assignments(a.on, s), assignments(a.off, s), a.controls, rng)
-            for kind, ids in (("excluded", excl), ("control", ctrl)):
-                with open(f"{a.ids}/{s}.{kind}.txt", "w") as f:
-                    f.write("".join(r + "\n" for r in ids))
+            for kind, rows in (("excluded", excl), ("control", ctrl)):
+                write_ids(f"{a.ids}/{s}.{kind}.tsv", rows)
+                # Drop the superseded bare-id file, but only once its
+                # replacement is safely written. Leaving both would put two
+                # descriptions of one read set in the cache, which is the
+                # disagreement this contract exists to prevent.
+                legacy = f"{a.ids}/{s}.{kind}.txt"
+                if os.path.exists(legacy):
+                    os.remove(legacy)
+                    print(f"{s}: replaced {kind}.txt with {kind}.tsv",
+                          file=sys.stderr)
             print(f"{s}: {len(excl)} excluded, {len(ctrl)} controls")
         return
 
@@ -236,8 +305,7 @@ def main():
     bams = dict(x.split("=", 1) for x in a.bam)
 
     def ids_of(sample, kind):
-        with open(f"{a.ids}/{sample}.{kind}.txt") as f:
-            return [l.strip() for l in f if l.strip()]
+        return read_ids(f"{a.ids}/{sample}.{kind}.tsv")
 
     rows_all, lengths_all, loci, repeats_cache = {}, {}, Counter(), {}
     picked = {"excluded": defaultdict(lambda: defaultdict(list)),
@@ -250,16 +318,19 @@ def main():
             n = sum(len(v) for v in repeats_cache[refset].values())
             print(f"{refset}: {n} simple repeats in the reference", file=sys.stderr)
         repeats = repeats_cache[refset]
-        off = assignments(a.off, s)
-        excl, ctrl = ids_of(s, "excluded"), ids_of(s, "control")
+        # The role and the length come out of the cache file, not out of the
+        # floor-off run: that run is 651 MB and is neither committed nor
+        # backed up, and this pass no longer needs it. One consequence worth
+        # keeping: the ids file is now the single source of both, so what the
+        # JSON reports and what the cache records cannot disagree.
+        excl_rows, ctrl_rows = ids_of(s, "excluded"), ids_of(s, "control")
+        excl = [r for r, _role, _n in excl_rows]
+        ctrl = [r for r, _role, _n in ctrl_rows]
         rows = read_rows(bams[s], set(excl) | set(ctrl), cmap, repeats)
         rows_all[s] = rows
-        # Read lengths come from the same floor-off table the roles do, so a
-        # read's length and its role cannot be taken from different runs.
-        lengths_all[s] = {r: off[r][3] for r in set(excl) | set(ctrl) if r in off}
+        lengths_all[s] = {r: n for r, _role, n in excl_rows + ctrl_rows}
         e = experiment_of(s)
-        for r in excl:
-            role = off.get(r, ("", "unknown"))[1]
+        for r, role, _n in excl_rows:
             picked["excluded"][e][role if role in ROLES else "other"].append(r)
             for c, st, en in rows.get(r, {}).get("loci", ()):
                 loci[(e, c, st, en)] += 1
