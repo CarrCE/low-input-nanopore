@@ -36,7 +36,7 @@ DEMO_READS  ?= 40000
 
 .DEFAULT_GOAL := help
 
-.PHONY: help images test check verify measurements masksummary nofloor threshold floor floorcomplexity flooralignments fragmentation seqsummary versions runmeta poolcov attribution comparison coverage modedelta estcontrol fetchreads instrumentdata carriermodel assigneddepth divergence s1 s2 all raghavendra q10 demo-data clean
+.PHONY: help images test check verify measurements masksummary nofloor threshold floor floorcomplexity flooralignments fragmentation seqsummary versions runmeta poolcov attribution comparison coverage modedelta estcontrol fetchreads instrumentdata carriermodel decisionedge assigneddepth divergence s1 s2 all raghavendra q10 demo-data clean
 
 help: ## Show this help
 	@printf 'low-input-nanopore -- make targets\n\n'
@@ -311,6 +311,14 @@ instrumentdata: ## Download the MinKNOW instrument records (doi:10.5281/zenodo.2
 # cached under results/carrier_model/work.
 carriermodel: ## Carrier-depletion model vs the runs (Fig. S1, Table S11; needs instrument records)
 	@bash "$(ROOT)/bin/carrier_model/run_carrier_model.sh"
+
+# Tests whether the rise of f_cos with read length is an artefact of the live
+# mapper at the lambda reference edge rather than evidence about intactness:
+# cos-start against break-start reads at the adaptive-sampling decision. Reads
+# a finished carrier-model workdir and the instrument records; remaps nothing.
+# RESULTS=, INSTRUMENT=, OUT= as in bin/carrier_model/run_decision_edge.sh.
+decisionedge: ## Cos-start vs break-start reads at the live decision (needs carriermodel)
+	@bash "$(ROOT)/bin/carrier_model/run_decision_edge.sh"
 
 seqsummary: ## Per-replicate yield, read length and read quality (needs finished runs + FASTQs)
 	@docker run --rm -u "$$(id -u):$$(id -g)" -v "$(ROOT)":/repo -w /repo "$(ANALYSIS_IMAGE)" \
