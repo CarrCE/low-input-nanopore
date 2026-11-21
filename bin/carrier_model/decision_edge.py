@@ -191,8 +191,10 @@ def compare(df, label):
         row[f"{k}_dec_bases_median"] = round(float(d["dec_bases"].median()), 1) if len(d) else None
         row[f"{k}_unblocked_frac"] = round(float(d["unblocked"].mean()), 5) if len(d) else None
     if row["cos_q_median"] is not None and row["break_q_median"] is not None:
-        # Negative means cos-start reads mapped worse at the decision, which is
-        # what the edge mechanism predicts.
+        # Negative means cos-start reads had LOWER BASECALL QUALITY at the
+        # decision. Not "mapped worse": this metric is mean_qscore, and a chunk
+        # can be basecalled perfectly and still align badly. Only the
+        # quality-mediated form of the edge mechanism predicts a negative here.
         row["q_delta_cos_minus_break"] = round(row["cos_q_median"] - row["break_q_median"], 4)
         row["unblocked_delta"] = round(row["cos_unblocked_frac"] - row["break_unblocked_frac"], 5)
     else:
@@ -312,9 +314,12 @@ def main(work, iroot, out, samples):
             "dec_bases": "bases basecalled at the decision; the window"
                          " mean_qscore averages over, and the legitimate"
                          " control here",
-            "q_delta_cos_minus_break": "negative means cos-start reads mapped"
-                                       " worse at the decision, as the edge"
-                                       " mechanism predicts",
+            "q_delta_cos_minus_break": "negative means cos-start reads had"
+                                       " lower basecall quality at the"
+                                       " decision, which is the"
+                                       " quality-mediated form of the edge"
+                                       " mechanism. NOT a statement about"
+                                       " mappability: see `limitation`",
             "conditioning": "the primary comparison is unconditioned: final read"
                             " length is a descendant of the ejection decision,"
                             " so matching on it conditions on a collider."
