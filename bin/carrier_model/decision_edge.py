@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Does a lambda read's start type change how the live mapper saw it?
+"""Did a lambda read's start type change the live decision?
 Run by `make decisionedge`.
 
 f_cos rises with read length (SI Section S6), and the cause is not established.

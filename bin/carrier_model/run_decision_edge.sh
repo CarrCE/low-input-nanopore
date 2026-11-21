@@ -1,13 +1,18 @@
 #!/usr/bin/env bash
 #
-# Does a lambda read's start type change how the live mapper saw it?
+# Did a lambda read's start type change the live decision?
 # (Supplementary Section S6; see bin/carrier_model/decision_edge.py for what is
-# being tested and why, including the verdict rule, which is fixed in advance.)
+# being tested and why, including the verdict rule, which is fixed in advance,
+# and the limitation, which bounds what the answer can mean.)
 #
-# Tests whether cos-start lambda-derived reads mapped worse at the adaptive
-# sampling decision than break-start ones. If they did, the rise of f_cos with
-# read length is a readout of the live mapper at the reference edge rather than
-# evidence about carrier intactness.
+# Compares cos-start against break-start lambda-derived reads at the adaptive
+# sampling decision, on decision-time basecall quality and on ejection rate.
+# The mechanism being probed is that a cos-start read's first chunk sits at the
+# end of the linear reference and so maps poorly, which would make the rise of
+# f_cos with read length a readout of the live mapper rather than evidence
+# about carrier intactness. What is measured is basecall quality, NOT
+# mappability: the deposited records never stored the live mapping result, so
+# that form of the mechanism cannot be tested at all.
 #
 # Inputs
 #   - a finished `make carriermodel` workdir:
